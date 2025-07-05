@@ -1,0 +1,92 @@
+<div class="flex bg-gray-100">
+  <!-- Sidebar -->
+  <main class="flex-1">
+    <!-- Top filters -->
+      <!-- <div class="flex">
+            <p-iconfield iconPosition="left" class="ml-auto">
+                <p-inputicon>
+                    <i class="pi pi-search"></i>
+                </p-inputicon>
+                <input pInputText type="text" (input)="dt.filterGlobal($event, 'contains')" placeholder="Search keyword" />
+            </p-iconfield>
+        </div> -->
+    <div class="flex flex-wrap gap-4 items-center mb-6">
+      <div class="flex bg-white border rounded-md shadow-sm w-full md:w-1/3">
+        <input type="text" placeholder="Search..." class="flex-1 p-2 rounded-l-md outline-none" />
+        <button class="bg-red-600 text-white px-4 rounded-r-md">Search</button>
+      </div>
+
+      <p-dropdown
+        class="w-48 bg-white"
+        [options]="searchOptions"
+        [(ngModel)]="selectedSearchBy"
+        placeholder="Search by">
+      </p-dropdown>
+
+      <p-datepicker [(ngModel)]="fromDate" placeholder="From Date" dateFormat="dd/mm/yy" class="w-44" />
+      <p-datepicker [(ngModel)]="toDate" placeholder="To Date" dateFormat="dd/mm/yy" class="w-44" />
+
+      <button class="bg-red-600 text-white px-4 py-2 rounded-md shadow">New Allocation</button>
+    </div>
+
+    <!-- Table -->
+   <!-- 📋 Allocation list -->
+<div class="overflow-auto rounded-xl bg-white shadow ring-1 ring-gray-200">
+  <p-table
+    #dt
+    [value]="records"
+    [paginator]="true"
+    [rows]="10"
+    styleClass="w-full text-m"
+    class="min-w-[800px]"
+  >
+    <!-- HEADER -->
+    <ng-template #header>
+      <tr class="bg-[#BE0000] text-white text-left text-m font-semibold">
+        <th class="!px-5 !py-3">SR.No</th>
+        <th class="!px-5 !py-3">Bag ID</th>
+        <th class="!px-5 !py-3">UhId No</th>
+        <th class="!px-5 !py-3">Patient Name</th>
+        <th class="!px-5 !py-3">Blood<br />Group</th>
+        <th class="!px-5 !py-3">Blood<br />Component</th>
+        <th class="!px-5 !py-3">Status</th>
+        <th class="!px-5 !py-3">Allocated On</th>
+      </tr>
+    </ng-template>
+
+    <!-- BODY -->
+    <ng-template pTemplate="body" let-rec let-i="rowIndex">
+      <tr
+        class=" hover:bg-red-50"
+        [ngClass]="stripe(i)"
+      >
+        <td class="!px-5 !py-3 font-medium">{{ i + 1 }}</td>
+        <td class="!px-5 !py-3">{{ rec.bagId }}</td>
+        <td class="!px-5 !py-3">{{ rec.uhid }}</td>
+        <td class="!px-5 !py-3">{{ rec.patient }}</td>
+        <td class="!px-5 !py-3">{{ rec.bloodGroup }}</td>
+        <td class="!px-5 !py-3">{{ rec.component }}</td>
+
+        <!-- Status badge -->
+        <td class="!px-5 !py-3">
+          <span
+            class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize"
+            [ngClass]="badgeClass(rec.status)"
+          >
+            {{ rec.status }}
+          </span>
+        </td>
+
+        <td class="px-5 py-3 whitespace-nowrap">{{ rec.allocatedOn }}</td>
+      </tr>
+    </ng-template>
+
+    <!-- PAGINATOR -->
+    <ng-template pTemplate="paginatorcenter">
+      <span class="text-xs italic text-gray-500">Showing best results</span>
+    </ng-template>
+  </p-table>
+</div>
+
+  </main>
+</div>
