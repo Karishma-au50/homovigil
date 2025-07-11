@@ -32,17 +32,17 @@ export class AppMenu {
             },
              {
                 label:'Bag Management',
-                items: [{ label: 'Allocate Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['']},
-                        { label: 'Release Bag', icon: 'pi pi-fw pi-sitemap', routerLink: [''] },
-                        { label: 'Allocate Bag History', icon: 'pi pi-fw pi-sitemap', routerLink: [''] },
+                items: [{ label: 'Allocate Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocateBag']},
+                        { label: 'Release Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/releaseBag'] },
+                        { label: 'Allocate Bag History', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocationHistory'] },
              ] 
                
             },
-             {
-                label:'Documentation',
-                items: [{ label: 'Documentation', icon: 'pi pi-fw pi-file', routerLink: ['']}], 
+            //  {
+            //     label:'Documentation',
+            //     items: [{ label: 'Documentation', icon: 'pi pi-fw pi-file', routerLink: ['']}], 
                
-            },
+            // },
             
 
             // {

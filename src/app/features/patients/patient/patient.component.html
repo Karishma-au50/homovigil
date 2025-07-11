@@ -1,6 +1,6 @@
 
 <div class="h-full flex items-center justify-center p-4">
-  <div class="w-full max-w-5xl bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col items-center">
+  <div class=" bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col items-center">
     
     <!-- Header -->
     <div class="bg-red-700 text-white text-center py-6 rounded-t-2xl w-full shadow">
@@ -8,17 +8,18 @@
     </div>
 
     <!-- Form -->
-    <div class="p-10 w-full">
+     <form  [formGroup]="registerPatient" (ngSubmit)="onSubmit()">
+    <div class="p-10">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         <div>
           <label class="block text-gray-700 mb-2 font-medium">UHID</label>
-          <input type="text" placeholder="Enter UHID" class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+          <input type="text" formControlName="UHID" placeholder="Enter UHID" class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
         </div>
 
         <div>
           <label class="block text-gray-700 mb-2 font-medium">Blood Group</label>
-          <select class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+          <select formControlName="bloodGroup" class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
             <option>--Select Blood Group--</option>
             <option>A+</option>
             <option>A-</option>
@@ -33,12 +34,12 @@
 
         <div>
           <label class="block text-gray-700 mb-2 font-medium">First Name</label>
-          <input type="text" placeholder="Enter First Name" class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+          <input  formControlName="firstname" type="text" placeholder="Enter First Name" class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
         </div>
 
         <div>
           <label class="block text-gray-700 mb-2 font-medium">Last Name</label>
-          <input type="text" placeholder="Enter Last Name" class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+          <input  formControlName="lastname" type="text" placeholder="Enter Last Name" class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
         </div>
       </div>
 
@@ -49,15 +50,18 @@
 
       <!-- Image -->
       <div class="flex justify-center mt-6">
-        <img src="../../assets/cell.png" alt="test-tube" class="w-56 md:w-72 rounded-xl shadow" />
+        <img src="/assets/tubes.png" alt="test-tube" class="w-60" />
       </div>
 
       <!-- Button -->
       <div class="text-center mt-8">
-        <button class="bg-[#BE0000] hover:from-red-700 hover:to-red-900 text-white font-bold py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">
+        <button type="submit" class="bg-[#BE0000] hover:from-red-700 hover:to-red-900 text-white font-bold py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">
           Get Haemovigil Transporter Key
         </button>
       </div>
     </div>
+    </form>
   </div>
 </div>
+<!-- trail -->
+ 

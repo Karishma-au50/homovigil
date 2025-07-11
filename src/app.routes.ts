@@ -7,6 +7,10 @@ import { Notfound } from './app/pages/notfound/notfound';
 import { HomeComponent } from './app/features/home/home.component';
 import { PatientComponent } from './app/features/patients/patient/patient.component';
 import { AllPatientComponent } from './app/features/patients/all-patient/all-patient.component';
+import { LoginComponent } from './app/features/login/login.component';
+import { AllocateBagComponent } from './app/features/bag/allocate-bag/allocate-bag.component';
+import { ReleasBagComponent } from './app/features/bag/realeas-bag/realeas-bag.component';
+import { AllocateBagHistoryComponent } from './app/features/bag/allocate-bag-history/allocate-bag-history.component';
 
 export const appRoutes: Routes = [
     {
@@ -25,23 +29,30 @@ export const appRoutes: Routes = [
                 path: 'patient',
                 component: PatientComponent
             },
-             {
-                path: 'home',
-                component: HomeComponent
-            },
-             {
-                path: 'home',
-                component: HomeComponent
-            },
             {
                 path: 'allPatient',
                 component:AllPatientComponent
+            },
+              {
+                path: 'allocateBag',
+                component:AllocateBagComponent
+            },
+            {
+                path:'releaseBag',
+                component:ReleasBagComponent
+            },
+            {
+                path:'allocationHistory',
+                component:AllocateBagHistoryComponent
+
             }
+
 
         ]
     },
     { path: 'landing', component: Landing },
     { path: 'notfound', component: Notfound },
     { path: 'auth', loadChildren: () => import('./app/pages/auth/auth.routes') },
-    { path: '**', redirectTo: '/notfound' }
+    { path: 'login', component: LoginComponent },
+    { path: '**', redirectTo: '/notfound' },
 ];

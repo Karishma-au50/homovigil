@@ -1,0 +1,29 @@
+<p-table #dt [value]="row" [paginator]="true" [rows]="10" responsiveLayout="scroll" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
+    <ng-template #header>
+        <tr class="bg-red-700 text-white text-left text-m font-semibold">
+            <th class="rounded-tl-xl !px-5 !py-3">Bag ID</th>
+            <th class="!px-5 !py-3">UHID</th>
+            <th class="!px-5 !py-3">Patient Name</th>
+            <th class="!px-5 !py-3">Blood Group</th>
+            <th class="!px-5 !py-3">Blood Component</th>
+            <th class="!px-5 !py-3">Status</th>
+            <th class="rounded-tr-xl !px-5 !py-3">Allocated On</th>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row let-i="rowIndex">
+        <tr>
+            <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodBagId }}</td>
+            <td class="!px-5 !py-3">{{ row.patientId?.UHID }}</td>
+            <td class="!px-5 !py-3">{{ row.patientId?.firstname }} {{ row.patientId?.lastname }}</td>
+            <td class="!px-5 !py-3">{{ row.patientId?.bloodGroup }}</td>
+            <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodcomponent }}</td>
+            <td class="!px-5 !py-3">
+                <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize" [ngClass]="badgeClass(row.status)">
+                    {{ row.status }}
+                </span>
+            </td>
+            <td class="!px-5 !py-3">{{ row.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+        </tr>
+    </ng-template>
+</p-table>

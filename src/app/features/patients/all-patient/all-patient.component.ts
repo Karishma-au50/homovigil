@@ -6,125 +6,77 @@ import { Component } from '@angular/core';
 import { TableModule }   from 'primeng/table';
 import { ButtonModule }  from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-import { NgFor, NgIf }   from '@angular/common';
+import { CommonModule, NgFor, NgIf }   from '@angular/common';
+import { AuthService } from '../../../core/auth/auth.service';
+import { Patient } from '../../../core/models/patient.modal';
+import { DatePicker } from 'primeng/datepicker';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-all-patient',
 
   templateUrl: './all-patient.component.html',
   styleUrl: './all-patient.component.scss',
-
-  // ⬇️ Stand-alone “imports” array replaces NgModule
   imports: [
-    // Angular built-ins you use in the template
+    CommonModule,
     NgFor,
-    NgIf,
-
-    // PrimeNG
     TableModule,
     ButtonModule,
-    TooltipModule
+    TooltipModule,
+    DatePicker,
+    FormsModule,
   ]
 })
+
 export class AllPatientComponent {
-  // Dummy data: replace with your API data
-  rows = [
-    {
-      lastName: 'Duggal',
-      firstName: 'Kusum',
-      uhid: 'MM0013879',
-      createdOn: 'Jan 26, 2025 | 04:30 PM',
-      haemoId: 'ASGSFS',
-      bloodGroup: 'B+'
-    },
-    {
-      lastName: 'Kulsheshtra',
-      firstName: 'Sharad',
-      uhid: 'MM0013879',
-      createdOn: 'Jan 26, 2025 | 04:30 PM',
-      haemoId: 'AJHJHG',
-      bloodGroup: 'A+'
-    },
-     {
-      lastName: 'Duggal',
-      firstName: 'Kusum',
-      uhid: 'MM0013879',
-      createdOn: 'Jan 26, 2025 | 04:30 PM',
-      haemoId: 'ASGSFS',
-      bloodGroup: 'B+'
-    },
-     {
-      lastName: 'Duggal',
-      firstName: 'Kusum',
-      uhid: 'MM0013879',
-      createdOn: 'Jan 26, 2025 | 04:30 PM',
-      haemoId: 'ASGSFS',
-      bloodGroup: 'B+'
-    },
-     {
-      lastName: 'Duggal',
-      firstName: 'Kusum',
-      uhid: 'MM0013879',
-      createdOn: 'Jan 26, 2025 | 04:30 PM',
-      haemoId: 'ASGSFS',
-      bloodGroup: 'B+'
-    },
-     {
-      lastName: 'Duggal',
-      firstName: 'Kusum',
-      uhid: 'MM0013879',
-      createdOn: 'Jan 26, 2025 | 04:30 PM',
-      haemoId: 'ASGSFS',
-      bloodGroup: 'B+'
-    },
-     {
-      lastName: 'Duggal',
-      firstName: 'Kusum',
-      uhid: 'MM0013879',
-      createdOn: 'Jan 26, 2025 | 04:30 PM',
-      haemoId: 'ASGSFS',
-      bloodGroup: 'B+'
-    },
-     {
-      lastName: 'Duggal',
-      firstName: 'Kusum',
-      uhid: 'MM0013879',
-      createdOn: 'Jan 26, 2025 | 04:30 PM',
-      haemoId: 'ASGSFS',
-      bloodGroup: 'B+'
-    },
-      {
-      lastName: 'Duggal',
-      firstName: 'Kusum',
-      uhid: 'MM0013879',
-      createdOn: 'Jan 26, 2025 | 04:30 PM',
-      haemoId: 'ASGSFS',
-      bloodGroup: 'B+'
-    },
-      {
-      lastName: 'Duggal',
-      firstName: 'Kusum',
-      uhid: 'MM0013879',
-      createdOn: 'Jan 26, 2025 | 04:30 PM',
-      haemoId: 'ASGSFS',
-      bloodGroup: 'B+'
-    },
-      {
-      lastName: 'Duggal',
-      firstName: 'Kusum',
-      uhid: 'MM0013879',
-      createdOn: 'Jan 26, 2025 | 04:30 PM',
-      haemoId: 'ASGSFS',
-      bloodGroup: 'B+'
-    },
-      {
-      lastName: 'Duggal',
-      firstName: 'Kusum',
-      uhid: 'MM0013879',
-      createdOn: 'Jan 26, 2025 | 04:30 PM',
-      haemoId: 'ASGSFS',
-      bloodGroup: 'B+'
-    },
-    // …more rows
-  ];
+  rows: Patient[] = [];
+
+  constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.loadPatients();
+  }
+
+  loadPatients(): void {
+    this.authService.getAllPatients().subscribe((data: any) => {
+      this.rows = data.data;
+    });
+  }
+
+  editPatient(patient: Patient): void {
+    // Call updatePatient with the updated patient object and its id
+    this.authService.updatePatient(patient, patient._id).subscribe({
+      next: (res) => {
+        // Optionally reload or update the table row
+        this.loadPatients();
+      }
+    });
+  }
+
+confirmDelete(patient: Patient): void {
+  console.log(patient)
+  const confirmed = window.confirm(`Are you sure you want to delete ${patient.firstname} ${patient.lastname}?`);
+
+  if (confirmed) {
+    this.authService.deletePatient(patient._id).subscribe({
+      next: () => {
+        // Optionally show success message
+        this.loadPatients(); // Reload updated list
+      },
+      error: () => {
+        // Optionally show error message
+        alert('Failed to delete patient.');
+      }
+    });
+  }
+}
+
+  // deletePatient(patient: Patient): void {
+  //   this.authService.deletePatient(patient.id).subscribe({
+  //     next: (res) => {
+  //       // Remove the deleted patient from the table or reload
+  //       this.loadPatients();
+  //     }
+  //   });
+  // }
 }

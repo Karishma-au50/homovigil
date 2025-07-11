@@ -8,6 +8,8 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { ToolbarModule } from 'primeng/toolbar';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
+import { BagAllocation } from '../../core/models/bag.modal';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -17,6 +19,7 @@ import { IconFieldModule } from 'primeng/iconfield';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
+     records: BagAllocation[] = [];
   searchOptions = [
     { label: 'Patient Name', value: 'patient' },
     { label: 'Blood Group', value: 'bloodGroup' },
@@ -27,16 +30,27 @@ export class HomeComponent {
   fromDate: Date | null = null;
   toDate: Date | null = null;
   @ViewChild('dt') dt!: Table;
+     constructor(private authService: AuthService) {}
+        ngOnInit(): void {
+      this.loadPatients();
+    }
+  
+    loadPatients(): void {
+      this.authService.getAllocationBag().subscribe((data: any) => {
+        console.log(data)
+        this.records = data.data.allocations;
+      });
+    }
 
-  records = Array.from({ length: 15 }).map((_, i) => ({
-    bagId: '123456',
-    uhid: 'MM00138779',
-    patient: i % 2 === 0 ? 'Kusum Duggal' : 'Sharad Kulsheshtra',
-    bloodGroup: ['B+', 'A+', 'AB+', 'O+', 'A-'][i % 5],
-    component: i % 2 === 0 ? 'Plasma' : 'RBC',
-    status: ['Allocate', 'Pending', 'In hold'][i % 3],
-    allocatedOn: 'Jan 26, 2025 | 04:30 PM',
-  }));
+  // records = Array.from({ length: 15 }).map((_, i) => ({
+  //   bagId: '123456',
+  //   uhid: 'MM00138779',
+  //   patient: i % 2 === 0 ? 'Kusum Duggal' : 'Sharad Kulsheshtra',
+  //   bloodGroup: ['B+', 'A+', 'AB+', 'O+', 'A-'][i % 5],
+  //   component: i % 2 === 0 ? 'Plasma' : 'RBC',
+  //   status: ['Allocate', 'Pending', 'In hold'][i % 3],
+  //   allocatedOn: 'Jan 26, 2025 | 04:30 PM',
+  // }));
     stripe = (i: number) => (i % 2 === 0 ? 'bg-gray-50' : '');
   badgeClass(status: string) {
     return {
