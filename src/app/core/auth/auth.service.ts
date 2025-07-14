@@ -96,10 +96,12 @@ export class AuthService {
     // }
 
     // Login
-    login(credentials: Credentials): Observable<any> {     
+    login(credentials: Credentials): Observable<any> {
         return this.slcRewardsService.login(credentials).pipe(
             tap((response: any) => {
-                this.authToken = response.data.token;
+                if (response.data.token) {
+                    this.authToken = response.data.token;
+                }
                 this.decodeAndStoreUser(response.data.token);
 
                 this.messageService.add({
