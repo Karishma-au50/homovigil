@@ -76,85 +76,107 @@ import { StepsModule } from 'primeng/steps';
 // import { Component, OnInit } from '@angular/core';
 // import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 // import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
-  selector: 'app-allocate-bag',
-  templateUrl: './allocate-bag.component.html',
-  standalone: true,
-   imports: [
-    CommonModule,
-    ReactiveFormsModule, // ✅ Add this
-    FormsModule,
-    StepsModule
-    // Add other PrimeNG modules here
-  ]
+    selector: 'app-allocate-bag',
+    templateUrl: './allocate-bag.component.html',
+    standalone: true,
+    imports: [
+        CommonModule,
+        ReactiveFormsModule, // ✅ Add this
+        FormsModule,
+        StepsModule,
+        ButtonModule
+        // Add other PrimeNG modules here
+    ]
 })
 export class AllocateBagComponent implements OnInit {
-  recordFormStep1: FormGroup;
-  recordFormStep2: FormGroup;
-  steps: MenuItem[] = [];
-  activeIndex = 0;
-  patientData: any = null;
+    recordFormStep1: FormGroup;
+    recordFormStep2: FormGroup;
+    steps: MenuItem[] = [];
+    activeIndex = 0;
+    patientData: any = null;
+    subscription: Subscription = new Subscription();
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
-    this.recordFormStep1 = this.fb.group({
-      patientId: [''],
-      bloodBagId: ['']
-    });
+    constructor(private fb: FormBuilder, private authService: AuthService) {
+        this.recordFormStep1 = this.fb.group({
+            patientId: [''],
+            bloodBagId: ['']
+        });
 
-    this.recordFormStep2 = this.fb.group({
-      bagId: ['', Validators.required],
-      bloodGroup: ['', Validators.required]
-    });
-  }
-
-  ngOnInit() {
-    this.steps = [
-      { label: 'Search Patient' },
-      { label: 'Allocate Bag' }
-    ];
-  }
-
-  handlePatientSearch() {
-    const { patientId, bloodBagId } = this.recordFormStep1.value;
-
-    if (!patientId && !bloodBagId) {
-      alert('Please enter UHID or Label');
-      return;
+        this.recordFormStep2 = this.fb.group({
+            bagId: ['', Validators.required],
+            bloodGroup: ['', Validators.required]
+        });
     }
 
-    const idToSearch = patientId || bloodBagId;
+    ngOnInit() {
+        this.steps = [
+            { label: 'Search Patient' },
+            { label: 'Allocate Bag' }
+        ];
 
-    this.authService.searchPatient(idToSearch).subscribe({
-      next: (res) => {
-        this.patientData = res.data[0];
-        this.activeIndex = 1; // Move to next step
-      },
-      error: () => {
-        alert('Patient not found');
-        this.patientData = null;
-      }
-    });
-  }
+        this.subscription.add(
+            this.recordFormStep1.get('patientId')!.valueChanges.pipe(
+                debounceTime(500),
+                distinctUntilChanged(),
+                filter((val: string) => val?.trim().length > 0)
+            ).subscribe((uhid: string) => {
+                this.authService.searchPatient(uhid).subscribe({
+                    next: (response) => {
+                        this.patientData = response.data[0];
+                        console.log(this.patientData)
+                    },
+                    error: (err) => {
+                        console.error('Search failed', err);
+                        this.patientData = null;
+                    }
+                });
+            })
+        );
+    }
 
-  onSubmit() {
-    if (!this.patientData) return;
+    handlePatientSearch() {
+        const { patientId, bloodBagId } = this.recordFormStep1.value;
 
-    const payload = {
-      ...this.patientData,
-      bagId: this.recordFormStep2.value.bagId,
-      bloodGroup: this.recordFormStep2.value.bloodGroup,
-      allocatedOn: new Date().toISOString(),
-      status: 'allocated'
-    };
+        if (!patientId && !bloodBagId) {
+            alert('Please enter UHID or Label');
+            return;
+        }
 
-    this.authService.searchPatient(payload).subscribe({
-      next: () => {
-        alert('Bag allocated successfully!');
-        this.activeIndex = 0; // Reset wizard if needed
-      },
-      error: () => alert('Failed to allocate bag')
-    });
-  }
+        const idToSearch = patientId || bloodBagId;
+
+        this.authService.searchPatient(idToSearch).subscribe({
+            next: (res) => {
+                this.patientData = res.data[0];
+                this.activeIndex = 1; // Move to next step
+            },
+            error: () => {
+                alert('Patient not found');
+                this.patientData = null;
+            }
+        });
+    }
+
+    onSubmit() {
+        if (!this.patientData) return;
+
+        const payload = {
+            ...this.patientData,
+            bagId: this.recordFormStep2.value.bagId,
+            bloodGroup: this.recordFormStep2.value.bloodGroup,
+            allocatedOn: new Date().toISOString(),
+            status: 'allocated'
+        };
+
+        this.authService.searchPatient(payload).subscribe({
+            next: () => {
+                alert('Bag allocated successfully!');
+                this.activeIndex = 0; // Reset wizard if needed
+            },
+            error: () => alert('Failed to allocate bag')
+        });
+    }
 }

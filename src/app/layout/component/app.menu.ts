@@ -24,26 +24,28 @@ export class AppMenu {
                 label: 'Dashboard',
                 items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/home'] }]
             },
-              {
-                label:'Patient Management',
-                items: [{ label: 'New Patient Entry', icon: 'pi pi-fw pi-users', routerLink: ['/patient']},
-                        { label: 'Existing Patient List', icon: 'pi pi-fw pi-user-plus', routerLink: ['/allPatient'] }], 
-               
+            {
+                label: 'Patient Management',
+                items: [
+                    // { label: 'New Patient Entry', icon: 'pi pi-fw pi-users', routerLink: ['/patient'] },
+                    { label: 'Patient List', icon: 'pi pi-fw pi-users', routerLink: ['/allPatient'] }
+                ],
+
             },
-             {
-                label:'Bag Management',
-                items: [{ label: 'Allocate Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocateBag']},
-                        { label: 'Release Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/releaseBag'] },
-                        { label: 'Allocate Bag History', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocationHistory'] },
-             ] 
-               
+            {
+                label: 'Bag Management',
+                items: [{ label: 'Allocate Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocateBag'] },
+                { label: 'Release Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/releaseBag'] },
+                { label: 'Allocate Bag History', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocationHistory'] },
+                ]
+
             },
             //  {
             //     label:'Documentation',
-            //     items: [{ label: 'Documentation', icon: 'pi pi-fw pi-file', routerLink: ['']}], 
-               
+            //     items: [{ label: 'Documentation', icon: 'pi pi-fw pi-file', routerLink: ['']}],
+
             // },
-            
+
 
             // {
             //     label: 'Home',

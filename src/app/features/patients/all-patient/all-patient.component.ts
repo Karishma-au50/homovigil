@@ -3,89 +3,107 @@
 import { Component } from '@angular/core';
 
 // ➜ PrimeNG & Angular standalone imports
-import { TableModule }   from 'primeng/table';
-import { ButtonModule }  from 'primeng/button';
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-import { CommonModule }   from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Patient } from '../../../core/models/patient.modal';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { AvatarModule } from 'primeng/avatar';
 import { PatientComponent } from '../patient/patient.component';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
-  selector: 'app-all-patient',
+    selector: 'app-all-patient',
 
-  templateUrl: './all-patient.component.html',
-  styleUrl: './all-patient.component.scss',
-  imports: [
-    CommonModule,
-    TableModule,
-    ButtonModule,
-    TooltipModule,
-    FormsModule,
-    DialogModule,
-    AvatarModule,
-    PatientComponent
-  ]
+    templateUrl: './all-patient.component.html',
+    styleUrl: './all-patient.component.scss',
+    imports: [
+        CommonModule,
+        TableModule,
+        ButtonModule,
+        TooltipModule,
+        FormsModule,
+        DialogModule,
+        AvatarModule,
+        PatientComponent
+    ]
 })
 
 export class AllPatientComponent {
-  rows: Patient[] = [];
+    rows: Patient[] = [];
 
-  constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService, private confirmationService: ConfirmationService) { }
 
-  ngOnInit(): void {
-    this.loadPatients();
-  }
+    // Component variables
+    modalTitle: string = 'Add New Patient';
+    selectedPatient: Patient | null = null;
 
-  loadPatients(): void {
-    this.authService.getAllPatients().subscribe((data: any) => {
-      this.rows = data.data;
-    });
-  }
-
-  editPatient(patient: Patient): void {
-    // Call updatePatient with the updated patient object and its id
-    this.authService.updatePatient(patient, patient._id).subscribe({
-      next: (res) => {
-        // Optionally reload or update the table row
+    ngOnInit(): void {
         this.loadPatients();
-      }
-    });
-  }
+    }
 
-confirmDelete(patient: Patient): void {
-  console.log(patient)
-  const confirmed = window.confirm(`Are you sure you want to delete ${patient.firstname} ${patient.lastname}?`);
+    loadPatients(): void {
+        this.authService.getAllPatients().subscribe((data: any) => {
+            this.rows = data.data;
+        });
+    }
 
-  if (confirmed) {
-    this.authService.deletePatient(patient._id).subscribe({
-      next: () => {
-        // Optionally show success message
-        this.loadPatients(); // Reload updated list
-      },
-      error: () => {
-        // Optionally show error message
-        alert('Failed to delete patient.');
-      }
-    });
-  }
-}
+    addPatient(): void {
+        this.selectedPatient = {
+            _id: '0',
+            firstname: '',
+            lastname: '',
+            UHID: '',
+            bloodGroup: ''
+        } as Patient; // Reset selected patient for new entry
+        this.modalTitle = 'Add New Patient';
+        this.showDialog();
+    }
 
-visible: boolean = false;
+    editPatient(patient: Patient): void {
+        // Call updatePatient with the updated patient object and its id
+        this.selectedPatient = patient;
+        this.modalTitle = 'Edit Patient';
+        this.showDialog();
+    }
 
-showDialog(): void {
-  this.visible = true;
-}
+    confirmDelete(patient: Patient): void {
+        this.confirmationService.confirm({
+            message: `Are you sure you want to delete ${patient.firstname} ${patient.lastname}?`,
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.authService.deletePatient(patient._id).subscribe({
+                    next: () => {
+                        // Optionally show success message
+                        this.loadPatients(); // Reload updated list
+                    },
+                    error: () => {
+                        // Optionally show error message
+                        alert('Failed to delete patient.');
+                    }
+                });
+            },
+            reject: () => {
+                // Optionally handle rejection
+            },
+            key: 'confirmDialog'
+        })
+    }
 
-  // deletePatient(patient: Patient): void {
-  //   this.authService.deletePatient(patient.id).subscribe({
-  //     next: (res) => {
-  //       // Remove the deleted patient from the table or reload
-  //       this.loadPatients();
-  //     }
-  //   });
-  // }
+    visible: boolean = false;
+
+    showDialog(): void {
+        this.visible = true;
+    }
+
+    closeDialog(fetchData: boolean): void {
+        this.visible = false;
+        if (fetchData) {
+            this.loadPatients();
+        }
+    }
 }

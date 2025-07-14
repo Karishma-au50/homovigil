@@ -1,8 +1,9 @@
-<div class="h-full flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col items-center">
+<div class="h-full flex items-center justify-center">
+    <div class="flex flex-col items-center">
         <!-- Header -->
-        <div class="bg-red-700 text-white text-center py-6 rounded-t-2xl w-full shadow">
+        <div class="bg-red-700 text-white p-6 rounded-t-xl w-full flex justify-between">
             <h2 class="text-3xl text-white tracking-wide m-0">New Patient Entry</h2>
+            <p-button icon="pi pi-times" aria-label="Close" (click)="onClose(false)" severity="contrast" />
         </div>
 
         <!-- Form -->
@@ -10,12 +11,12 @@
             <div class="p-10">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <label class="block text-gray-700 mb-2 font-medium">UHID</label>
+                        <label class="block text-muted-color mb-2 font-medium">UHID</label>
                         <input type="text" formControlName="UHID" placeholder="Enter UHID" class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 mb-2 font-medium">Blood Group</label>
+                        <label class="block text-muted-color mb-2 font-medium">Blood Group</label>
                         <select formControlName="bloodGroup" class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
                             <option disabled selected hidden>--Select Blood Group--</option>
                             <option>A+</option>
@@ -30,18 +31,18 @@
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 mb-2 font-medium">First Name</label>
+                        <label class="block text-muted-color mb-2 font-medium">First Name</label>
                         <input formControlName="firstname" type="text" placeholder="Enter First Name" class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 mb-2 font-medium">Last Name</label>
+                        <label class="block text-muted-color mb-2 font-medium">Last Name</label>
                         <input formControlName="lastname" type="text" placeholder="Enter Last Name" class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
                 </div>
 
                 <!-- Label Text -->
-                <div class="text-center mt-10 text-xl font-semibold text-gray-800">Scan the Haemovigil label on test tube</div>
+                <div class="text-center mt-10 text-xl font-semibold text-muted-color">Scan the Haemovigil label on test tube</div>
 
                 <!-- Image -->
                 <div class="flex justify-center mt-6">

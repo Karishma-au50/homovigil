@@ -1,15 +1,15 @@
-<div class="flex p-4">
-  <button 
-    class="ms-auto bg-blue-700 text-white px-4 py-2 rounded" 
-    (click)="visible = true">
-    Show
-  </button>
+<div class="flex p-4 justify-end">
+    <p-button label="Add Patient" icon="pi pi-user-plus" (click)="addPatient()">
+    </p-button>
 </div>
-<p-dialog [(visible)]="visible" [modal]="true" >
-   <app-patient (closeDialog)="visible = false"></app-patient>
-   
+<p-dialog [(visible)]="visible" [closable]="true" [modal]="true" contentStyle="border: none">
+    <ng-template #headless>
+        <app-patient (closeDialog)="visible = false" (closeDialog)="closeDialog($event)" [formData]="selectedPatient"></app-patient>
+    </ng-template>
+
 </p-dialog>
-<p-table #dt [value]="rows" [paginator]="true" [rows]="10" styleClass="w-full text-m" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
+<p-table #dt [value]="rows" [paginator]="true" [rows]="10" styleClass="w-full text-m"
+    class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
     >
     <ng-template pTemplate="header">
         <tr class="bg-red-700 text-white text-m px-5 py-3 font-semibold">
@@ -40,9 +40,12 @@
             <td class="!px-5 !py-3">{{ row.bloodGroup }}</td>
             <td class="!px-5 !py-3">
                 <div class="flex items-center gap-2">
-                    <button pButton type="button" icon="pi pi-pencil" class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit"></button>
+                    <button pButton type="button" icon="pi pi-pencil"
+                        class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit" (click)="editPatient(row)"></button>
                     <Span class="text-gray-400">|</Span>
-                    <button pButton type="button" icon="pi pi-trash" class="p-button-text text-red-600 hover:text-red-800" pTooltip="Delete" (click)="confirmDelete(row)"></button>
+                    <button pButton type="button" icon="pi pi-trash"
+                        class="p-button-text text-red-600 hover:text-red-800" pTooltip="Delete"
+                        (click)="confirmDelete(row)"></button>
                     <!-- <button
             pButton
             type="button"

@@ -127,8 +127,6 @@ export class AuthService {
     registerPatient(patientData: any): Observable<any> {
         return this.slcRewardsService.registerPatient(patientData).pipe(
             tap((response: any) => {
-                     this.authToken = response.data.token;
-                this.decodeAndStoreUser(response.data.token);
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Registration Successful',
@@ -147,11 +145,9 @@ export class AuthService {
             })
         );
     }
-        searchPatient(uhid: string): Observable<any> {
+    searchPatient(uhid: string): Observable<any> {
         return this.slcRewardsService.searchPatient(uhid).pipe(
             tap((response: any) => {
-                     this.authToken = response.data.token;
-                this.decodeAndStoreUser(response.data.token);
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Patient fetched Successful',
@@ -195,7 +191,7 @@ export class AuthService {
             })
         );
     }
-        getAllocationBag(): Observable<any> {
+    getAllocationBag(): Observable<any> {
         return this.slcRewardsService.getAllocationBag().pipe(
             tap((response: any) => {
                 this.messageService.add({
@@ -218,55 +214,53 @@ export class AuthService {
             })
         );
     }
-// ...existing code...
+    // ...existing code...
 
-updatePatient(patient: any, id: string): Observable<any> {
-    return this.slcRewardsService.updatePatient(patient, id).pipe(
-        tap((response: any) => {
-               this.authToken = response.data.token;
-                this.decodeAndStoreUser(response.data.token);
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Update Successful',
-                detail: 'Patient updated successfully.',
-                life: 3000
-            });
-        }),
-        catchError((error) => {
-            this.messageService.add({
-                severity: 'error',
-                summary: 'Update Failed',
-                detail: error.error?.message || 'An error occurred during update.',
-                life: 3000
-            });
-            return throwError(() => error);
-        })
-    );
-}
+    updatePatient(patient: any, id: string): Observable<any> {
+        return this.slcRewardsService.updatePatient(patient, id).pipe(
+            tap((response: any) => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Update Successful',
+                    detail: 'Patient updated successfully.',
+                    life: 3000
+                });
+            }),
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Update Failed',
+                    detail: error.error?.message || 'An error occurred during update.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
 
-deletePatient(id: string): Observable<any> {
-    return this.slcRewardsService.deletePatient(id).pipe(
-        tap(() => {
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Delete Successful',
-                detail: 'Patient deleted successfully.',
-                life: 3000
-            });
-        }),
-        catchError((error) => {
-            this.messageService.add({
-                severity: 'error',
-                summary: 'Delete Failed',
-                detail: error.error?.message || 'An error occurred during deletion.',
-                life: 3000
-            });
-            return throwError(() => error);
-        })
-    );
-}
+    deletePatient(id: string): Observable<any> {
+        return this.slcRewardsService.deletePatient(id).pipe(
+            tap(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Delete Successful',
+                    detail: 'Patient deleted successfully.',
+                    life: 3000
+                });
+            }),
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Delete Failed',
+                    detail: error.error?.message || 'An error occurred during deletion.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
 
-// ...existing code...
+    // ...existing code...
     // Logout
     signOut(): Observable<any> {
         localStorage.removeItem('slcAuthToken');
