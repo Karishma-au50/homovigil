@@ -6,11 +6,13 @@ import { Component } from '@angular/core';
 import { TableModule }   from 'primeng/table';
 import { ButtonModule }  from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-import { CommonModule, NgFor, NgIf }   from '@angular/common';
+import { CommonModule }   from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Patient } from '../../../core/models/patient.modal';
-import { DatePicker } from 'primeng/datepicker';
 import { FormsModule } from '@angular/forms';
+import { DialogModule } from 'primeng/dialog';
+import { AvatarModule } from 'primeng/avatar';
+import { PatientComponent } from '../patient/patient.component';
 
 @Component({
   selector: 'app-all-patient',
@@ -19,12 +21,13 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './all-patient.component.scss',
   imports: [
     CommonModule,
-    NgFor,
     TableModule,
     ButtonModule,
     TooltipModule,
-    DatePicker,
     FormsModule,
+    DialogModule,
+    AvatarModule,
+    PatientComponent
   ]
 })
 
@@ -69,6 +72,12 @@ confirmDelete(patient: Patient): void {
       }
     });
   }
+}
+
+visible: boolean = false;
+
+showDialog(): void {
+  this.visible = true;
 }
 
   // deletePatient(patient: Patient): void {

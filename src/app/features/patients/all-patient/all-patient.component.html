@@ -1,3 +1,14 @@
+<div class="flex p-4">
+  <button 
+    class="ms-auto bg-blue-700 text-white px-4 py-2 rounded" 
+    (click)="visible = true">
+    Show
+  </button>
+</div>
+<p-dialog [(visible)]="visible" [modal]="true" >
+   <app-patient (closeDialog)="visible = false"></app-patient>
+   
+</p-dialog>
 <p-table #dt [value]="rows" [paginator]="true" [rows]="10" styleClass="w-full text-m" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
     >
     <ng-template pTemplate="header">

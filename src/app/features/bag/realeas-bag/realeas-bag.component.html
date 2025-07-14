@@ -19,13 +19,12 @@
             <td class="!px-5 !py-3">{{ row.patientId?.firstname }} {{ row.patientId?.lastname }}</td>
             <td class="!px-5 !py-3">{{ row.patientId?.bloodGroup }}</td>
             <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodcomponent }}</td>
-                <td class="!px-5 !py-3">
-                            <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize" [ngClass]="badgeClass(row.status)">
-                                {{ row.status }}
-                            </span>
-                        </td>
+            <td class="!px-5 !py-3">
+                <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize" [ngClass]="badgeClass(row.status)">
+                    {{ row.status }}
+                </span>
+            </td>
 
-       
             <td class="!px-5 !py-3">{{ row.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
             <td class="!px-5 !py-3">
                 <span class="border border-red-600 px-3 py-1 rounded-full text-s font-semibold"> Release </span>

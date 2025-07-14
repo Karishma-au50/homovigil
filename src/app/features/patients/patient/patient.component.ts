@@ -1,4 +1,4 @@
-import { Component,inject } from '@angular/core';
+import { Component,EventEmitter,inject, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AuthService } from '../../../core/auth/auth.service';
@@ -42,6 +42,10 @@ export class PatientComponent {
     } else {
       this.registerPatient.markAllAsTouched();
     }
+  }
+    @Output() closeDialog = new EventEmitter<void>();
+  onClose(): void {
+    this.closeDialog.emit();
   }
 
 }
