@@ -24,4 +24,5 @@ export interface BagAllocation {
   status: string;
   createdAt: number;
   updatedAt: number;
+  transporterKey: string;
 }

@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../models/api-response.model';
@@ -13,66 +13,58 @@ import { BagAllocation } from '../models/bag.modal';
 })
 export class HemoVigilHttpService {
     private http = inject(HttpClient);
-
-    // Base API URL
     private baseUrl = environment.apiUrl;
 
     // Auth
     public login(credentials: Credentials): Observable<ApiResponse<User>> {
         return this.http.post<ApiResponse<User>>(`${this.baseUrl}api/user/login`, credentials);
     }
+
     public registerPatient(patient: any): Observable<ApiResponse<Patient>> {
-        const token = localStorage.getItem('slcAuthToken'); // or use your AuthService getter
-        const headers = new HttpHeaders({
-            Authorization: `Bearer ${token}`
-        });
-        return this.http.post<ApiResponse<any>>(`${this.baseUrl}api/patient/`, patient, { headers });
-    }
-    public searchPatient(uhid: string): Observable<ApiResponse<string>> {
-
-        return this.http.get<ApiResponse<any>>(`${this.baseUrl}api/patient/search?uhid=${uhid}`);
+        return this.http.post<ApiResponse<any>>(`${this.baseUrl}api/patient/`, patient);
     }
 
-    // Users
+    public searchPatient(uhid: string, label: string): Observable<ApiResponse<string>> {
+        let url = `${this.baseUrl}api/patient/search`;
+
+        if (uhid && !label) {
+            url += `?uhid=${uhid}`;
+        } else if (!uhid && label) {
+            url += `?haemovigilId=${label}`;
+        } else if (uhid && label) {
+            url += `?uhid=${uhid}&haemovigilId=${label}`;
+        }
+
+        return this.http.get<ApiResponse<any>>(url);
+    }
+    // Patients
     public getAllPatients(): Observable<ApiResponse<Patient[]>> {
-        const token = localStorage.getItem('slcAuthToken');
-        const headers = new HttpHeaders({
-            Authorization: `Bearer ${token}`
-        });
-        return this.http.get<ApiResponse<Patient[]>>(`${this.baseUrl}api/patient/`, { headers });
+        return this.http.get<ApiResponse<Patient[]>>(`${this.baseUrl}api/patient/`);
     }
 
     public getAllocationBag(): Observable<ApiResponse<BagAllocation[]>> {
-        const token = localStorage.getItem('slcAuthToken');
-        const headers = new HttpHeaders({
-            Authorization: `Bearer ${token}`
-        });
-        return this.http.get<ApiResponse<BagAllocation[]>>(`${this.baseUrl}api/allocation`, { headers });
+        return this.http.get<ApiResponse<BagAllocation[]>>(`${this.baseUrl}api/allocation`);
     }
-    // public createUser(user: any): Observable<ApiResponse<User>> {
-    //     return this.http.post<ApiResponse<User>>(`${this.baseUrl}/users/`, user);
-    // }
+
+    public allocateBag(bagAllocation: BagAllocation): Observable<ApiResponse<BagAllocation>> {
+        return this.http.post<ApiResponse<BagAllocation>>(`${this.baseUrl}api/allocation`, bagAllocation);
+    }
 
     public updatePatient(user: any, id: string): Observable<ApiResponse<any>> {
         return this.http.put<ApiResponse<User>>(`${this.baseUrl}api/patient/${id}`, user);
     }
+
     public deletePatient(id: string) {
-        const token = localStorage.getItem('slcAuthToken');
-        const headers = new HttpHeaders({
-            Authorization: `Bearer ${token}`
-        });
-        return this.http.delete(`${this.baseUrl}api/patient/${id}`, { headers });
+        return this.http.delete(`${this.baseUrl}api/patient/${id}`);
     }
-
-    // public getAllAllocations(user:any,id:string):Observable<ApiResponse<any>>{
-    //     return this.http.get<ApiResponse<
-    // }
-
-    // public sendOtp(mobile: string): Observable<ApiResponse<any>> {
-    //     return this.http.post<ApiResponse<any>>(`${this.baseUrl}/users/send-otp`, { mobile });
-    // }
-
-    // public verifyOtp(mobile: string, otp: string): Observable<ApiResponse<User>> {
-    //     return this.http.post<ApiResponse<User>>(`${this.baseUrl}/users/verify-otp`, { mobile, otp });
-    // }
+    public releaseAllocatedBag(allocationId: string, releaseUserName: string): Observable<ApiResponse<any>> {
+        return this.http.patch<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}/release`, { releaseUserName });
+    }
+    public reserveAllocatedBag(allocationId: string, allocatedOn: string, reserved: string): Observable<ApiResponse<any>> {
+        const payload = {
+            status: reserved,
+            allocatedOn: allocatedOn
+        };
+        return this.http.patch<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}`, payload);
+    }
 }

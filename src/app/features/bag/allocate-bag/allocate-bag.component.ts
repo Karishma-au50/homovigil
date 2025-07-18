@@ -1,4 +1,3 @@
-
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,75 +7,9 @@ import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { StepsModule } from 'primeng/steps';
 
-// @Component({
-//   selector: 'app-allocate-bag',
-//   standalone: true,
-//   imports: [CommonModule, ReactiveFormsModule,StepsModule ],
-//   templateUrl: './allocate-bag.component.html',
-// })
-// export class AllocateBagComponent implements OnInit, OnDestroy {
-//   recordForm: FormGroup;
-//   patientData: any = [];
-//   private sub: Subscription = new Subscription();
-
-//   authService = inject(AuthService);
-
-//   constructor(private fb: FormBuilder, private http: HttpClient) {
-//     this.recordForm = this.fb.group({
-//       patientId: [''],
-//       bloodBagId: ['']
-//     });
-//   }
-
-//   ngOnInit(): void {
-//     this.sub.add(
-//       this.recordForm.get('patientId')!.valueChanges.pipe(
-//         debounceTime(500),
-//         distinctUntilChanged(),
-//         filter((val: string) => val?.trim().length > 0)
-//       ).subscribe((uhid: string) => {
-//         this.authService.searchPatient(uhid).subscribe({
-//           next: (response) => {
-//             this.patientData = response.data[0];
-//             console.log(this.patientData)
-//           },
-//           error: (err) => {
-//             console.error('Search failed', err);
-//             this.patientData = null;
-//           }
-//         });
-//       })
-//     );
-//   }
-
-//   onSearch(): void {
-//     const label = this.recordForm.value.bloodBagId;
-//     if (!label) return;
-//   }
-
-//   onSubmit(): void {
-//     if (!this.patientData) return;
-
-//     const payload = {
-//       ...this.patientData,
-//       allocatedOn: new Date().toISOString(),
-//       status: 'allocated'
-//     };
-
-//     this.authService.searchPatient(payload).subscribe({
-//       next: () => alert('Allocation successful!'),
-//       error: () => alert('Allocation failed.')
-//     });
-//   }
-
-//   ngOnDestroy(): void {
-//     this.sub.unsubscribe();
-//   }
-// }
-// import { Component, OnInit } from '@angular/core';
-// import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { Patient } from '../../../core/models/patient.modal';
 // import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
@@ -97,10 +30,13 @@ export class AllocateBagComponent implements OnInit {
     recordFormStep2: FormGroup;
     steps: MenuItem[] = [];
     activeIndex = 0;
-    patientData: any = null;
+    patientData: Patient | null = null;
     subscription: Subscription = new Subscription();
 
-    constructor(private fb: FormBuilder, private authService: AuthService) {
+    constructor(
+        private fb: FormBuilder,
+        private authService: AuthService
+    ) {
         this.recordFormStep1 = this.fb.group({
             patientId: [''],
             bloodBagId: ['']
@@ -108,70 +44,97 @@ export class AllocateBagComponent implements OnInit {
 
         this.recordFormStep2 = this.fb.group({
             bagId: ['', Validators.required],
-            bloodGroup: ['', Validators.required]
+            bloodGroup: ['', Validators.required],
+            componentType: ['', Validators.required] // Assuming a default value, adjust as needed
         });
     }
 
+
     ngOnInit() {
-        this.steps = [
-            { label: 'Search Patient' },
-            { label: 'Allocate Bag' }
-        ];
+        this.steps = [{ label: 'Search Patient' }, { label: 'Allocate Bag' }];
 
         this.subscription.add(
-            this.recordFormStep1.get('patientId')!.valueChanges.pipe(
-                debounceTime(500),
-                distinctUntilChanged(),
-                filter((val: string) => val?.trim().length > 0)
-            ).subscribe((uhid: string) => {
-                this.authService.searchPatient(uhid).subscribe({
-                    next: (response) => {
-                        this.patientData = response.data[0];
-                        console.log(this.patientData)
-                    },
-                    error: (err) => {
-                        console.error('Search failed', err);
+            this.recordFormStep1.valueChanges
+                .pipe(
+                    debounceTime(500),
+                    distinctUntilChanged((prev, curr) =>
+                        prev.patientId === curr.patientId && prev.bloodBagId === curr.bloodBagId
+                    ),
+                    filter(val => (val.patientId?.trim() || val.bloodBagId?.trim()))
+                )
+                .subscribe(({ patientId, bloodBagId }) => {
+                    const uhid = patientId?.trim() || '';
+                    const label = bloodBagId?.trim() || '';
+
+                    // Only one field should be filled
+                    if (uhid && label) {
+                        this.patientData = null;
+                        return;
+                    }
+
+                    if (uhid || label) {
+                        this.authService.searchPatient(uhid, label).subscribe({
+                            next: (response) => {
+                                this.patientData = response.data[0];
+                                console.log(this.patientData);
+                            },
+                            error: (err) => {
+                                console.error('Search failed', err);
+                                this.patientData = null;
+                            }
+                        });
+                    } else {
                         this.patientData = null;
                     }
-                });
-            })
+                })
         );
     }
 
-    handlePatientSearch() {
-        const { patientId, bloodBagId } = this.recordFormStep1.value;
+ handlePatientSearch() {
+    const patientId = this.recordFormStep1.get('patientId')?.value?.trim();
+    const bloodBagId = this.recordFormStep1.get('bloodBagId')?.value?.trim();
 
-        if (!patientId && !bloodBagId) {
-            alert('Please enter UHID or Label');
-            return;
-        }
+    // Only one field should be filled
+    let uhid = '';
+    let label = '';
 
-        const idToSearch = patientId || bloodBagId;
-
-        this.authService.searchPatient(idToSearch).subscribe({
-            next: (res) => {
-                this.patientData = res.data[0];
-                this.activeIndex = 1; // Move to next step
-            },
-            error: () => {
-                alert('Patient not found');
-                this.patientData = null;
-            }
-        });
+    if (patientId && !bloodBagId) {
+        uhid = patientId;
+        label = '';
+    } else if (!patientId && bloodBagId) {
+        uhid = '';
+        label = bloodBagId;
+    } else {
+        alert('Please enter either UHID or Label, not both.');
+        return;
     }
 
+    this.authService.searchPatient(uhid, label).subscribe({
+        next: (res) => {
+            this.patientData = res.data[0];
+            this.activeIndex = 1; // Move to next step
+        },
+        error: () => {
+            alert('Patient not found');
+            this.patientData = null;
+        }
+    });
+}
     onSubmit() {
         if (!this.patientData) return;
-
         const payload = {
-            ...this.patientData,
-            bagId: this.recordFormStep2.value.bagId,
+            // ...this.patientData,
+            // Use values from both step forms as needed
+            patientId: this.patientData._id,
+            bloodBagId: this.recordFormStep2.value.bagId,
+            // bagId: this.recordFormStep2.value.bagId,
             bloodGroup: this.recordFormStep2.value.bloodGroup,
+            bloodcomponent: this.recordFormStep2.value.componentType, // Assuming a default value, adjust as needed
             allocatedOn: new Date().toISOString(),
             status: 'allocated'
         };
-
-        this.authService.searchPatient(payload).subscribe({
+        console.log('Payload to allocate bag:', payload);
+        this.authService.allocateBag(payload).subscribe({
             next: () => {
                 alert('Bag allocated successfully!');
                 this.activeIndex = 0; // Reset wizard if needed

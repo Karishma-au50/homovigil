@@ -10,6 +10,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { BagAllocation } from '../../core/models/bag.modal';
 import { AuthService } from '../../core/auth/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -30,8 +31,8 @@ export class HomeComponent {
   fromDate: Date | null = null;
   toDate: Date | null = null;
   @ViewChild('dt') dt!: Table;
-     constructor(private authService: AuthService) {}
-        ngOnInit(): void {
+  constructor(private authService: AuthService, private router: Router) {}
+  ngOnInit(): void {
       this.loadPatients();
     }
   
@@ -41,21 +42,12 @@ export class HomeComponent {
         this.records = data.data.allocations;
       });
     }
-
-  // records = Array.from({ length: 15 }).map((_, i) => ({
-  //   bagId: '123456',
-  //   uhid: 'MM00138779',
-  //   patient: i % 2 === 0 ? 'Kusum Duggal' : 'Sharad Kulsheshtra',
-  //   bloodGroup: ['B+', 'A+', 'AB+', 'O+', 'A-'][i % 5],
-  //   component: i % 2 === 0 ? 'Plasma' : 'RBC',
-  //   status: ['Allocate', 'Pending', 'In hold'][i % 3],
-  //   allocatedOn: 'Jan 26, 2025 | 04:30 PM',
-  // }));
     stripe = (i: number) => (i % 2 === 0 ? 'bg-gray-50' : '');
   badgeClass(status: string) {
     return {
-      Allocate: 'bg-green-100 text-green-700',
-      Pending : 'bg-red-100 text-red-700',
+      'reserved': 'bg-green-100 text-green-700',
+      'allocated' : 'bg-red-100 text-red-700',
+      'released': 'bg-blue-100 text-blue-700',
       'In hold': 'bg-yellow-100 text-yellow-700',
     }[status] ?? 'bg-gray-100 text-gray-700';
   }
@@ -63,4 +55,7 @@ export class HomeComponent {
         const inputElement = event.target as HTMLInputElement;
         this.dt.filterGlobal(inputElement.value, 'contains');
     }
+      goToAllocateBag() {
+    this.router.navigate(['/allocateBag']);
+  }
 }

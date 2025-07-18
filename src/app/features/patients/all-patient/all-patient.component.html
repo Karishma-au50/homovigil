@@ -1,21 +1,28 @@
-<div class="flex p-4 justify-end">
-    <p-button label="Add Patient" icon="pi pi-user-plus" (click)="addPatient()">
-    </p-button>
+<div class="flex p-4 flex-wrap justify-between">
+    <div class="flex gap-4 items-center mb-6">
+        <div class="bg-white border rounded-md shadow-sm w-full md:w-1/3">
+            <input type="text" placeholder="Search..." class="flex-1 p-2 rounded-l-md outline-none" />
+            <button class="bg-red-600 text-white px-4 rounded-r-md">Search</button>
+        </div>
+
+        <p-dropdown class="w-48 bg-white" [options]="searchOptions" [(ngModel)]="selectedSearchBy" placeholder="Search by"> </p-dropdown>
+
+        <p-datepicker [(ngModel)]="fromDate" placeholder="From Date" dateFormat="dd/mm/yy" class="w-44" />
+        <p-datepicker [(ngModel)]="toDate" placeholder="To Date" dateFormat="dd/mm/yy" class="w-44" />
+    </div>
+    <p-button label="Add Patient" icon="pi pi-user-plus" (click)="addPatient()"> </p-button>
 </div>
 <p-dialog [(visible)]="visible" [closable]="true" [modal]="true" contentStyle="border: none">
     <ng-template #headless>
         <app-patient (closeDialog)="visible = false" (closeDialog)="closeDialog($event)" [formData]="selectedPatient"></app-patient>
     </ng-template>
-
 </p-dialog>
-<p-table #dt [value]="rows" [paginator]="true" [rows]="10" styleClass="w-full text-m"
-    class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
+<p-table #dt [value]="rows" [paginator]="true" [rows]="10" styleClass="w-full text-m" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
     >
     <ng-template pTemplate="header">
         <tr class="bg-red-700 text-white text-m px-5 py-3 font-semibold">
             <th class="rounded-tl-xl !px-5 !py-3">SR.No</th>
             <th class="!px-5 !py-3">Patient Name</th>
-            <!-- <th class="!px-5 !py-3">First Name</th> -->
             <th class="!px-5 !py-3">UhId No</th>
             <th class="!px-5 !py-3">Created On</th>
             <th class="!px-5 !py-3">Haemovigil Id</th>
@@ -25,11 +32,9 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-row let-i="rowIndex">
-        <tr>
+        <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
             <td class="!px-5 !py-3">{{ i + 1 }}</td>
-            <td class="!px-5 !py-3">{{row.firstname}} {{row.lastname}}</td>
-            <!-- <td class="!px-5 !py-3">{{ row.lastname }}</td>
-            <td class="!px-5 !py-3">{{ row.firstname }}</td> -->
+            <td class="!px-5 !py-3">{{ row.firstname | titlecase }} {{ row.lastname | titlecase }}</td>
             <td class="!px-5 !py-3">{{ row.UHID }}</td>
             <td class="!px-5 !py-3">{{ row.createdAt | date: 'MMM dd, yyyy | hh:mm a' }}</td>
             <td class="!px-5 !py-3">
@@ -40,20 +45,17 @@
             <td class="!px-5 !py-3">{{ row.bloodGroup }}</td>
             <td class="!px-5 !py-3">
                 <div class="flex items-center gap-2">
-                    <button pButton type="button" icon="pi pi-pencil"
-                        class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit" (click)="editPatient(row)"></button>
+                    <button pButton type="button" icon="pi pi-pencil" class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit" (click)="editPatient(row)"></button>
                     <Span class="text-gray-400">|</Span>
-                    <button pButton type="button" icon="pi pi-trash"
-                        class="p-button-text text-red-600 hover:text-red-800" pTooltip="Delete"
-                        (click)="confirmDelete(row)"></button>
-                    <!-- <button
-            pButton
-            type="button"
-            icon="pi pi-trash"
-            class="p-button-text text-red-600 hover:text-red-800"
-            pTooltip="Delete"
-          ></button> -->
+                    <button pButton type="button" icon="pi pi-trash" class="p-button-text text-red-600 hover:text-red-800" pTooltip="Delete" (click)="confirmDelete(row)"></button>
                 </div>
+            </td>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td colspan="8" class="text-center py-8 text-gray-700 text-xl">
+                <div class="flex justify-center items-center h-full">No data found</div>
             </td>
         </tr>
     </ng-template>

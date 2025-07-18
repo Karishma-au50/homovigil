@@ -1,8 +1,12 @@
+<p-confirmDialog [position]="'top'" [baseZIndex]="5000"></p-confirmDialog>
+
+
 <p-table #dt [value]="row" [paginator]="true" [rows]="10" styleClass="w-full text-m" responsiveLayout="scroll" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
     <ng-template pTemplate="header">
         <tr class="bg-red-700 text-white text-m px-5 py-3 font-semibold">
             <th class="rounded-tl-xl !px-5 !py-3">Bag ID</th>
             <th class="!px-5 !py-3">UHID</th>
+            <th class="!px-5 !py-3">Transporter Key</th>
             <th class="!px-5 !py-3">Patient Name</th>
             <th class="!px-5 !py-3">Blood Group</th>
             <th class="!px-5 !py-3">Blood Component</th>
@@ -16,7 +20,8 @@
         <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
             <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodBagId }}</td>
             <td class="!px-5 !py-3">{{ row.patientId?.UHID }}</td>
-            <td class="!px-5 !py-3">{{ row.patientId?.firstname }} {{ row.patientId?.lastname }}</td>
+            <td class="!px-5 !py-3">{{ row.transporterKey }}</td>
+            <td class="!px-5 !py-3">{{ row.patientId?.firstname | titlecase }} {{ row.patientId?.lastname | titlecase }}</td>
             <td class="!px-5 !py-3">{{ row.patientId?.bloodGroup }}</td>
             <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodcomponent }}</td>
             <td class="!px-5 !py-3">
@@ -27,8 +32,21 @@
 
             <td class="!px-5 !py-3">{{ row.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
             <td class="!px-5 !py-3">
-                <span class="border border-red-600 px-3 py-1 rounded-full text-s font-semibold"> Release </span>
+                <div class="flex gap-x-4">
+                    <span class="border border-blue-600 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-s font-semibold cursor-pointer" (click)="releaseBag(row._id, i)"> Release </span>
+                    <span class="border border-green-600 bg-green-100 text-green-700 px-3 py-1 rounded-full text-s font-semibold cursor-pointer" (click)="reserveAllocatedBag(row._id,  row.allocatedOn)"> Reserve </span>
+                </div>
             </td>
         </tr>
+    </ng-template>
+     <ng-template pTemplate="emptymessage">
+        <tr>
+            <td colspan="8" class="text-center py-8 text-gray-700 text-xl">
+                <div class="flex justify-center items-center h-full">
+                    No data found
+                </div>
+            </td>
+        </tr>
+       
     </ng-template>
 </p-table>

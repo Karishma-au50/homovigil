@@ -1,4 +1,3 @@
-
 // haemovigil-table.component.ts
 import { Component } from '@angular/core';
 
@@ -14,28 +13,31 @@ import { DialogModule } from 'primeng/dialog';
 import { AvatarModule } from 'primeng/avatar';
 import { PatientComponent } from '../patient/patient.component';
 import { ConfirmationService } from 'primeng/api';
+import { DatePickerModule } from 'primeng/datepicker';
+import { DropdownModule } from 'primeng/dropdown';
 
 @Component({
     selector: 'app-all-patient',
 
     templateUrl: './all-patient.component.html',
     styleUrl: './all-patient.component.scss',
-    imports: [
-        CommonModule,
-        TableModule,
-        ButtonModule,
-        TooltipModule,
-        FormsModule,
-        DialogModule,
-        AvatarModule,
-        PatientComponent
-    ]
+    imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent,DropdownModule,DatePickerModule]
 })
-
 export class AllPatientComponent {
     rows: Patient[] = [];
-
-    constructor(private authService: AuthService, private confirmationService: ConfirmationService) { }
+    router: any;
+      selectedSearchBy: any;
+  fromDate: Date | null = null;
+  toDate: Date | null = null;
+  searchOptions = [
+    { label: 'Patient Name', value: 'patient' },
+    { label: 'Blood Group', value: 'bloodGroup' },
+    { label: 'Component', value: 'component' }
+  ];
+    constructor(
+        private authService: AuthService,
+        private confirmationService: ConfirmationService
+    ) {}
 
     // Component variables
     modalTitle: string = 'Add New Patient';
@@ -91,8 +93,9 @@ export class AllPatientComponent {
                 // Optionally handle rejection
             },
             key: 'confirmDialog'
-        })
+        });
     }
+    stripe = (i: number) => (i % 2 === 0 ? 'bg-gray-50' : '');
 
     visible: boolean = false;
 
@@ -106,4 +109,7 @@ export class AllPatientComponent {
             this.loadPatients();
         }
     }
+        goToAllocateBag() {
+    this.router.navigate(['/allocateBag']);
+  }
 }

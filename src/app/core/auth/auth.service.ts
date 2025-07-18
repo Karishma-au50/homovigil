@@ -1,10 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, catchError, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, of, tap, throwError } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { User } from '../models/user.model';
 import { MessageService } from 'primeng/api';
 import { HemoVigilHttpService } from '../services/hemovigil.http.service';
-import { Patient } from '../models/patient.modal';
 
 export interface Credentials {
     mobile: string;
@@ -13,20 +12,17 @@ export interface Credentials {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-    private slcRewardsService = inject(HemoVigilHttpService);
+    private hemoVigilService = inject(HemoVigilHttpService);
     private messageService = inject(MessageService);
 
-    // Private reactive user state
     private _user$ = new BehaviorSubject<User | null>(null);
-
-    // Public observable to subscribe in components
     public readonly user$ = this._user$.asObservable();
 
     constructor() {
         this.initialize();
     }
 
-    // Access token management
+    // Token management
     set authToken(token: string) {
         localStorage.setItem('slcAuthToken', token);
     }
@@ -35,7 +31,6 @@ export class AuthService {
         return localStorage.getItem('slcAuthToken') ?? '';
     }
 
-    // Synchronous access
     get currentUser(): User | null {
         return this._user$.value;
     }
@@ -44,66 +39,14 @@ export class AuthService {
         return !!this._user$.value;
     }
 
-    // sendOtp(mobile: string): Observable<any> {
-    //     return this.slcRewardsService.sendOtp(mobile).pipe(
-    //         tap((response: any) => {
-    //             this.messageService.add({
-    //                 severity: 'success',
-    //                 summary: 'OTP Sent',
-    //                 detail: 'An OTP has been sent to your mobile number.',
-    //                 life: 3000
-    //             });
-    //         }),
-    //         catchError((error) => {
-    //             this.messageService.add({
-    //                 severity: 'error',
-    //                 summary: 'OTP Failed',
-    //                 detail: error.error?.message || 'An error occurred while sending OTP.',
-    //                 life: 3000
-    //             });
-
-    //             return throwError(() => error); // propagates error to the component
-    //         })
-    //     );
-    // }
-
-    // verifyOtp(mobile: string, otp: string): Observable<any> {
-    //     return this.slcRewardsService.verifyOtp(mobile, otp).pipe(
-    //         tap((response: any) => {
-    //             if (response.data.token) {
-    //                 this.authToken = response.data.token;
-    //             }
-    //             this.decodeAndStoreUser(response.data.token);
-
-    //             this.messageService.add({
-    //                 severity: 'success',
-    //                 summary: 'OTP Verified',
-    //                 detail: 'OTP verified successfully. Logged in.',
-    //                 life: 3000
-    //             });
-    //         }),
-    //         catchError((error) => {
-    //             this.messageService.add({
-    //                 severity: 'error',
-    //                 summary: 'Verification Failed',
-    //                 detail: error.error?.message || 'An error occurred during OTP verification.',
-    //                 life: 3000
-    //             });
-
-    //             return throwError(() => error); // propagates error to the component
-    //         })
-    //     );
-    // }
-
     // Login
     login(credentials: Credentials): Observable<any> {
-        return this.slcRewardsService.login(credentials).pipe(
+        return this.hemoVigilService.login(credentials).pipe(
             tap((response: any) => {
                 if (response.data.token) {
                     this.authToken = response.data.token;
+                    this.decodeAndStoreUser(response.data.token);
                 }
-                this.decodeAndStoreUser(response.data.token);
-
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Login Successful',
@@ -118,15 +61,15 @@ export class AuthService {
                     detail: error.error?.message || 'An error occurred during login.',
                     life: 3000
                 });
-
-                return throwError(() => error); // propagates error to the component
+                return throwError(() => error);
             })
         );
     }
 
+    // Patient registration
     registerPatient(patientData: any): Observable<any> {
-        return this.slcRewardsService.registerPatient(patientData).pipe(
-            tap((response: any) => {
+        return this.hemoVigilService.registerPatient(patientData).pipe(
+            tap(() => {
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Registration Successful',
@@ -145,12 +88,14 @@ export class AuthService {
             })
         );
     }
-    searchPatient(uhid: string): Observable<any> {
-        return this.slcRewardsService.searchPatient(uhid).pipe(
-            tap((response: any) => {
+
+    // Patient search
+    searchPatient(uhid: string, label:string): Observable<any> {
+        return this.hemoVigilService.searchPatient(uhid,label).pipe(
+            tap(() => {
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Patient fetched Successful',
+                    summary: 'Patient Fetched',
                     detail: 'Patient fetched successfully.',
                     life: 3000
                 });
@@ -158,8 +103,8 @@ export class AuthService {
             catchError((error) => {
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'fetched Failed',
-                    detail: error.error?.message || 'An error occurred during registration.',
+                    summary: 'Fetch Failed',
+                    detail: error.error?.message || 'An error occurred during patient fetch.',
                     life: 3000
                 });
                 return throwError(() => error);
@@ -167,18 +112,16 @@ export class AuthService {
         );
     }
 
-
+    // Get all patients
     getAllPatients(): Observable<any> {
-        return this.slcRewardsService.getAllPatients().pipe(
-            tap((response: any) => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Patients Loaded',
-                    detail: 'All patients loaded successfully.',
-                    life: 3000
-                });
-
-                return of(response)
+        return this.hemoVigilService.getAllPatients().pipe(
+            tap(() => {
+                // this.messageService.add({
+                //     severity: 'success',
+                //     summary: 'Patients Loaded',
+                //     detail: 'All patients loaded successfully.',
+                //     life: 3000
+                // });
             }),
             catchError((error) => {
                 this.messageService.add({
@@ -191,17 +134,17 @@ export class AuthService {
             })
         );
     }
-    getAllocationBag(): Observable<any> {
-        return this.slcRewardsService.getAllocationBag().pipe(
-            tap((response: any) => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Bags Loaded',
-                    detail: 'All Bags loaded successfully.',
-                    life: 3000
-                });
 
-                return of(response.data)
+    // Get all allocation bags
+    getAllocationBag(): Observable<any> {
+        return this.hemoVigilService.getAllocationBag().pipe(
+            tap(() => {
+                // this.messageService.add({
+                //     severity: 'success',
+                //     summary: 'Bags Loaded',
+                //     detail: 'All Bags loaded successfully.',
+                //     life: 3000
+                // });
             }),
             catchError((error) => {
                 this.messageService.add({
@@ -214,11 +157,11 @@ export class AuthService {
             })
         );
     }
-    // ...existing code...
 
+    // Update patient
     updatePatient(patient: any, id: string): Observable<any> {
-        return this.slcRewardsService.updatePatient(patient, id).pipe(
-            tap((response: any) => {
+        return this.hemoVigilService.updatePatient(patient, id).pipe(
+            tap(() => {
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Update Successful',
@@ -238,8 +181,9 @@ export class AuthService {
         );
     }
 
+    // Delete patient
     deletePatient(id: string): Observable<any> {
-        return this.slcRewardsService.deletePatient(id).pipe(
+        return this.hemoVigilService.deletePatient(id).pipe(
             tap(() => {
                 this.messageService.add({
                     severity: 'success',
@@ -260,7 +204,29 @@ export class AuthService {
         );
     }
 
-    // ...existing code...
+    // Allocate bag
+    allocateBag(bagData: any): Observable<any> {
+        return this.hemoVigilService.allocateBag(bagData).pipe(
+            tap(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Bag Allocation Successful',
+                    detail: 'Bag allocated successfully.',
+                    life: 3000
+                });
+            }),
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Allocation Failed',
+                    detail: error.error?.message || 'An error occurred during bag allocation.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
     // Logout
     signOut(): Observable<any> {
         localStorage.removeItem('slcAuthToken');
@@ -268,7 +234,7 @@ export class AuthService {
         return of(true);
     }
 
-    // Init on app load
+    // Initialization on app load
     private initialize(): void {
         const token = this.authToken;
         if (token) {
@@ -293,5 +259,49 @@ export class AuthService {
             console.error('Invalid token:', error);
             this._user$.next(null);
         }
+    }
+    // Release allocated bag
+    releaseAllocatedBag(allocationId: string, releaseUserName: string): Observable<any> {
+        return this.hemoVigilService.releaseAllocatedBag(allocationId, releaseUserName).pipe(
+            tap(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Bag Released',
+                    detail: 'Allocated bag released successfully.',
+                    life: 3000
+                });
+            }),
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Release Failed',
+                    detail: error.error?.message || 'An error occurred during bag release.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+    // Reserve allocated bag
+    reserveAllocatedBag(allocationId: string, allocatedOn: string, reserved: string): Observable<any> {
+        return this.hemoVigilService.reserveAllocatedBag(allocationId, allocatedOn,reserved).pipe(
+            tap(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Bag Reserved',
+                    detail: 'Allocated bag reserved successfully.',
+                    life: 3000
+                });
+            }),
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Reservation Failed',
+                    detail: error.error?.message || 'An error occurred during bag reservation.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
     }
 }
