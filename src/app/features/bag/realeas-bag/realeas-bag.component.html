@@ -1,7 +1,73 @@
 <p-confirmDialog [position]="'top'" [baseZIndex]="5000"></p-confirmDialog>
 
+<div class="flex flex-wrap gap-4 p-4 items-center">
+  <!-- Search input + button -->
+  <div class="flex bg-white border rounded-md shadow-sm w-full sm:w-auto sm:min-w-[350px]">
+    <input
+      type="text"
+      pInputText
+      placeholder="Search..."
+      class="flex-1 p-2 rounded-l-md outline-none"
+      (input)="onGlobalFilter(dt, $event)"
+      
+    />
+    <button class="bg-red-600 text-white px-4 rounded-r-md">Search</button>
+  </div>
 
-<p-table #dt [value]="row" [paginator]="true" [rows]="10" styleClass="w-full text-m" responsiveLayout="scroll" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
+  <!-- From + To Date (Always in same row) -->
+  <div class="flex gap-2 w-full sm:w-auto">
+    <p-datepicker
+      [(ngModel)]="fromDate"
+      placeholder="From Date"
+      dateFormat="dd/mm/yy"
+      class="w-full sm:w-40">
+    </p-datepicker>
+    <p-datepicker
+      [(ngModel)]="toDate"
+      placeholder="To Date"
+      dateFormat="dd/mm/yy"
+      class="w-full sm:w-40">
+    </p-datepicker>
+  </div>
+</div>
+
+
+    <!-- <div class="flex flex-1 min-w-[300px] bg-white border rounded-md shadow-sm">
+      <input
+        type="text"
+        pInputText
+        placeholder="Search..."
+        class="flex-1 p-2 rounded-l-md outline-none"
+        />
+      <button class="bg-red-600 text-white px-4 rounded-r-md">Search</button>
+    </div>
+
+    <p-dropdown
+      class="flex s:w-full"
+      [options]="searchOptions"
+      [(ngModel)]="selectedSearchBy"
+      placeholder="Search by">
+    </p-dropdown>
+
+    <div class="flex gap-2">
+      <p-datepicker
+        [(ngModel)]="fromDate"
+        placeholder="From Date"
+        dateFormat="dd/mm/yy"
+        class="w-full">
+      </p-datepicker>
+      <p-datepicker
+        [(ngModel)]="toDate"
+        placeholder="To Date"
+        dateFormat="dd/mm/yy"
+        class="w-full">
+      </p-datepicker>
+    </div> -->
+
+
+<p-table #dt [value]="row" 
+[globalFilterFields]="['bloodBagId.bloodBagId', 'patientId.UHID', 'patientId.firstname', 'patientId.lastname', 'patientId.bloodGroup', 'bloodBagId.bloodcomponent', 'transporterKey']"
+[paginator]="true" [rows]="10" responsiveLayout="scroll" class="w-full text-m p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
     <ng-template pTemplate="header">
         <tr class="bg-red-700 text-white text-m px-5 py-3 font-semibold">
             <th class="rounded-tl-xl !px-5 !py-3">Bag ID</th>

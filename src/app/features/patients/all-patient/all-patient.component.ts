@@ -2,7 +2,7 @@
 import { Component } from '@angular/core';
 
 // ➜ PrimeNG & Angular standalone imports
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { CommonModule } from '@angular/common';
@@ -18,22 +18,22 @@ import { DropdownModule } from 'primeng/dropdown';
 
 @Component({
     selector: 'app-all-patient',
-
     templateUrl: './all-patient.component.html',
     styleUrl: './all-patient.component.scss',
-    imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent,DropdownModule,DatePickerModule]
+    imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule]
 })
 export class AllPatientComponent {
     rows: Patient[] = [];
+
     router: any;
-      selectedSearchBy: any;
-  fromDate: Date | null = null;
-  toDate: Date | null = null;
-  searchOptions = [
-    { label: 'Patient Name', value: 'patient' },
-    { label: 'Blood Group', value: 'bloodGroup' },
-    { label: 'Component', value: 'component' }
-  ];
+    selectedSearchBy: any;
+    fromDate: Date | null = null;
+    toDate: Date | null = null;
+    searchOptions = [
+        { label: 'Patient Name', value: 'patient' },
+        { label: 'Blood Group', value: 'bloodGroup' },
+        { label: 'Component', value: 'component' }
+    ];
     constructor(
         private authService: AuthService,
         private confirmationService: ConfirmationService
@@ -109,7 +109,11 @@ export class AllPatientComponent {
             this.loadPatients();
         }
     }
-        goToAllocateBag() {
-    this.router.navigate(['/allocateBag']);
-  }
+    goToAllocateBag() {
+        this.router.navigate(['/allocateBag']);
+    }
+    onGlobalFilter(table: Table, event: Event) {
+        const value = (event.target as HTMLInputElement).value;
+        table.filterGlobal(value, 'contains');
+    }
 }

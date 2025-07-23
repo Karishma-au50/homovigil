@@ -1,4 +1,37 @@
-<p-table #dt [value]="row" [paginator]="true" [rows]="10" responsiveLayout="scroll" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
+      <div class="flex flex-wrap gap-4 p-4 items-center">
+  <div class="flex bg-white border rounded-md shadow-sm w-full sm:w-auto sm:min-w-[350px]">
+    <input
+      type="text"
+      pInputText
+      placeholder="Search..."
+      class="flex-1 p-2 rounded-l-md outline-none"
+      (input)="onGlobalFilter(dt, $event)"
+      
+    />
+    <button class="bg-red-600 text-white px-4 rounded-r-md">Search</button>
+  </div>
+
+  <div class="flex gap-2 w-full sm:w-auto">
+    <p-datepicker
+      [(ngModel)]="fromDate"
+      placeholder="From Date"
+      dateFormat="dd/mm/yy"
+      class="w-full sm:w-40">
+    </p-datepicker>
+    <p-datepicker
+      [(ngModel)]="toDate"
+      placeholder="To Date"
+      dateFormat="dd/mm/yy"
+      class="w-full sm:w-40">
+    </p-datepicker>
+  </div>
+        <!-- <p-button label="New Allocation" icon="pi pi-bag" (click)="goToAllocateBag()"> </p-button> -->
+
+</div>
+<p-table #dt [value]="row"
+    [globalFilterFields]="['bloodBagId.bloodBagId', 'patientId.UHID', 'patientId.firstname', 'patientId.lastname', 'patientId.bloodGroup', 'bloodBagId.bloodcomponent', 'transporterKey']"
+
+[paginator]="true" [rows]="10" responsiveLayout="scroll" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
     <ng-template #header>
         <tr class="bg-red-700 text-white text-left text-m font-semibold">
             <th class="rounded-tl-xl !px-5 !py-3">Bag ID</th>
