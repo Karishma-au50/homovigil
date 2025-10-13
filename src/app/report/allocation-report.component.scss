@@ -1,0 +1,66 @@
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+// Status badge specific styling
+.status-badge {
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    
+    &.bg-green-100 {
+        background-color: #dcfce7 !important;
+        color: #15803d !important;
+    }
+    
+    &.bg-red-100 {
+        background-color: #fee2e2 !important;
+        color: #b91c1c !important;
+    }
+    
+    &.bg-blue-100 {
+        background-color: #dbeafe !important;
+        color: #1d4ed8 !important;
+    }
+    
+    &.bg-yellow-100 {
+        background-color: #fef3c7 !important;
+        color: #b45309 !important;
+    }
+    
+    &.bg-gray-100 {
+        background-color: #f3f4f6 !important;
+        color: #374151 !important;
+    }
+}
+
+// Dropdown styling to match patient report
+select {
+    min-width: 250px;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    
+    &:focus {
+        border-color: #dc2626;
+        box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+        outline: none;
+    }
+}
+
+// Print-specific styles
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .status-badge {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+// Remove bottom padding from popup header
+::ng-deep .p-dialog .p-dialog-header {
+    padding-bottom: 0 !important;
+}

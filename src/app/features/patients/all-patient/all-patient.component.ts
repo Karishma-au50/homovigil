@@ -15,12 +15,13 @@ import { PatientComponent } from '../patient/patient.component';
 import { ConfirmationService } from 'primeng/api';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DropdownModule } from 'primeng/dropdown';
+import { PopupComponent } from '../../../shared/components/popup/popup.component';
 
 @Component({
     selector: 'app-all-patient',
     templateUrl: './all-patient.component.html',
     styleUrl: './all-patient.component.scss',
-    imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule]
+    imports: [PopupComponent, CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule]
 })
 export class AllPatientComponent {
     rows: Patient[] = [];
@@ -49,7 +50,15 @@ export class AllPatientComponent {
 
     loadPatients(): void {
         this.authService.getAllPatients().subscribe((data: any) => {
-            this.rows = data.data;
+            this.rows = (data.data || []).map((row: any) => {
+                if (row.signature && typeof row.signature === 'string') {
+                    // If it's a filename (not a data URL or already a full URL)
+                    if (!row.signature.startsWith('http') && !row.signature.startsWith('data:')) {
+                        row.signature = `https://haemovigil.atf-labs.com/public/${row.signature.replace(/^\/+/, '')}`;
+                    }
+                }
+                return row;
+            });
         });
     }
 
@@ -63,6 +72,21 @@ export class AllPatientComponent {
         } as Patient; // Reset selected patient for new entry
         this.modalTitle = 'Add New Patient';
         this.showDialog();
+    }
+
+    // ✅ Utility: calculate age from DOB
+    calculateAge(dob: string | Date | null | undefined): number {
+        if (!dob) return 0;
+        const birthDate = new Date(dob);
+        const today = new Date();
+
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
     }
 
     editPatient(patient: Patient): void {

@@ -12,11 +12,14 @@ import { BagAllocation } from '../../core/models/bag.modal';
 import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
+import { AllocationPopupComponent } from '../../shared/components/allocation-popup/allocation-popup.component';
+
+
 
 @Component({
     selector: 'app-home',
     standalone: true,
-    imports: [CommonModule, FormsModule, DropdownModule, ButtonModule, DatePickerModule, TableModule, InputIconModule, ToolbarModule, IconFieldModule, InputTextModule],
+    imports: [AllocationPopupComponent, CommonModule, FormsModule, DropdownModule, ButtonModule, DatePickerModule, TableModule, InputIconModule, ToolbarModule, IconFieldModule, InputTextModule],
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss']
 })
@@ -41,6 +44,8 @@ export class HomeComponent {
         this.authService.getAllocationBag().subscribe((data: any) => {
             console.log(data);
             this.records = data.data.allocations;
+             this.allRecords = [...this.records]; // Make a copy for filtering
+             console.log("allRecords",this.allRecords);
         });
     }
     onGlobalFilter(table: Table, event: Event) {

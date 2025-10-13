@@ -21,7 +21,9 @@ export class HemoVigilHttpService {
     }
 
     public registerPatient(patient: any): Observable<ApiResponse<Patient>> {
-        return this.http.post<ApiResponse<any>>(`${this.baseUrl}api/patient/`, patient);
+        return this.http.post<ApiResponse<any>>(`${this.baseUrl}api/patient/`, patient
+
+        );
     }
 
     public searchPatient(uhid: string, label: string): Observable<ApiResponse<string>> {
@@ -47,7 +49,13 @@ export class HemoVigilHttpService {
     }
 
     public allocateBag(bagAllocation: BagAllocation): Observable<ApiResponse<BagAllocation>> {
-        return this.http.post<ApiResponse<BagAllocation>>(`${this.baseUrl}api/allocation`, bagAllocation);
+        return this.http.post<ApiResponse<BagAllocation>>(`${this.baseUrl}api/allocation`,
+             bagAllocation,
+            //  pass token inthe header
+
+            
+            
+            );
     }
 
     public updatePatient(user: any, id: string): Observable<ApiResponse<any>> {

@@ -1,0 +1,88 @@
+.signature-pad-container {
+  width: 100%;
+  
+  
+  .signature-pad-header {
+    margin-bottom: 0.5rem;
+    
+    label {
+      font-weight: 500;
+      color: #6b7280;
+    }
+  }
+  
+  .signature-pad-wrapper {
+    position: relative;
+    background-color: #dedede8f;
+    border-radius: 5px;
+    
+    .clear-icon-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 10;
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 50%;
+      background-color: #ef4444;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      
+      &:hover:not(:disabled) {
+        background-color: #dc2626;
+        transform: scale(1.05);
+      }
+      
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+      
+      i {
+        font-size: 12px;
+      }
+    }
+  }
+  
+  
+  .signature-pad-footer {
+    margin-top: 0.5rem;
+    
+    .placeholder-text {
+      color: #9ca3af;
+      font-size: 0.875rem;
+      font-style: italic;
+    }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .signature-pad-container {
+    .signature-canvas {
+      height: 120px;
+    }
+    
+    .signature-pad-wrapper {
+      .clear-icon-btn {
+        width: 28px;
+        height: 28px;
+        top: 6px;
+        right: 6px;
+        font-size: 12px;
+        
+        i {
+          font-size: 10px;
+        }
+      }
+    }
+  }
+}

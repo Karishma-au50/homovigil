@@ -11,6 +11,7 @@ import { LoginComponent } from './app/features/login/login.component';
 import { AllocateBagComponent } from './app/features/bag/allocate-bag/allocate-bag.component';
 import { ReleasBagComponent } from './app/features/bag/realeas-bag/realeas-bag.component';
 import { AllocateBagHistoryComponent } from './app/features/bag/allocate-bag-history/allocate-bag-history.component';
+import { ReportComponent } from './app/report/report.component';
 
 export const appRoutes: Routes = [
     {
@@ -46,6 +47,10 @@ export const appRoutes: Routes = [
                 path:'allocationHistory',
                 component:AllocateBagHistoryComponent
 
+            },
+            {
+                path: 'report',
+                component: ReportComponent
             }
 
 

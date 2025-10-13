@@ -1,0 +1,126 @@
+
+:host {
+    height: 100%;
+    width: 100%;
+}
+
+::ng-deep .p-dialog {
+    border-width: 0 !important;
+}
+
+::ng-deep select{
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 3rem !important; /* Added extra padding for arrow */
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+}
+
+
+::ng-deep select option:hover {
+    background-color: #fca5a5;
+    color: white;
+}
+
+
+
+// css for print table
+
+/* Enhanced print styles for better column fitting and header styling */
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  /* Hide components/elements not needed on print */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Table styling for print */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+    font-size: 10px !important; /* Smaller font to fit more columns */
+  }
+
+  /* Table header styling - matching your requirements */
+  th {
+    background-color: #c53030 !important; /* Tailwind bg-red-700 */
+    color: white !important;              /* Tailwind text-white */
+    font-weight: 600 !important;          /* Tailwind font-semibold */
+    font-size: 12px !important;           /* Tailwind text-m equivalent */
+    border: 1px solid #ccc !important;
+    padding: 6px 4px !important;
+    text-align: center !important;
+    word-wrap: break-word !important;
+  }
+
+  /* Table cell styling */
+  td {
+    border: 1px solid #ccc !important;
+    padding: 4px 3px !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    font-size: 10px !important;
+  }
+
+  /* Specific column width adjustments for better fitting */
+  th:nth-child(1), td:nth-child(1) { width: 5% !important; }   /* S.No */
+  th:nth-child(2), td:nth-child(2) { width: 12% !important; }  /* Patient Name */
+  th:nth-child(3), td:nth-child(3) { width: 8% !important; }   /* UHID */
+  th:nth-child(4), td:nth-child(4) { width: 10% !important; }  /* Created On */
+  th:nth-child(5), td:nth-child(5) { width: 8% !important; }   /* Haemovigil Id */
+  th:nth-child(6), td:nth-child(6) { width: 6% !important; }   /* Blood Group */
+  th:nth-child(7), td:nth-child(7) { width: 6% !important; }   /* Gender */
+  th:nth-child(8), td:nth-child(8) { width: 5% !important; }   /* Age */
+  th:nth-child(9), td:nth-child(9) { width: 8% !important; }   /* DOB */
+  th:nth-child(10), td:nth-child(10) { width: 10% !important; } /* Department */
+  th:nth-child(11), td:nth-child(11) { width: 7% !important; }  /* Ward No */
+  th:nth-child(12), td:nth-child(12) { width: 7% !important; }  /* Donor No */
+  th:nth-child(13), td:nth-child(13) { width: 8% !important; }  /* DOP */
+  th:nth-child(14), td:nth-child(14) { width: 10% !important; } /* Signature */
+
+  /* Override any theme styles that might interfere */
+  .p-datatable thead tr th {
+    background-color: #c53030 !important; /* bg-red-700 */
+    color: white !important;
+    font-weight: 600 !important;
+  }
+
+  /* Remove shadows and rounded corners for print */
+  .shadow-lg {
+    box-shadow: none !important;
+  }
+  .rounded-xl {
+    border-radius: 0 !important;
+  }
+
+  /* Ensure images fit properly */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Hide pagination and other controls */
+  .p-paginator {
+    display: none !important;
+  }
+
+  /* Make sure the table container uses full width */
+  .p-datatable-wrapper {
+    overflow: visible !important;
+  }
+
+  /* Additional styling for better print layout */
+  @page {
+    size: landscape;
+    margin: 0.5in;
+  }
+}

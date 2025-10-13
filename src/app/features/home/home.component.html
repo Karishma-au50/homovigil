@@ -1,6 +1,6 @@
-<div class="flex flex-wrap gap-4 p-4 items-center">
+<div class="flex flex-wrap gap-4 p-4 items-center md:justify-between">
     <div class="flex bg-white border rounded-md shadow-sm w-full sm:w-auto sm:min-w-[350px]">
-        <input type="text" pInputText placeholder="Search..." class="flex-1 p-2 rounded-l-md outline-none" (input)="onGlobalFilter(dt, $event)" />
+        <input type="text" pInputText placeholder="Search..." class="flex-1 p-2 !rounded-none outline-none" (input)="onGlobalFilter(dt, $event)" />
         <button class="bg-red-600 text-white px-4 rounded-r-md">Search</button>
     </div>
     <!-- <div class="flex flex-wrap gap-2 items-center">
@@ -8,14 +8,22 @@
         <p-datepicker [(ngModel)]="toDate" placeholder="To Date" dateFormat="yy-mm-dd" inputId="toDate"></p-datepicker>
         <button pButton type="button" label="Search" (click)="filterByDateRange()"></button>
     </div> -->
-    <div class="flex flex-wrap gap-2 items-center">
+
+    <!-- <div class="flex flex-wrap gap-2 items-center">
         <p-datepicker [(ngModel)]="fromDate" placeholder="From Date" dateFormat="yy-mm-dd" inputId="fromDate"> </p-datepicker>
         <p-datepicker [(ngModel)]="toDate" placeholder="To Date" dateFormat="yy-mm-dd" inputId="toDate"> </p-datepicker>
         <button pButton type="button" label="Search" (click)="filterByDateRange()"></button>
         <button pButton type="button" label="Clear" class="p-button-secondary" (click)="clearDateFilter()"></button>
+    </div> -->
+    <div class="flex flex-wrap gap-2 items-center">
+        <p-button label="New Allocation" icon="pi pi-bag" (click)="goToAllocateBag()"> </p-button>
+        <app-allocation-popup></app-allocation-popup>
     </div>
-    <p-button label="New Allocation" icon="pi pi-bag" (click)="goToAllocateBag()"> </p-button>
 </div>
+
+<!-- <div class="flex justify-start md:justify-end p-4">
+<p-button  label="New Allocation" icon="pi pi-bag" (click)="goToAllocateBag()"> </p-button>
+</div> -->
 
 <!-- 📋 Allocation list -->
 <div class="overflow-auto rounded-xl bg-white shadow ring-1 ring-gray-200">
@@ -47,21 +55,21 @@
         <ng-template pTemplate="body" let-rec let-i="rowIndex">
             <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
                 <td class="!px-5 !py-3 font-medium">{{ i + 1 }}</td>
-                <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodBagId }}</td>
-                <td class="!px-5 !py-3">{{ rec.patientId?.UHID }}</td>
-                <td class="!px-5 !py-3">{{ rec.transporterKey }}</td>
-                <td class="!px-5 !py-3">{{ rec.patientId?.firstname | titlecase }} {{ rec.patientId?.lastname | titlecase }}</td>
-                <td class="!px-5 !py-3">{{ rec.patientId?.bloodGroup }}</td>
-                <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodcomponent }}</td>
+                <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodBagId || 'N/A' }}</td>
+                <td class="!px-5 !py-3">{{ rec.patientId?.UHID || 'N/A' }}</td>
+                <td class="!px-5 !py-3">{{ rec.transporterKey || 'N/A' }}</td>
+                <td class="!px-5 !py-3">{{ (rec.patientId?.firstname || 'N/A') | titlecase }} {{ (rec.patientId?.lastname || '') | titlecase }}</td>
+                <td class="!px-5 !py-3">{{ rec.patientId?.bloodGroup || 'N/A' }}</td>
+                <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodcomponent || 'N/A' }}</td>
 
                 <!-- Status badge -->
                 <td class="!px-5 !py-3">
                     <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize" [ngClass]="badgeClass(rec.status)">
-                        {{ rec.status }}
+                        {{ rec.status || 'N/A' }}
                     </span>
                 </td>
 
-                <td class="px-5 py-3 whitespace-nowrap">{{ rec.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+                <td class="px-5 py-3 whitespace-nowrap">{{ rec.allocatedOn ? (rec.allocatedOn | date: 'MMM dd, yyyy | hh:mm a') : 'N/A' }}</td>
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">

@@ -1,4 +1,7 @@
 export const environment = {
     production: true,
-    apiUrl: 'http://192.168.1.9:4020/',
+    apiUrl: 'https://server.atf-labs.com:6002/',
+    // apiUrl: 'http://192.168.1.8:3000/',
+   
+
 };
