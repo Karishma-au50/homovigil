@@ -12,6 +12,8 @@ import { AllocateBagComponent } from './app/features/bag/allocate-bag/allocate-b
 import { ReleasBagComponent } from './app/features/bag/realeas-bag/realeas-bag.component';
 import { AllocateBagHistoryComponent } from './app/features/bag/allocate-bag-history/allocate-bag-history.component';
 import { ReportComponent } from './app/report/report.component';
+import { donorComponent } from './app/features/Donor/donor/donor.component';
+import { AllDonorComponent } from './app/features/Donor/all-donor/all-donor.component';
 
 export const appRoutes: Routes = [
     {
@@ -51,6 +53,14 @@ export const appRoutes: Routes = [
             {
                 path: 'report',
                 component: ReportComponent
+            },
+             {
+                path: 'donor',
+                component: donorComponent
+            },
+            {
+                path: 'alldonor',
+                component:AllDonorComponent
             }
 
 

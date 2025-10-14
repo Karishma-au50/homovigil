@@ -16,8 +16,8 @@ import { ButtonModule } from 'primeng/button';
         <label class="block text-muted-color mb-2 font-medium">{{ label }}</label>
       </div>
       <div class="signature-pad-wrapper" [class.has-error]="hasError">
-        <button 
-          type="button" 
+        <button
+          type="button"
           class="clear-icon-btn"
           (click)="clear()"
           [disabled]="disabled || isEmpty()"
@@ -25,14 +25,14 @@ import { ButtonModule } from 'primeng/button';
           title="Clear signature">
           <i class="pi pi-times"></i>
         </button>
-        <canvas 
+        <canvas
           #canvas
           class="signature-canvas"
           [width]="width"
           [height]="height">
         </canvas>
       </div>
-     
+
       <p-toast [showTransitionOptions]="'250ms'" [showTransformOptions]="'translateX(100%)'" [hideTransitionOptions]="'150ms'" [hideTransformOptions]="'translateX(100%)'" />
     </div>
   `,
@@ -52,25 +52,30 @@ export class SignaturePadComponent implements AfterViewInit, OnDestroy, ControlV
     // show() {
     //     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message Content' });
     // }
-    
+
   @ViewChild('canvas', { static: true }) canvasEl!: ElementRef<HTMLCanvasElement>;
-  
+
   @Input() width: number = 400;
   @Input() height: number = 200;
   @Input() label: string = '';
   @Input() placeholder: string = 'Please sign here';
   @Input() disabled: boolean = false;
   @Input() hasError: boolean = false;
-  
+
   @Output() onSave = new EventEmitter<string>();
   @Output() onClear = new EventEmitter<void>();
 
   private signaturePad!: SignaturePad;
   private onChange = (value: string) => {};
   private onTouched = () => {};
+  private pendingValue: string | null = null;
 
   ngAfterViewInit() {
     this.initializeSignaturePad();
+    if (this.pendingValue !== null) {
+      this.writeValue(this.pendingValue);
+      this.pendingValue = null;
+    }
   }
 
   ngOnDestroy() {
@@ -94,9 +99,9 @@ export class SignaturePadComponent implements AfterViewInit, OnDestroy, ControlV
       const dataURL = this.signaturePad.toDataURL();
       this.onChange(dataURL);
       this.onTouched();
-      
+
       // Auto-save signature when user finishes drawing
-      this.autoSave();
+    //   this.autoSave();
     });
 
     // Handle disabled state
@@ -107,10 +112,14 @@ export class SignaturePadComponent implements AfterViewInit, OnDestroy, ControlV
 
   // ControlValueAccessor implementation
   writeValue(value: string): void {
-    if (value && this.signaturePad) {
-      this.signaturePad.fromDataURL(value);
-    } else if (!value && this.signaturePad) {
-      this.signaturePad.clear();
+    if (this.signaturePad) {
+      if (value) {
+        this.signaturePad.fromDataURL(value);
+      } else {
+        this.signaturePad.clear();
+      }
+    } else {
+      this.pendingValue = value;
     }
   }
 
@@ -155,11 +164,11 @@ export class SignaturePadComponent implements AfterViewInit, OnDestroy, ControlV
       const dataURL = this.signaturePad.toDataURL();
       this.onSave.emit(dataURL);
       // Show a subtle success message for auto-save
-      this.messageService.add({ 
-        severity: 'success', 
-        summary: 'Auto-saved', 
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Auto-saved',
         detail: 'Signature saved automatically!',
-        life: 2000 
+        life: 2000
       });
     }
   }

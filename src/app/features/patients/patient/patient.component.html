@@ -41,14 +41,12 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-muted-color mb-3 font-medium">Age</label>
-                        <input type="number" formControlName="age" placeholder="Age" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
-                    </div>
-                   
-
-                    <div>
                         <label class="block text-muted-color mb-3 font-medium">Date of Birth</label>
-                        <p-datepicker formControlName="dob" [showClear]="true" dateFormat="yy-mm-dd" />
+                        <p-datepicker formControlName="dob" [showClear]="true" dateFormat="yy-mm-dd" appendTo="body" />
+                    </div>
+                    <div>
+                        <label class="block text-muted-color mb-3 font-medium">Age</label>
+                        <input readonly type="number" formControlName="age" placeholder="Age" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
                     <!-- <div>
                         <label class="block text-muted-color mb-2 font-medium">Date</label>
@@ -77,84 +75,10 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Toggle button outside the grid -->
-                <div class="mt-6 flex items-center gap-6">
-                    <label class="text-muted-color font-medium">Show Donor Field:</label>
-                    <p-togglebutton [(ngModel)]="hideShowBtn" [ngModelOptions]="{ standalone: true }" onLabel="Hide" offLabel="Show" size="small" />
-                </div>
-
-                <!-- Donor No field - separate from main grid -->
-                <div *ngIf="hideShowBtn" class="mt-6 transition-all duration-300 ease-in-out">
-                    <div class="grid grid-cols-1 md:grid-cols-6 gap-10">
-                        <div>
-                            <label class="block text-muted-color mb-3 font-medium">Donor No</label>
-                            <input type="number" formControlName="donorNo" placeholder="Donor Number" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
-                        </div>
-                        <div>
-                            <label class="block text-muted-color mb-3 font-medium">Date of Procedure</label>
-                            <p-datepicker formControlName="dateOfProcedure" [showClear]="true" dateFormat="yy-mm-dd" />
-                        </div>
-                        <div>
-                            <label class="block text-muted-color mb-3 font-medium">Donor Name</label>
-                            <input formControlName="donorName" type="text" placeholder="Donor Name" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
-                        </div>
-                        <div>
-                            <label class="block text-muted-color mb-3 font-medium">Weight</label>
-                            <input type="number" formControlName="weight" placeholder="Weight (kg)" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
-                        </div>
-                        <div>
-                            <label class="block text-muted-color mb-3 font-medium">Address</label>
-                            <input formControlName="address" type="text" placeholder="Address" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
-                        </div>
-                        <div>
-                            <label class="block text-muted-color mb-3 font-medium">Haemoglobin</label>
-                            <input formControlName="haemoglobin" type="text" placeholder="Hb Level" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
-                        </div>
-                        <div>
-                            <label class="block text-muted-color mb-3 font-medium">HIV</label>
-                            <select formControlName="HIV" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
-                                <option value="" disabled selected hidden>Select</option>
-                                <option value="NR">NR</option>
-                                <option value="R">R</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-muted-color mb-3 font-medium">HBs Ag</label>
-                            <select formControlName="HBsAg" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
-                                <option value="" disabled selected hidden>Select</option>
-                                <option value="NR">NR</option>
-                                <option value="R">R</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-muted-color mb-3 font-medium">HCV</label>
-                            <select formControlName="HCV" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
-                                <option value="" disabled selected hidden>Select</option>
-                                <option value="NR">NR</option>
-                                <option value="R">R</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-muted-color mb-3 font-medium">VDRL</label>
-                            <select formControlName="VDRL" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
-                                <option value="" disabled selected hidden>Select</option>
-                                <option value="NR">NR</option>
-                                <option value="R">R</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-muted-color mb-3 font-medium">MP</label>
-                            <select formControlName="MP" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
-                                <option value="" disabled selected hidden>Select</option>
-                                <option value="NR">NR</option>
-                                <option value="R">R</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <!-- signature and remark -->
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                         <div class="mt-10">
-                            <app-signature-pad 
+                            <app-signature-pad
                                 formControlName="signature"
                                 label="Technician Signature (Please sign here to confirm the information)"
                                 [width]="400"
@@ -165,9 +89,7 @@
                             <label class="block text-muted-color mb-3 font-medium">Remarks</label>
                             <textarea rows="6" cols="30" pTextarea formControlName="remarks" placeholder="Remarks" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition"></textarea>
                         </div>
-                        
                     </div>
-                </div>
 
                 <!-- Label Text -->
                 <div class="text-center mt-12 text-xl font-semibold text-muted-color">Scan the Haemovigil label on test tube</div>

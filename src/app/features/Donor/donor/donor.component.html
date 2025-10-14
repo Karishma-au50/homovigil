@@ -1,0 +1,87 @@
+<div class="h-full flex items-center justify-center">
+    <div class="flex flex-col items-center max-h-screen w-full max-w-7xl">
+        <div class="bg-red-700 text-white p-6 rounded-t-xl w-full flex justify-between flex-shrink-0">
+            <h2 class="text-3xl text-white tracking-wide m-0">New Donor Entry</h2>
+            <p-button icon="pi pi-times" aria-label="Close" (click)="onClose(false)" severity="contrast" />
+        </div>
+
+        <div class="flex-1 w-full overflow-y-auto overflow-x-hidden max-h-[70vh] custom-scrollbar-css">
+        <form [formGroup]="registerDonor" (ngSubmit)="onSubmit()">
+            <div class="p-12">
+                <div class="mt-6 transition-all duration-300 ease-in-out">
+                    <div class="grid grid-cols-1 md:grid-cols-6 gap-10">
+                        <div>
+                            <label class="block text-muted-color mb-3 font-medium">Donor No</label>
+                            <input type="number" formControlName="donorNo" placeholder="Donor Number" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                        </div>
+                        <div>
+                            <label class="block text-muted-color mb-3 font-medium">Date of Procedure</label>
+                            <p-datepicker formControlName="dateOfProcedure" [showClear]="true" dateFormat="yy-mm-dd" appendTo="body" />
+                        </div>
+                        <div>
+                            <label class="block text-muted-color mb-3 font-medium">Donor Name</label>
+                            <input formControlName="donorName" type="text" placeholder="Donor Name" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                        </div>
+                        <div>
+                            <label class="block text-muted-color mb-3 font-medium">Weight</label>
+                            <input type="number" formControlName="weight" placeholder="Weight (kg)" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                        </div>
+                        <div>
+                            <label class="block text-muted-color mb-3 font-medium">Address</label>
+                            <input formControlName="address" type="text" placeholder="Address" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                        </div>
+                        <div>
+                            <label class="block text-muted-color mb-3 font-medium">Haemoglobin</label>
+                            <input formControlName="haemoglobin" type="text" placeholder="Hb Level" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                        </div>
+                        <div>
+                            <label class="block text-muted-color mb-3 font-medium">HIV</label>
+                            <select formControlName="HIV" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                                <option value="" disabled selected hidden>Select</option>
+                                <option value="NR">NR</option>
+                                <option value="R">R</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-muted-color mb-3 font-medium">HBs Ag</label>
+                            <select formControlName="HBsAg" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                                <option value="" disabled selected hidden>Select</option>
+                                <option value="NR">NR</option>
+                                <option value="R">R</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-muted-color mb-3 font-medium">HCV</label>
+                            <select formControlName="HCV" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                                <option value="" disabled selected hidden>Select</option>
+                                <option value="NR">NR</option>
+                                <option value="R">R</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-muted-color mb-3 font-medium">VDRL</label>
+                            <select formControlName="VDRL" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                                <option value="" disabled selected hidden>Select</option>
+                                <option value="NR">NR</option>
+                                <option value="R">R</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-muted-color mb-3 font-medium">MP</label>
+                            <select formControlName="MP" class="w-full border border-red-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                                <option value="" disabled selected hidden>Select</option>
+                                <option value="NR">NR</option>
+                                <option value="R">R</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-10">
+                    <button type="submit" class="bg-[#BE0000] hover:from-red-700 hover:to-red-900 text-white font-bold py-5 px-12 rounded-full shadow-lg transition transform hover:scale-105">Save Donor</button>
+                </div>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>

@@ -6,11 +6,14 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { StepsModule } from 'primeng/steps';
+import { DialogModule } from 'primeng/dialog';
 
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { Patient } from '../../../core/models/patient.modal';
 // import { AuthService } from '../../../core/auth/auth.service';
+import { Router } from '@angular/router';
+import { PatientComponent } from '../../patients/patient/patient.component';
 
 @Component({
     selector: 'app-allocate-bag',
@@ -21,7 +24,9 @@ import { Patient } from '../../../core/models/patient.modal';
         ReactiveFormsModule, // ✅ Add this
         FormsModule,
         StepsModule,
-        ButtonModule
+        ButtonModule,
+        DialogModule,
+        PatientComponent
         // Add other PrimeNG modules here
     ]
 })
@@ -32,10 +37,13 @@ export class AllocateBagComponent implements OnInit {
     activeIndex = 0;
     patientData: Patient | null = null;
     subscription: Subscription = new Subscription();
+    errorMessage: string | null = null;
+    isLimitError: boolean = false;
 
     constructor(
         private fb: FormBuilder,
-        private authService: AuthService
+        private authService: AuthService,
+        private router: Router
     ) {
         this.recordFormStep1 = this.fb.group({
             patientId: [''],
@@ -112,7 +120,8 @@ export class AllocateBagComponent implements OnInit {
     this.authService.searchPatient(uhid, label).subscribe({
         next: (res) => {
             this.patientData = res.data[0];
-            this.activeIndex = 1; // Move to next step
+            console.log(this.patientData);
+            this.activeIndex = 1; // Move to next step when under limit
         },
         error: () => {
             alert('Patient not found');
@@ -122,6 +131,8 @@ export class AllocateBagComponent implements OnInit {
 }
     onSubmit() {
         if (!this.patientData) return;
+        this.errorMessage = null;
+        this.isLimitError = false;
         const payload = {
             // ...this.patientData,
             // Use values from both step forms as needed
@@ -138,8 +149,42 @@ export class AllocateBagComponent implements OnInit {
             next: () => {
                 alert('Bag allocated successfully!');
                 this.activeIndex = 0; // Reset wizard if needed
+                console.log(payload);
             },
-            error: () => alert('Failed to allocate bag')
+            error: (err) => {
+                const backendMsg: string = err?.error?.message || '';
+                if (backendMsg.toLowerCase().includes('maximum of six allocations')) {
+                    this.errorMessage = 'Maximum of six allocations allowed per patient. Edit UH Id to proceed.';
+                    this.isLimitError = true;
+                } else {
+                    this.errorMessage = backendMsg || 'Allocation failed.';
+                    this.isLimitError = false;
+                }
+            }
         });
     }
+
+    modalTitle: string = 'Add New Patient';
+    selectedPatient: Patient | null = null;
+
+    editPatient(patient: Patient): void {
+        this.selectedPatient = patient;
+        this.modalTitle = 'Edit Patient';
+        this.showDialog();
+    }
+    visible: boolean = false;
+    showDialog(): void {
+        this.visible = true;
+    }
+
+    closeDialog(fetchData: boolean): void {
+        this.visible = false;
+        if (fetchData) {
+            this.router.navigate(['/allocateBag']);
+        }
+    }
+    // navigateToEditPatient() {
+    //     if (!this.patientData) return;
+    //     this.router.navigate(['/patient'], { queryParams: { uhid: this.patientData.UHID } });
+    // }
 }

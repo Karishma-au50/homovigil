@@ -86,7 +86,16 @@
             </div>
             <div class="text-center mt-6">
                 <button type="button" (click)="onSubmit()" class="bg-green-600 text-white px-6 py-2 rounded">Allocate</button>
+                <div *ngIf="errorMessage" class="mt-3 text-sm text-red-600">
+                    {{ errorMessage }}
+                    <a *ngIf="patientData && isLimitError" (click)="editPatient(patientData)" class="ml-2 underline text-blue-700 cursor-pointer">Edit patient</a>
+                </div>
             </div>
         </form>
     </div>
 </div>
+<p-dialog [(visible)]="visible" [closable]="true" [modal]="true" contentStyle="border: none">
+    <ng-template #headless>
+        <app-patient (closeDialog)="visible = false" (closeDialog)="closeDialog($event)" [formData]="selectedPatient"></app-patient>
+    </ng-template>
+</p-dialog>

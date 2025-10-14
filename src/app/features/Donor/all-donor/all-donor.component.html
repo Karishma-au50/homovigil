@@ -3,27 +3,21 @@
         <input type="text" pInputText placeholder="Search..." class="flex-1 p-2 rounded-l-md outline-none" (input)="onGlobalFilter(dt, $event)" />
         <button class="bg-red-600 text-white px-4 rounded-r-md">Search</button>
     </div>
-
-    <!-- <div class="flex gap-2 w-full sm:w-auto">
-        <p-datepicker [(ngModel)]="fromDate" placeholder="From Date" dateFormat="dd/mm/yy" class="w-full sm:w-40"> </p-datepicker>
-        <p-datepicker [(ngModel)]="toDate" placeholder="To Date" dateFormat="dd/mm/yy" class="w-full sm:w-40"> </p-datepicker>
-    </div> -->
-    <!-- <p-button label="Add Patient" icon="pi pi-user-plus" (click)="addPatient()"> </p-button> -->
     <div class="flex flex-wrap gap-2 items-center">
-        <p-button label="Add Patient" icon="pi pi-user-plus" (click)="addPatient()"> </p-button>
+        <p-button label="Add Donor" icon="pi pi-user-plus" (click)="addDonor()"> </p-button>
         <app-popup></app-popup>
     </div>
 </div>
 
 <p-dialog [(visible)]="visible" [closable]="true" [modal]="true" contentStyle="border: none">
     <ng-template #headless>
-        <app-patient (closeDialog)="visible = false" (closeDialog)="closeDialog($event)" [formData]="selectedPatient"></app-patient>
+        <app-donor (closeDialog)="visible = false" (closeDialog)="closeDialog($event)" [formData]="selectedDonor"></app-donor>
     </ng-template>
 </p-dialog>
 <p-table
     #dt
     [value]="rows"
-    [globalFilterFields]="['firstname', 'lastname', 'UHID', 'bloodGroup', 'haemovigilId', 'gender', 'age', 'dob', 'department', 'wardNo', 'donorNo', 'dateOfProcedure']"
+    [globalFilterFields]="['donorName', 'donorNo', 'dateOfProcedure']"
     [paginator]="true"
     [rows]="10"
     styleClass="w-full text-m"
@@ -33,16 +27,17 @@
     <ng-template pTemplate="header">
         <tr class="bg-red-700 text-white text-m px-5 py-3 font-semibold">
             <th class="rounded-tl-xl !px-5 !py-3 whitespace-nowrap">SR.No</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Patient Name</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">UhId No</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Created On</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Haemovigil Id</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Blood Group</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Gender</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Age</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">DOB</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Department</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Ward No</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">Donor Name</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">Donor No</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">DOP</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">Weight</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">Address</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">Haemoglobin</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">HIV</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">HBs Ag</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">HCV</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">VDRL</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">MP</th>
             <th class="!px-5 !py-3 whitespace-nowrap">Signature</th>
             <th class="rounded-tr-xl !px-5 !py-3 whitespace-nowrap">Action</th>
         </tr>
@@ -51,27 +46,24 @@
     <ng-template pTemplate="body" let-row let-i="rowIndex">
         <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
             <td class="whitespace-nowrap">{{ i + 1 }}</td>
-            <td class="whitespace-nowrap">{{ row.firstname | titlecase }} {{ row.lastname | titlecase }}</td>
-            <td class="whitespace-nowrap">{{ row.UHID || 'N/A' }}</td>
-            <td class="whitespace-nowrap">{{ row.createdAt | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+            <td class="whitespace-nowrap">{{ row.donorName | titlecase }}</td>
+            <td class="whitespace-nowrap">{{ row.donorNo || 'N/A' }}</td>
+             <td class="whitespace-nowrap">
+                {{ row.dateOfProcedure ? (row.dateOfProcedure | date: 'MMM dd, yyyy') : 'N/A' }}
+            </td>
+            <td class="whitespace-nowrap">{{ row.weight || 'N/A' }}</td>
+            <td class="whitespace-nowrap">{{ row.address || 'N/A' }}</td>
             <td class="whitespace-nowrap">
                 <span class="border border-red-600 px-3 py-1 rounded-full text-xs font-bold">
                     {{ row.haemovigilId || 'N/A' }}
                 </span>
             </td>
-            <td class="whitespace-nowrap">{{ row.bloodGroup || 'N/A' }}</td>
-            <td class="whitespace-nowrap">{{ row.gender || 'N/A' }}</td>
-            <!-- <td class="whitespace-nowrap">{{ row.age || 'N/A' }}</td> -->
-            <td class="whitespace-nowrap">
-                {{ row.dob ? calculateAge(row.dob) : 'N/A' }}
-            </td>
-            <!-- <td class="whitespace-nowrap">{{ row.dob | date: 'MMM dd, yyyy' }}</td> -->
-            <td class="whitespace-nowrap">
-                {{ row.dob ? (row.dob | date: 'MMM dd, yyyy') : 'N/A' }}
-            </td>
+            <td class="whitespace-nowrap">{{ row.HIV || 'N/A' }}</td>
+            <td class="whitespace-nowrap">{{ row.HBsAg || 'N/A' }}</td>
+            <td class="whitespace-nowrap">{{ row.HCV || 'N/A' }}</td>
+            <td class="whitespace-nowrap">{{ row.VDRL || 'N/A' }}</td>
+            <td class="whitespace-nowrap">{{ row.MP || 'N/A' }}</td>
 
-            <td class="whitespace-nowrap">{{ row.department || 'N/A' }}</td>
-            <td class="whitespace-nowrap">{{ row.wardNo || 'N/A' }}</td>
             <td class="whitespace-nowrap">
                 <ng-container *ngIf="row.signature; else noSignature">
                     <img [src]="row.signature" alt="Signature" class="h-8 w-20 object-contain" />
@@ -82,7 +74,7 @@
             </td>
             <td class="!px-5 !py-3 whitespace-nowrap">
                 <div class="flex items-center gap-2">
-                    <button pButton type="button" icon="pi pi-pencil" class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit" (click)="editPatient(row)"></button>
+                    <button pButton type="button" icon="pi pi-pencil" class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit" (click)="editDonor(row)"></button>
                     <Span class ="text-gray-400">|</Span>
                     <button pButton type="button" icon="pi pi-trash" class="p-button-text text-red-600 hover:text-red-800" pTooltip="Delete" (click)="confirmDelete(row)"></button>
                 </div>

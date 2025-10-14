@@ -10,10 +10,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
     selector: 'app-allocate-bag-history',
     imports: [CommonModule, FormsModule, ButtonModule, TableModule, DropdownModule, TagModule, DatePickerModule, InputTextModule],
+    providers: [ConfirmationService],
     templateUrl: './allocate-bag-history.component.html',
     styleUrl: './allocate-bag-history.component.scss'
 })
@@ -30,7 +32,9 @@ export class AllocateBagHistoryComponent {
     toDate: Date | null = null;
     @ViewChild('dt') dt!: Table;
 
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService,   private confirmationService: ConfirmationService ) {
+
+    }
     ngOnInit(): void {
         this.loadPatients();
     }

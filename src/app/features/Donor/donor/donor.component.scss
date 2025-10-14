@@ -1,0 +1,94 @@
+:host {
+    height: 100%;
+    width: 100%;
+}
+
+/* Custom scrollbar styling for CSS approach */
+.custom-scrollbar-css {
+    /* Webkit browsers (Chrome, Safari, Edge) */
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(190, 0, 0, 0.05);
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(190, 0, 0, 0.3);
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: rgba(190, 0, 0, 0.5);
+    }
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(190, 0, 0, 0.3) rgba(190, 0, 0, 0.05);
+}
+
+/* Ensure smooth scrolling behavior */
+.custom-scrollbar-css {
+    scroll-behavior: smooth;
+}
+
+/* PrimeNG ScrollPanel custom styling (if using ScrollPanel) */
+::ng-deep .custom-scrollbar {
+    .p-scrollpanel-wrapper {
+        border-right: none;
+    }
+    
+    .p-scrollpanel-bar-y {
+        background-color: rgba(190, 0, 0, 0.1);
+        width: 8px;
+        border-radius: 4px;
+    }
+    
+    .p-scrollpanel-bar-y:hover {
+        background-color: rgba(190, 0, 0, 0.2);
+    }
+    
+    .p-scrollpanel-content {
+        padding-right: 15px;
+    }
+}
+
+/* PrimeNG DatePicker styling */
+::ng-deep .p-datepicker input {
+    width: 100%;
+    border: 1px solid #fca5a5;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    // padding: 1rem;
+}
+
+/* Remove hover effect */
+::ng-deep .p-datepicker input:hover {
+    border-color: #fca5a5;
+}
+
+/* Highlight on focus */
+::ng-deep .p-datepicker input:focus {
+    width: 100%;
+    border: 1px solid #fca5a5;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    // padding: 1rem;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.5);
+    transition: all 0.2s ease;
+}
+
+::ng-deep select{
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 3rem !important; /* Added extra padding for arrow */
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+}

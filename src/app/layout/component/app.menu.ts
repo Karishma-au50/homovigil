@@ -16,7 +16,7 @@ import { ButtonModule } from 'primeng/button';
                 <li *ngIf="item.separator" class="menu-separator"></li>
             </ng-container>
         </ul>
-        
+
     </div>`
 })
 export class AppMenu {
@@ -35,6 +35,12 @@ export class AppMenu {
                 items: [
                     // { label: 'New Patient Entry', icon: 'pi pi-fw pi-users', routerLink: ['/patient'] },
                     { label: 'Patient List', icon: 'pi pi-fw pi-users', routerLink: ['/allPatient'] }
+                ]
+            },
+             {
+                label: 'Donor Management',
+                items: [
+                    { label: 'Donor List', icon: 'pi pi-fw pi-users', routerLink: ['/alldonor'] }
                 ]
             },
             {

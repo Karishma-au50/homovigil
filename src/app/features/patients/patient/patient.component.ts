@@ -8,7 +8,6 @@ import { ButtonModule } from 'primeng/button';
 import { RadioButton } from 'primeng/radiobutton';
 import { FormsModule } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
-import { ToggleButton } from 'primeng/togglebutton';
 import { TextareaModule } from 'primeng/textarea';
 import { SignaturePadComponent } from '../../../shared/components/signature-pad/signature-pad.component';
 
@@ -16,7 +15,7 @@ import { SignaturePadComponent } from '../../../shared/components/signature-pad/
 @Component({
     selector: 'app-patient',
     standalone: true,
-    imports: [TextareaModule, CommonModule, ReactiveFormsModule, ButtonModule, RadioButton, FormsModule, DatePicker, ToggleButton, SignaturePadComponent],
+    imports: [TextareaModule, CommonModule, ReactiveFormsModule, ButtonModule, RadioButton, FormsModule, DatePicker, SignaturePadComponent],
     templateUrl: './patient.component.html',
     styleUrls: ['./patient.component.scss']
 })
@@ -33,7 +32,32 @@ export class PatientComponent {
         //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
         //Add 'implements OnInit' to the class.
         if (this.formData) {
-            this.registerPatient.patchValue(this.formData);
+            const formDataWithDates = {
+                ...this.formData,
+                dob: this.convertToDate(this.formData.dob),
+                dateOfProcedure: this.convertToDate(this.formData.dateOfProcedure),
+                signature: this.formData.signature || ''
+            };
+            this.registerPatient.patchValue(formDataWithDates);
+        }
+
+        const dobControl = this.registerPatient.get('dob');
+        const ageControl = this.registerPatient.get('age');
+        if (dobControl && ageControl) {
+            dobControl.valueChanges.subscribe((dobValue: unknown) => {
+                const age = this.calculateAge(dobValue as any);
+                if (age === null) {
+                    ageControl.setValue('', { emitEvent: false });
+                } else {
+                    ageControl.setValue(age, { emitEvent: false });
+                }
+            });
+
+            const initialDob = dobControl.value;
+            if (initialDob) {
+                const initialAge = this.calculateAge(initialDob as any);
+                ageControl.setValue(initialAge ?? '', { emitEvent: false });
+            }
         }
     }
 
@@ -47,22 +71,10 @@ export class PatientComponent {
             bloodGroup: ['', Validators.required], // Will be set programmatically
             age: ['', Validators.required],
             gender: ['Male', Validators.required], // Default to Male
-            dob: [new Date(), Validators.required],
-            // date: [new Date(), Validators.required],
+            dob: ['', Validators.required],
             wardNo: ['', Validators.required],
             department: ['', Validators.required],
-            donorNo: ['', Validators.required],
-            dateOfProcedure: [new Date(), Validators.required],
-            donorName: ['', Validators.required],
-            weight: ['', Validators.required],
-            address: ['', Validators.required],
-            haemoglobin: ['', Validators.required],
-            HIV: ['', Validators.required], 
-            HBsAg: ['', Validators.required],
-            HCV: ['', Validators.required],
-            VDRL: ['', Validators.required],
-            MP: ['', Validators.required],
-            remarks: ['', Validators.required],
+            remarks: [''],
             signature: ['', Validators.required] // Add signature field
         });
     }
@@ -72,28 +84,17 @@ export class PatientComponent {
         if (this.registerPatient.valid) {
             // Transform form data to match backend expectations
             const raw = this.registerPatient.value;
+            const isNewRecord = raw._id == '0';
+
             const payload = {
                 ...raw,
-                // dob: raw.dob ? new Date(raw.dob).getTime() : null,
-                dob: raw.dob ? new Date(raw.dob).toISOString().split('T')[0] : null,
+                dob: raw.dob ? (isNewRecord ? this.formatDateForBackend(raw.dob) : this.formatDateAsTimestamp(raw.dob)) : null,
                 donorNo: String(raw.donorNo),
-                dateOfProcedure: raw.dateOfProcedure ? new Date(raw.dateOfProcedure).getTime() : null,
+                dateOfProcedure: raw.dateOfProcedure ? (isNewRecord ? this.formatDateForBackend(raw.dateOfProcedure) : this.formatDateAsTimestamp(raw.dateOfProcedure)) : null,
                 haemoglobin: Number(raw.haemoglobin),
-                HIV: mapTestResult(raw.HIV),
-                HBsAg: mapTestResult(raw.HBsAg),
-                HCV: mapTestResult(raw.HCV),
-                VDRL: mapTestResult(raw.VDRL),
-                MP: mapTestResult(raw.MP),
             };
 
-            function mapTestResult(val: string): 'Positive' | 'Negative' | 'Not Tested' {
-                if (val === 'NR') return 'Not Tested';
-                if (val === 'R') return 'Positive';
-                if (val === 'N') return 'Negative';
-                return val as any;
-            }
-
-            if (payload._id == '0') {
+            if (isNewRecord) {
                 // Remove the _id field if it's not needed for registration
                 delete payload._id;
                 this.authService.registerPatient(payload).subscribe(
@@ -126,6 +127,72 @@ export class PatientComponent {
     onClose(fetchData: boolean): void {
         // Return true if needs to fetch data after closing the dialog else return false
         this.closeDialog.emit(fetchData);
+    }
+
+    private convertToDate(dateValue: any): Date | null {
+        if (!dateValue) return null;
+        if (dateValue instanceof Date) return dateValue;
+        if (typeof dateValue === 'number') {
+            return new Date(dateValue);
+        }
+        if (typeof dateValue === 'string') {
+            const parsedDate = new Date(dateValue);
+            return isNaN(parsedDate.getTime()) ? null : parsedDate;
+        }
+        return null;
+    }
+
+    private formatDateForBackend(dateValue: any): string | null {
+        if (!dateValue) return null;
+        let date: Date;
+        if (dateValue instanceof Date) {
+            date = dateValue;
+        } else if (typeof dateValue === 'string') {
+            date = new Date(dateValue);
+        } else if (typeof dateValue === 'number') {
+            date = new Date(dateValue);
+        } else {
+            return null;
+        }
+        if (isNaN(date.getTime())) {
+            return null;
+        }
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    private formatDateAsTimestamp(dateValue: any): number | null {
+        if (!dateValue) return null;
+        let date: Date;
+        if (dateValue instanceof Date) {
+            date = dateValue;
+        } else if (typeof dateValue === 'string') {
+            date = new Date(dateValue);
+        } else if (typeof dateValue === 'number') {
+            date = new Date(dateValue);
+        } else {
+            return null;
+        }
+        if (isNaN(date.getTime())) {
+            return null;
+        }
+        return date.getTime();
+    }
+
+    private calculateAge(dob: Date | string | null | undefined): number | null {
+        if (!dob) return null;
+        const dobDate = typeof dob === 'string' ? new Date(dob) : dob;
+        if (!(dobDate instanceof Date) || isNaN(dobDate.getTime())) return null;
+
+        const today = new Date();
+        let age = today.getFullYear() - dobDate.getFullYear();
+        const monthDiff = today.getMonth() - dobDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
+            age--;
+        }
+        return age < 0 ? 0 : age;
     }
 
 }
