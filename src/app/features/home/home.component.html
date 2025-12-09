@@ -1,6 +1,7 @@
 <div class="flex flex-wrap gap-4 p-4 items-center">
     <div class="flex bg-white border rounded-md shadow-sm w-full sm:w-auto sm:min-w-[350px]">
-        <input type="text" pInputText placeholder="Search..." class="flex-1 p-2 rounded-l-md outline-none" (input)="onGlobalFilter(dt, $event)" />
+        <input type="text" pInputText placeholder="Search..." class="flex-1 p-2 rounded-l-md outline-none"
+            (input)="onGlobalFilter(dt, $event)" />
         <button class="bg-red-600 text-white px-4 rounded-r-md">Search</button>
     </div>
     <!-- <div class="flex flex-wrap gap-2 items-center">
@@ -8,26 +9,20 @@
         <p-datepicker [(ngModel)]="toDate" placeholder="To Date" dateFormat="yy-mm-dd" inputId="toDate"></p-datepicker>
         <button pButton type="button" label="Search" (click)="filterByDateRange()"></button>
     </div> -->
-    <div class="flex flex-wrap gap-2 items-center">
+    <!-- <div class="flex flex-wrap gap-2 items-center">
         <p-datepicker [(ngModel)]="fromDate" placeholder="From Date" dateFormat="yy-mm-dd" inputId="fromDate"> </p-datepicker>
         <p-datepicker [(ngModel)]="toDate" placeholder="To Date" dateFormat="yy-mm-dd" inputId="toDate"> </p-datepicker>
         <button pButton type="button" label="Search" (click)="filterByDateRange()"></button>
         <button pButton type="button" label="Clear" class="p-button-secondary" (click)="clearDateFilter()"></button>
-    </div>
+    </div> -->
     <p-button label="New Allocation" icon="pi pi-bag" (click)="goToAllocateBag()"> </p-button>
 </div>
 
 <!-- 📋 Allocation list -->
 <div class="overflow-auto rounded-xl bg-white shadow ring-1 ring-gray-200">
-    <p-table
-        #dt
-        [value]="records"
+    <p-table #dt [value]="records"
         [globalFilterFields]="['patientId.firstname', 'patientId.lastname', 'patientId.UHID', 'bloodBagId.bloodBagId', 'bloodBagId.bloodcomponent', 'patientId.bloodGroup', 'transporterKey']"
-        [paginator]="true"
-        [rows]="10"
-        styleClass="w-full text-m"
-        class="min-w-[800px]"
-    >
+        [paginator]="true" [rows]="10" styleClass="w-full text-m" class="min-w-[800px]">
         <!-- HEADER -->
         <ng-template #header>
             <tr class="bg-red-700 text-white text-left text-m font-semibold">
@@ -50,13 +45,15 @@
                 <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodBagId }}</td>
                 <td class="!px-5 !py-3">{{ rec.patientId?.UHID }}</td>
                 <td class="!px-5 !py-3">{{ rec.transporterKey }}</td>
-                <td class="!px-5 !py-3">{{ rec.patientId?.firstname | titlecase }} {{ rec.patientId?.lastname | titlecase }}</td>
+                <td class="!px-5 !py-3">{{ rec.patientId?.firstname | titlecase }} {{ rec.patientId?.lastname |
+                    titlecase }}</td>
                 <td class="!px-5 !py-3">{{ rec.patientId?.bloodGroup }}</td>
                 <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodcomponent }}</td>
 
                 <!-- Status badge -->
                 <td class="!px-5 !py-3">
-                    <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize" [ngClass]="badgeClass(rec.status)">
+                    <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize"
+                        [ngClass]="badgeClass(rec.status)">
                         {{ rec.status }}
                     </span>
                 </td>

@@ -5,11 +5,7 @@
     <p>Let's begin your Blood Bank</p>
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <input formControlName="phone" placeholder="Phone" />
-      <input
-        formControlName="password"
-        placeholder="Password"
-        type="password"
-      />
+      <input formControlName="password" placeholder="Password" type="password" />
       <button class="primary" type="submit">Login</button>
     </form>
   </div>
