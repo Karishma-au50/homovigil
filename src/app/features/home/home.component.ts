@@ -25,8 +25,7 @@ export class HomeComponent {
 
     fromDate: Date | null = null;
     toDate: Date | null = null;
-      allRecords: any[] = []; 
-
+    allRecords: any[] = [];
 
     @ViewChild('dt') dt!: Table;
     constructor(
@@ -65,14 +64,14 @@ export class HomeComponent {
     goToAllocateBag() {
         this.router.navigate(['/allocateBag']);
     }
-     filterByDateRange() {
+    filterByDateRange() {
         if (!this.fromDate && !this.toDate) {
             // If no dates selected, show all records
             this.records = [...this.allRecords];
             return;
         }
 
-        this.records = this.allRecords.filter(record => {
+        this.records = this.allRecords.filter((record) => {
             console.log(record);
             if (!record.allocatedOn) return false;
 

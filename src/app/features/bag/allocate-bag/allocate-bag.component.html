@@ -10,13 +10,14 @@
             <div class="flex flex-col md:flex-row items-center justify-center gap-8">
                 <div class="flex flex-col w-full md:w-1/2">
                     <label class="font-semibold mb-1">Patient UHID</label>
-                    <input type="text" formControlName="patientId" placeholder="Enter UHID" class="border-2 border-red-600 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300" />
+                    <input type="text" formControlName="patientId" placeholder="Enter UHID"
+                        class="border-2 border-red-600 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300" />
                 </div>
-                <div class="font-bold text-gray-600">OR</div>
+                <!-- <div class="font-bold text-gray-600">OR</div>
                 <div class="flex flex-col w-full md:w-1/2">
                     <label class="font-semibold mb-1">Haemovigil Label</label>
                     <input type="text" formControlName="bloodBagId" placeholder="Enter Label" class="border-2 border-red-600 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300" />
-                </div>
+                </div> -->
             </div>
 
             <div *ngIf="patientData" class="mt-6 p-4 rounded w-full px-6">
@@ -24,7 +25,8 @@
                 <table class="w-full text-left border-collapse">
                     <tr class="border-b">
                         <td class="py-2 font-semibold w-1/3">Patient Name:</td>
-                        <td class="py-2">{{ patientData.firstname | titlecase }} {{ patientData.lastname | titlecase }}</td>
+                        <td class="py-2">{{ patientData.firstname | titlecase }} {{ patientData.lastname | titlecase }}
+                        </td>
                     </tr>
                     <tr class="border-b">
                         <td class="py-2 font-semibold">UHID:</td>
@@ -85,7 +87,8 @@
                 </div>
             </div>
             <div class="text-center mt-6">
-                <button type="button" (click)="onSubmit()" class="bg-green-600 text-white px-6 py-2 rounded">Allocate</button>
+                <button type="button" (click)="onSubmit()"
+                    class="bg-green-600 text-white px-6 py-2 rounded">Allocate</button>
             </div>
         </form>
     </div>

@@ -90,8 +90,8 @@ export class AuthService {
     }
 
     // Patient search
-    searchPatient(uhid: string, label:string): Observable<any> {
-        return this.hemoVigilService.searchPatient(uhid,label).pipe(
+    searchPatient(uhid: string, label: string): Observable<any> {
+        return this.hemoVigilService.searchPatient(uhid, label).pipe(
             tap(() => {
                 this.messageService.add({
                     severity: 'success',
@@ -284,7 +284,7 @@ export class AuthService {
     }
     // Reserve allocated bag
     reserveAllocatedBag(allocationId: string, allocatedOn: string, reserved: string): Observable<any> {
-        return this.hemoVigilService.reserveAllocatedBag(allocationId, allocatedOn,reserved).pipe(
+        return this.hemoVigilService.reserveAllocatedBag(allocationId, allocatedOn, reserved).pipe(
             tap(() => {
                 this.messageService.add({
                     severity: 'success',
@@ -298,6 +298,19 @@ export class AuthService {
                     severity: 'error',
                     summary: 'Reservation Failed',
                     detail: error.error?.message || 'An error occurred during bag reservation.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+    getPatientDetailsWithBags(patientId: string): Observable<any> {
+        return this.hemoVigilService.getPatientDetailsWithBags(patientId).pipe(
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Load Failed',
+                    detail: error.error?.message || 'An error occurred while fetching patient details.',
                     life: 3000
                 });
                 return throwError(() => error);

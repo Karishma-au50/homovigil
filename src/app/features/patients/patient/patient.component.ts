@@ -16,12 +16,16 @@ export class PatientComponent {
     registerPatient: FormGroup;
     authService = inject(AuthService);
     @Input() formData: any;
+    // Track if this is an edit (true) or new entry (false)
+    isEditMode = false;
 
     ngOnInit(): void {
         //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
         //Add 'implements OnInit' to the class.
         if (this.formData) {
             this.registerPatient.patchValue(this.formData);
+            // If formData has an _id that's not '0', it's an edit
+            this.isEditMode = this.formData._id && this.formData._id !== '0';
         }
     }
 

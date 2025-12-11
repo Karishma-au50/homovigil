@@ -67,4 +67,7 @@ export class HemoVigilHttpService {
         };
         return this.http.patch<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}`, payload);
     }
+    getPatientDetailsWithBags(patientId: string): Observable<any> {
+        return this.http.get<any>(`${this.baseUrl}api/patient/${patientId}/details-with-bags`);
+    }
 }

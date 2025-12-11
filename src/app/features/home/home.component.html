@@ -1,6 +1,6 @@
 <div class="flex flex-wrap justify-between items-center gap-4 p-4">
-    <div class="flex bg-white border rounded-md shadow-sm w-full sm:w-auto sm:min-w-[350px]">
-        <input type="text" pInputText placeholder="Search..." class="flex-1 p-2 rounded-l-md outline-none"
+    <div class="flex bg-white border rounded-md shadow-sm">
+        <input type="text" pInputText placeholder="Search..." class="p-2 rounded-l-md outline-none w-[200px]"
             (input)="onGlobalFilter(dt, $event)" />
         <button class="bg-red-600 text-white px-4 rounded-r-md">Search</button>
     </div>
@@ -24,7 +24,7 @@
         [globalFilterFields]="['patientId.firstname', 'patientId.lastname', 'patientId.UHID', 'bloodBagId.bloodBagId', 'bloodBagId.bloodcomponent', 'patientId.bloodGroup', 'transporterKey']"
         [paginator]="true" [rows]="10" styleClass="w-full text-m" class="min-w-[800px]">
         <!-- HEADER -->
-        <ng-template #header>
+        <ng-template pTemplate="header">
             <tr class="bg-red-700 text-white text-left text-m font-semibold">
                 <th class="!px-5 !py-3">SR.No</th>
                 <th class="!px-5 !py-3">Bag ID</th>

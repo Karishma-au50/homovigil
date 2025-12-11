@@ -67,7 +67,7 @@ export class AllPatientComponent {
 
     editPatient(patient: Patient): void {
         // Call updatePatient with the updated patient object and its id
-        this.selectedPatient = patient;
+        this.selectedPatient = { ...patient };
         this.modalTitle = 'Edit Patient';
         this.showDialog();
     }
@@ -115,5 +115,22 @@ export class AllPatientComponent {
     onGlobalFilter(table: Table, event: Event) {
         const value = (event.target as HTMLInputElement).value;
         table.filterGlobal(value, 'contains');
+    }
+    detailsVisible: boolean = false;
+    selectedPatientDetails: any = null;
+
+    viewPatientDetails(row: any) {
+        this.selectedPatientDetails = row;
+        this.detailsVisible = true;
+
+        this.authService.getPatientDetailsWithBags(row._id).subscribe({
+            next: (res) => {
+                this.selectedPatientDetails = res.data;
+                this.detailsVisible = true;
+            },
+            error: () => {
+                alert('Failed to fetch patient details.');
+            }
+        });
     }
 }

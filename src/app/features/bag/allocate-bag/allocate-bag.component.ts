@@ -49,7 +49,6 @@ export class AllocateBagComponent implements OnInit {
         });
     }
 
-
     ngOnInit() {
         this.steps = [{ label: 'Search Patient' }, { label: 'Allocate Bag' }];
 
@@ -57,10 +56,8 @@ export class AllocateBagComponent implements OnInit {
             this.recordFormStep1.valueChanges
                 .pipe(
                     debounceTime(500),
-                    distinctUntilChanged((prev, curr) =>
-                        prev.patientId === curr.patientId && prev.bloodBagId === curr.bloodBagId
-                    ),
-                    filter(val => (val.patientId?.trim() || val.bloodBagId?.trim()))
+                    distinctUntilChanged((prev, curr) => prev.patientId === curr.patientId && prev.bloodBagId === curr.bloodBagId),
+                    filter((val) => val.patientId?.trim() || val.bloodBagId?.trim())
                 )
                 .subscribe(({ patientId, bloodBagId }) => {
                     const uhid = patientId?.trim() || '';
@@ -90,36 +87,46 @@ export class AllocateBagComponent implements OnInit {
         );
     }
 
- handlePatientSearch() {
-    const patientId = this.recordFormStep1.get('patientId')?.value?.trim();
-    const bloodBagId = this.recordFormStep1.get('bloodBagId')?.value?.trim();
+    handlePatientSearch() {
+        const patientId = this.recordFormStep1.get('patientId')?.value?.trim();
+        const bloodBagId = this.recordFormStep1.get('bloodBagId')?.value?.trim();
 
-    // Only one field should be filled
-    let uhid = '';
-    let label = '';
+        // Only one field should be filled
+        if ((patientId && bloodBagId) || (!patientId && !bloodBagId)) {
+            alert('Please enter either UHID or Label, not both.');
+            return;
+        }
 
-    if (patientId && !bloodBagId) {
-        uhid = patientId;
-        label = '';
-    } else if (!patientId && bloodBagId) {
-        uhid = '';
-        label = bloodBagId;
-    } else {
-        alert('Please enter either UHID or Label, not both.');
-        return;
+        const uhid = patientId || '';
+        const label = bloodBagId || '';
+
+        this.authService.searchPatient(uhid, label).subscribe({
+            next: (res) => {
+                const patient = res.data[0];
+
+                if (!patient) {
+                    alert('Patient not found');
+                    this.patientData = null;
+                    return;
+                }
+
+                // Check allocated bags count
+                if (patient.allocatedBags >= 6) {
+                    alert('This UHID has already been used 6 times and cannot be used anymore.');
+                    this.patientData = null;
+                    return;
+                }
+
+                this.patientData = patient;
+                this.activeIndex = 1; // Move to next step
+            },
+            error: (err) => {
+                alert(err?.error?.message || 'Error fetching patient');
+                this.patientData = null;
+            }
+        });
     }
 
-    this.authService.searchPatient(uhid, label).subscribe({
-        next: (res) => {
-            this.patientData = res.data[0];
-            this.activeIndex = 1; // Move to next step
-        },
-        error: () => {
-            alert('Patient not found');
-            this.patientData = null;
-        }
-    });
-}
     onSubmit() {
         if (!this.patientData) return;
         const payload = {
@@ -139,7 +146,13 @@ export class AllocateBagComponent implements OnInit {
                 alert('Bag allocated successfully!');
                 this.activeIndex = 0; // Reset wizard if needed
             },
-            error: () => alert('Failed to allocate bag')
+            error: (err) => {
+                if (err?.error?.message) {
+                    alert(err.error.message); // <-- shows "Patient already has 6 bags"
+                } else {
+                    alert('Failed to allocate bag');
+                }
+            }
         });
     }
 }
