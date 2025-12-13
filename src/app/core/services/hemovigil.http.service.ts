@@ -70,4 +70,11 @@ export class HemoVigilHttpService {
     getPatientDetailsWithBags(patientId: string): Observable<any> {
         return this.http.get<any>(`${this.baseUrl}api/patient/${patientId}/details-with-bags`);
     }
+
+    checkAllocationLimit(patientId: string): Observable<any> {
+        return this.http.get<any>(`${this.baseUrl}api/patient/${patientId}/allocation-check`);
+    }
+    rotateHaemovigil(patientId: string): Observable<any> {
+        return this.http.post<any>(`${this.baseUrl}api/patient/${patientId}/rotate-haemovigil`, {});
+    }
 }

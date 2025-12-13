@@ -120,12 +120,13 @@ export class AllPatientComponent {
     selectedPatientDetails: any = null;
 
     viewPatientDetails(row: any) {
-        this.selectedPatientDetails = row;
-        this.detailsVisible = true;
-
         this.authService.getPatientDetailsWithBags(row._id).subscribe({
             next: (res) => {
-                this.selectedPatientDetails = res.data;
+                // Backend returns { status, data: { patient, totalBags, allocations } }
+                this.selectedPatientDetails = res.data.patient;
+                this.selectedPatientDetails.totalBags = res.data.totalBags || 0;
+                this.selectedPatientDetails.allocations = res.data.allocations || [];
+
                 this.detailsVisible = true;
             },
             error: () => {

@@ -4,6 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 import { User } from '../models/user.model';
 import { MessageService } from 'primeng/api';
 import { HemoVigilHttpService } from '../services/hemovigil.http.service';
+import { HttpClient } from '@angular/common/http';
 
 export interface Credentials {
     mobile: string;
@@ -304,6 +305,7 @@ export class AuthService {
             })
         );
     }
+
     getPatientDetailsWithBags(patientId: string): Observable<any> {
         return this.hemoVigilService.getPatientDetailsWithBags(patientId).pipe(
             catchError((error) => {
@@ -316,5 +318,11 @@ export class AuthService {
                 return throwError(() => error);
             })
         );
+    }
+    checkAllocationLimit(patientId: string): Observable<any> {
+        return this.hemoVigilService.checkAllocationLimit(patientId);
+    }
+    rotateHaemovigil(patientId: string): Observable<any> {
+        return this.hemoVigilService.rotateHaemovigil(patientId);
     }
 }
