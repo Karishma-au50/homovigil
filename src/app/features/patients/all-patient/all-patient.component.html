@@ -12,20 +12,86 @@
 
 <!-- ADD / EDIT PATIENT DIALOG -->
 <p-dialog [(visible)]="visible" [modal]="true" [closable]="false" [showHeader]="false" contentStyle="border: none">
+
     <ng-template pTemplate="content">
         <app-patient [formData]="selectedPatient" (closeDialog)="closeDialog($event)">
         </app-patient>
     </ng-template>
+
 </p-dialog>
 
 <!-- PATIENT DETAILS DIALOG -->
-<p-dialog [(visible)]="visible" [modal]="true" [closable]="false" [showHeader]="false" contentStyle="border: none">
+<p-dialog [(visible)]="detailsVisible" modal="true" dismissableMask="true" header="Patient Details"
+    [style]="{ width: '520px' }" styleClass="patient-details-dialog">
+
     <ng-template pTemplate="content">
-        <app-patient [formData]="selectedPatient" (closeDialog)="closeDialog($event)"></app-patient>
+
+        <div *ngIf="selectedPatientDetails" class="pd-container">
+
+            <!-- NAME -->
+            <h3 class="pd-name">
+                {{ selectedPatientDetails.firstname | titlecase }}
+                {{ selectedPatientDetails.lastname | titlecase }}
+            </h3>
+
+            <!-- INFO GRID -->
+            <div class="pd-grid">
+                <div>
+                    <span>UHID</span>
+                    <strong>{{ selectedPatientDetails.UHID }}</strong>
+                </div>
+                <div>
+                    <span>Blood Group</span>
+                    <strong class="red">{{ selectedPatientDetails.bloodGroup }}</strong>
+                </div>
+                <div>
+                    <span>Haemovigil ID</span>
+                    <strong class="badge">{{ selectedPatientDetails.haemovigilId }}</strong>
+                </div>
+                <div>
+                    <span>Total Bags</span>
+                    <strong class="badge">{{ selectedPatientDetails.totalBags }}</strong>
+                </div>
+            </div>
+
+            <!-- ALLOCATED BAGS -->
+            <div class="pd-section">
+                <h4>Allocated Bags</h4>
+
+                <div class="pd-table-wrapper" *ngIf="selectedPatientDetails.allocations?.length">
+
+                    <table class="pd-table">
+                        <thead>
+                            <tr>
+                                <th>Bag ID</th>
+                                <th>Component</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let a of selectedPatientDetails.allocations">
+                                <td>{{ a.bloodBagId?.bloodBagId }}</td>
+                                <td>{{ a.bloodBagId?.bloodcomponent }}</td>
+                                <td>
+                                    <span class="status-badge">
+                                        {{ a.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div *ngIf="!selectedPatientDetails.allocations?.length" class="pd-empty">
+                    No bags allocated
+                </div>
+            </div>
+
+        </div>
+
     </ng-template>
 </p-dialog>
-
-
 
 
 <!-- MAIN TABLE -->
