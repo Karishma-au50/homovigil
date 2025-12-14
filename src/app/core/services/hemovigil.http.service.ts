@@ -67,10 +67,20 @@ export class HemoVigilHttpService {
         return this.http.get<any>(`${this.baseUrl}api/patient/${patientId}/details-with-bags`);
     }
 
+    // ✅ PAGINATED ALLOCATION API
+    getAllocationBagPaginated(page: number, limit: number, status?: string) {
+        let url = `${this.baseUrl}api/allocation?page=${page}&limit=${limit}`;
+
+        if (status) {
+            url += `&status=${status}`;
+        }
+
+        return this.http.get(url);
+    }
+
     checkAllocationLimit(patientId: string): Observable<any> {
         return this.http.get<any>(`${this.baseUrl}api/patient/${patientId}/allocation-check`);
     }
-
     rotateHaemovigil(patientId: string): Observable<any> {
         return this.http.post<any>(`${this.baseUrl}api/patient/${patientId}/rotate-haemovigil`, {});
     }

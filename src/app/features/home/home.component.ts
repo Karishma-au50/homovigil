@@ -37,7 +37,7 @@ export class HomeComponent {
     }
 
     loadPatients(): void {
-        this.authService.getAllocationBag().subscribe((data: any) => {
+        this.authService.getAllocationBagPaginated(1, 10).subscribe((data: any) => {
             console.log(data);
             this.records = data.data.allocations;
         });

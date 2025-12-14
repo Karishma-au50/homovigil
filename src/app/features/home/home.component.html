@@ -22,7 +22,7 @@
 <div class="overflow-auto rounded-xl bg-white shadow ring-1 ring-gray-200">
     <p-table #dt [value]="records"
         [globalFilterFields]="['patientId.firstname', 'patientId.lastname', 'patientId.UHID', 'bloodBagId.bloodBagId', 'bloodBagId.bloodcomponent', 'patientId.bloodGroup', 'transporterKey']"
-        [paginator]="true" [rows]="10" styleClass="w-full text-m" class="min-w-[800px]">
+        [paginator]="true" [rows]="7" styleClass="w-full text-m" class="min-w-[800px]">
         <!-- HEADER -->
         <ng-template pTemplate="header">
             <tr class="bg-red-700 text-white text-left text-m font-semibold">

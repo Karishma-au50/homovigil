@@ -59,10 +59,13 @@
     </div> -->
 
 
-<p-table #dt [value]="row"
-  [globalFilterFields]="['bloodBagId.bloodBagId','patientId.UHID', 'patientId.firstname', 'patientId.lastname', 'bloodBagId.bloodcomponent', 'transporterKey']"
-  [paginator]="true" [rows]="10" responsiveLayout="scroll"
-  class="w-full text-m p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
+<p-table #dt [value]="row" [paginator]="true" [rows]="7" [globalFilterFields]="[
+    'bloodBagId.bloodBagId',
+    'patientId.UHID',
+    'patientId.firstname',
+    'patientId.lastname',
+    'bloodBagId.bloodcomponent'
+  ]" responsiveLayout="scroll" class="w-full text-m p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
   <ng-template pTemplate="header">
     <tr class="bg-red-700 text-white text-m px-5 py-3 font-semibold">
       <th class="rounded-tl-xl !px-5 !py-3">Bag ID</th>

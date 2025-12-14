@@ -153,6 +153,20 @@ export class AuthService {
         );
     }
 
+    getAllocationBagPaginated(page: number, limit: number, status?: string): Observable<any> {
+        return this.hemoVigilService.getAllocationBagPaginated(page, limit, status).pipe(
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Load Failed',
+                    detail: error.error?.message || 'An error occurred while loading bags.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
     // Update patient
     updatePatient(patient: any, id: string): Observable<any> {
         return this.hemoVigilService.updatePatient(patient, id).pipe(

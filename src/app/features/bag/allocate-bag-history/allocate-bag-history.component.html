@@ -22,10 +22,14 @@
     <!-- <p-button label="New Allocation" icon="pi pi-bag" (click)="goToAllocateBag()"> </p-button> -->
 
 </div>
-<p-table #dt [value]="row"
-    [globalFilterFields]="['bloodBagId.bloodBagId', 'patientId.UHID', 'patientId.firstname', 'patientId.lastname', 'patientId.bloodGroup', 'bloodBagId.bloodcomponent', 'transporterKey']"
-    [paginator]="true" [rows]="10" responsiveLayout="scroll"
-    class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
+<p-table #dt [value]="row" [paginator]="true" [rows]="7" [globalFilterFields]="[
+    'bloodBagId.bloodBagId',
+    'patientId.UHID',
+    'patientId.firstname',
+    'patientId.lastname',
+    'bloodBagId.bloodcomponent',
+    'transporterKey'
+  ]" responsiveLayout="scroll" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
     <ng-template pTemplate="header">
         <tr class="bg-red-700 text-white text-left text-m font-semibold">
             <th class="rounded-tl-xl !px-5 !py-3">Bag ID</th>
