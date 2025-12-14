@@ -5,6 +5,8 @@ import { User } from '../models/user.model';
 import { MessageService } from 'primeng/api';
 import { HemoVigilHttpService } from '../services/hemovigil.http.service';
 import { HttpClient } from '@angular/common/http';
+import { ApiResponse } from '../models/api-response.model';
+import { BagAllocation } from '../models/bag.modal';
 
 export interface Credentials {
     mobile: string;
@@ -137,16 +139,8 @@ export class AuthService {
     }
 
     // Get all allocation bags
-    getAllocationBag(): Observable<any> {
+    getAllocationBag(): Observable<ApiResponse<BagAllocation[]>> {
         return this.hemoVigilService.getAllocationBag().pipe(
-            tap(() => {
-                // this.messageService.add({
-                //     severity: 'success',
-                //     summary: 'Bags Loaded',
-                //     detail: 'All Bags loaded successfully.',
-                //     life: 3000
-                // });
-            }),
             catchError((error) => {
                 this.messageService.add({
                     severity: 'error',

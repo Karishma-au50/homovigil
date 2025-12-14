@@ -60,7 +60,7 @@
 
 
 <p-table #dt [value]="row"
-  [globalFilterFields]="['bloodBagId.bloodBagId', 'patientId.UHID', 'patientId.firstname', 'patientId.lastname', 'patientId.bloodGroup', 'bloodBagId.bloodcomponent', 'transporterKey']"
+  [globalFilterFields]="['bloodBagId.bloodBagId','patientId.UHID', 'patientId.firstname', 'patientId.lastname', 'bloodBagId.bloodcomponent', 'transporterKey']"
   [paginator]="true" [rows]="10" responsiveLayout="scroll"
   class="w-full text-m p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
   <ng-template pTemplate="header">
@@ -81,7 +81,7 @@
     <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
       <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodBagId }}</td>
       <td class="!px-5 !py-3">{{ row.patientId?.UHID }}</td>
-      <td class="!px-5 !py-3">{{ row.transporterKey }}</td>
+      <td class="!px-5 !py-3"> {{ row.transporterKey || 'N/A' }}</td>
       <td class="!px-5 !py-3">{{ row.patientId?.firstname | titlecase }} {{ row.patientId?.lastname | titlecase }}</td>
       <td class="!px-5 !py-3">{{ row.patientId?.bloodGroup }}</td>
       <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodcomponent }}</td>
