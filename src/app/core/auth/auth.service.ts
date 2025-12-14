@@ -278,8 +278,8 @@ export class AuthService {
         );
     }
     // Reserve allocated bag
-    reserveAllocatedBag(allocationId: string, allocatedOn: string, reserved: string): Observable<any> {
-        return this.hemoVigilService.reserveAllocatedBag(allocationId, allocatedOn, reserved).pipe(
+    reserveAllocatedBag(allocationId: string): Observable<any> {
+        return this.hemoVigilService.reserveAllocatedBag(allocationId).pipe(
             tap(() => {
                 this.messageService.add({
                     severity: 'success',

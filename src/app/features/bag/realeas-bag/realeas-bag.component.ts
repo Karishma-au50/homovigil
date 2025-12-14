@@ -55,7 +55,7 @@ export class ReleasBagComponent {
     }
 
     stripe = (i: number) => (i % 2 === 0 ? 'bg-gray-50' : '');
-       searchOptions = [
+    searchOptions = [
         { label: 'Patient Name', value: 'patient' },
         { label: 'Blood Group', value: 'bloodGroup' },
         { label: 'Component', value: 'component' }
@@ -129,19 +129,19 @@ export class ReleasBagComponent {
         });
     }
 
-    reserveAllocatedBag(allocationId: string, allocatedOn: string): void {
+    reserveAllocatedBag(allocationId: string): void {
         this.confirmationService.confirm({
             message: 'Are you sure you want to reserve this bag?',
             header: 'Confirm Reserve',
             icon: 'pi pi-info-circle',
             accept: () => {
-                this.authService.reserveAllocatedBag(allocationId, allocatedOn, 'reserved').subscribe({
+                this.authService.reserveAllocatedBag(allocationId).subscribe({
                     next: () => {
                         alert('Bag reserved successfully!');
-                        this.loadPatients();
+                        this.loadPatients(); // refresh table
                     },
                     error: (error) => {
-                        alert('Error reserving bag.');
+                        alert(error.error?.message || 'Error reserving bag.');
                         console.error('Error reserving bag:', error);
                     }
                 });

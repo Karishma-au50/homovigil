@@ -98,34 +98,44 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
 
     // 🔍 Manual search + limit check
     handlePatientSearch(): void {
-        const uhid = this.recordFormStep1.get('patientId')?.value?.trim() || '';
-        const label = this.recordFormStep1.get('bloodBagId')?.value?.trim() || '';
+        const uhid = this.recordFormStep1.get('patientId')?.value?.trim();
 
-        if ((uhid && label) || (!uhid && !label)) {
-            this.showError('Input Error', 'Please enter either UHID or Label');
+        if (!uhid) {
+            this.showError('Input Error', 'Please enter UHID');
             return;
         }
 
-        this.authService.searchPatient(uhid, label).subscribe({
+        // 1️⃣ Search patient
+        this.authService.searchPatient(uhid, '').subscribe({
             next: (res: any) => {
-                const patient = res.data[0];
+                const patient = res.data?.[0];
                 if (!patient) {
                     this.showError('Not Found', 'Patient not found');
                     return;
                 }
 
-                if (patient.allocatedBags >= 6) {
-                    // 🚨 limit reached → rotate haemovigil
-                    this.patientToClone = patient;
-                    this.showMaxBagsDialog = true;
-                    return;
-                }
+                // 2️⃣ Check allocation limit
+                this.authService.checkAllocationLimit(patient._id).subscribe({
+                    next: (limitRes: any) => {
+                        // 🔥 THIS IS THE KEY LINE
+                        if (limitRes?.data?.limitReached) {
+                            this.patientToClone = patient;
+                            this.patientData = null;
+                            this.showMaxBagsDialog = true;
+                            return;
+                        }
 
-                this.patientData = patient;
-                this.activeIndex = 1;
+                        // ✅ safe to allocate
+                        this.patientData = patient;
+                        this.activeIndex = 1;
+                    },
+                    error: () => {
+                        this.showError('Error', 'Failed to verify allocation limit');
+                    }
+                });
             },
-            error: (err) => {
-                this.showError('Error', err?.error?.message || 'Failed to fetch patient');
+            error: () => {
+                this.showError('Error', 'Patient search failed');
             }
         });
     }
