@@ -39,7 +39,7 @@ export class ReleasBagComponent {
 
     // ✅ LOAD ALL, THEN FILTER CLIENT SIDE
     loadPatients(): void {
-        this.authService.getAllocationBag().subscribe({
+        this.authService.getAllAllocationsNoPagination().subscribe({
             next: (res: any) => {
                 const all = res.data?.allocations ?? res.data ?? [];
                 this.row = all.filter((a: BagAllocation) => a.status?.toLowerCase() === 'allocated');

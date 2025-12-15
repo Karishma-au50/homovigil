@@ -37,11 +37,20 @@ export class HomeComponent {
     }
 
     loadPatients(): void {
-        this.authService.getAllocationBagPaginated(1, 10).subscribe((data: any) => {
-            console.log(data);
-            this.records = data.data.allocations;
+        this.authService.getAllAllocationsNoPagination().subscribe({
+            next: (res: any) => {
+                this.records = res.data ?? [];
+                this.allRecords = [...this.records];
+
+                setTimeout(() => this.dt?.reset());
+            },
+            error: () => {
+                this.records = [];
+                this.allRecords = [];
+            }
         });
     }
+
     onGlobalFilter(table: Table, event: Event) {
         const value = (event.target as HTMLInputElement).value;
         table.filterGlobal(value, 'contains');
@@ -57,10 +66,10 @@ export class HomeComponent {
             }[status] ?? 'bg-gray-100 text-gray-700'
         );
     }
-    onFilterGlobal(event: Event): void {
-        const inputElement = event.target as HTMLInputElement;
-        this.dt.filterGlobal(inputElement.value, 'contains');
-    }
+    // onFilterGlobal(event: Event): void {
+    //     const inputElement = event.target as HTMLInputElement;
+    //     this.dt.filterGlobal(inputElement.value, 'contains');
+    // }
     goToAllocateBag() {
         this.router.navigate(['/allocateBag']);
     }
