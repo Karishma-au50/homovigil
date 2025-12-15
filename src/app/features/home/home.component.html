@@ -20,16 +20,20 @@
 
 <!-- 📋 Allocation list -->
 <div class="overflow-auto rounded-xl bg-white shadow ring-1 ring-gray-200">
-    <p-table #dt [value]="records"
-        [globalFilterFields]="['patientId.firstname', 'patientId.lastname', 'patientId.UHID', 'bloodBagId.bloodBagId', 'bloodBagId.bloodcomponent', 'patientId.bloodGroup', 'transporterKey']"
-        [paginator]="true" [rows]="7" styleClass="w-full text-m" class="min-w-[800px]">
+    <p-table #dt [value]="records" [globalFilterFields]="['HaemovigilID',
+  'patientId.haemovigilId',
+  'patientId.UHID',
+  'patientId.firstname',
+  'patientId.lastname',
+  'bloodBagId.bloodBagId',
+  'bloodBagId.bloodcomponent']" [paginator]="true" [rows]="7" styleClass="w-full text-m" class="min-w-[800px]">
         <!-- HEADER -->
         <ng-template pTemplate="header">
             <tr class="bg-red-700 text-white text-left text-m font-semibold">
                 <th class="!px-5 !py-3">SR.No</th>
                 <th class="!px-5 !py-3">Bag ID</th>
                 <th class="!px-5 !py-3">UhID</th>
-                <th class="!px-5 !py-3">Transporter Key</th>
+                <th class="!px-5 !py-3">Haemovigil ID</th>
                 <th class="!px-5 !py-3">Patient Name</th>
                 <th class="!px-5 !py-3">Blood<br />Group</th>
                 <th class="!px-5 !py-3">Blood<br />Component</th>
@@ -44,7 +48,9 @@
                 <td class="!px-5 !py-3 font-medium">{{ i + 1 }}</td>
                 <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodBagId }}</td>
                 <td class="!px-5 !py-3">{{ rec.patientId?.UHID }}</td>
-                <td class="!px-5 !py-3">{{ rec.transporterKey }}</td>
+                <td class="!px-5 !py-3">
+                    {{ rec.HaemovigilID || rec.patientId?.haemovigilId || 'N/A' }}
+                </td>
                 <td class="!px-5 !py-3">{{ rec.patientId?.firstname | titlecase }} {{ rec.patientId?.lastname |
                     titlecase }}</td>
                 <td class="!px-5 !py-3">{{ rec.patientId?.bloodGroup }}</td>

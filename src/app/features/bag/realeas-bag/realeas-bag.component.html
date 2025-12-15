@@ -64,13 +64,14 @@
     'patientId.UHID',
     'patientId.firstname',
     'patientId.lastname',
-    'bloodBagId.bloodcomponent'
+    'bloodBagId.bloodcomponent',
+    'HaemovigilID'
   ]" responsiveLayout="scroll" class="w-full text-m p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
   <ng-template pTemplate="header">
     <tr class="bg-red-700 text-white text-m px-5 py-3 font-semibold">
       <th class="rounded-tl-xl !px-5 !py-3">Bag ID</th>
       <th class="!px-5 !py-3">UHID</th>
-      <th class="!px-5 !py-3">Transporter Key</th>
+      <th class="!px-5 !py-3">HaemovigilID</th>
       <th class="!px-5 !py-3">Patient Name</th>
       <th class="!px-5 !py-3">Blood Group</th>
       <th class="!px-5 !py-3">Blood Component</th>
@@ -84,7 +85,7 @@
     <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
       <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodBagId }}</td>
       <td class="!px-5 !py-3">{{ row.patientId?.UHID }}</td>
-      <td class="!px-5 !py-3"> {{ row.transporterKey || 'N/A' }}</td>
+      <td class="!px-5 !py-3"> {{ row.HaemovigilID || row.patientId?.haemovigilId }}</td>
       <td class="!px-5 !py-3">{{ row.patientId?.firstname | titlecase }} {{ row.patientId?.lastname | titlecase }}</td>
       <td class="!px-5 !py-3">{{ row.patientId?.bloodGroup }}</td>
       <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodcomponent }}</td>
