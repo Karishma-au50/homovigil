@@ -84,4 +84,7 @@ export class HemoVigilHttpService {
     rotateHaemovigil(patientId: string): Observable<any> {
         return this.http.post<any>(`${this.baseUrl}api/patient/${patientId}/rotate-haemovigil`, {});
     }
+    getAllAllocationsNoPagination() {
+        return this.http.get<any>(`${this.baseUrl}api/allocation/all`);
+    }
 }

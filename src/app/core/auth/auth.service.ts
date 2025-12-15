@@ -333,4 +333,7 @@ export class AuthService {
     rotateHaemovigil(patientId: string): Observable<any> {
         return this.hemoVigilService.rotateHaemovigil(patientId);
     }
+    getAllAllocationsNoPagination() {
+        return this.hemoVigilService.getAllAllocationsNoPagination();
+    }
 }

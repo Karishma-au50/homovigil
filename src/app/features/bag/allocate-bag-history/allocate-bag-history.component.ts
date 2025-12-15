@@ -32,10 +32,9 @@ export class AllocateBagHistoryComponent {
 
     // ✅ LOAD ALL DATA ONCE
     loadPatients(): void {
-        this.authService.getAllocationBag().subscribe({
+        this.authService.getAllAllocationsNoPagination().subscribe({
             next: (res: any) => {
-                // backend may return { allocations } or direct array
-                this.row = res.data?.allocations ?? res.data ?? [];
+                this.row = res.data ?? [];
             },
             error: () => {
                 this.row = [];
