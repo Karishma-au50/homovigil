@@ -1,5 +1,5 @@
 // haemovigil-table.component.ts
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 
 // ➜ PrimeNG & Angular standalone imports
 import { Table, TableModule } from 'primeng/table';
@@ -23,6 +23,7 @@ import { DropdownModule } from 'primeng/dropdown';
     imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule]
 })
 export class AllPatientComponent {
+    @ViewChild('dt') table!: Table;
     rows: Patient[] = [];
 
     router: any;
@@ -48,8 +49,18 @@ export class AllPatientComponent {
     }
 
     loadPatients(): void {
+        this.rows = []; // 🔥 STEP 1: clear table first
+
         this.authService.getAllPatients().subscribe((data: any) => {
+            // 🔥 STEP 2: assign sorted data
             this.rows = data.data;
+
+            // 🔥 STEP 3: force paginator to page 1
+            setTimeout(() => {
+                if (this.table) {
+                    this.table.first = 0;
+                }
+            });
         });
     }
 
@@ -67,7 +78,7 @@ export class AllPatientComponent {
 
     editPatient(patient: Patient): void {
         // Call updatePatient with the updated patient object and its id
-        this.selectedPatient = patient;
+        this.selectedPatient = { ...patient };
         this.modalTitle = 'Edit Patient';
         this.showDialog();
     }
@@ -105,15 +116,35 @@ export class AllPatientComponent {
 
     closeDialog(fetchData: boolean): void {
         this.visible = false;
+
         if (fetchData) {
-            this.loadPatients();
+            this.loadPatients(); // paginator reset happens inside
         }
     }
+
     goToAllocateBag() {
         this.router.navigate(['/allocateBag']);
     }
     onGlobalFilter(table: Table, event: Event) {
         const value = (event.target as HTMLInputElement).value;
         table.filterGlobal(value, 'contains');
+    }
+    detailsVisible: boolean = false;
+    selectedPatientDetails: any = null;
+
+    viewPatientDetails(row: any) {
+        this.authService.getPatientDetailsWithBags(row._id).subscribe({
+            next: (res) => {
+                // Backend returns { status, data: { patient, totalBags, allocations } }
+                this.selectedPatientDetails = res.data.patient;
+                this.selectedPatientDetails.totalBags = res.data.totalBags || 0;
+                this.selectedPatientDetails.allocations = res.data.allocations || [];
+
+                this.detailsVisible = true;
+            },
+            error: () => {
+                alert('Failed to fetch patient details.');
+            }
+        });
     }
 }

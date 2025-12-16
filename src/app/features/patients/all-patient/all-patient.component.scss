@@ -6,3 +6,123 @@
 ::ng-deep .p-dialog {
     border-width: 0 !important;
 }
+
+/* Dialog shell */
+.patient-details-dialog {
+  .p-dialog-header {
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    color: #b10000;
+  }
+
+  .p-dialog-content {
+    padding: 1.25rem;
+  }
+}
+
+/* Layout */
+.pd-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pd-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Info grid */
+.pd-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+
+  div {
+    background: #fff5f5;
+    border: 1px solid #ffd6d6;
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+
+    span {
+      display: block;
+      color: #9b1c1c;
+      font-size: 0.7rem;
+      margin-bottom: 2px;
+    }
+
+    strong {
+      color: #7a0000;
+    }
+  }
+}
+
+// /* Badges */
+// .badge {
+//   display: inline-block;
+//   background: #be0000;
+//   color: #fff;
+//   padding: 2px 10px;
+//   border-radius: 999px;
+//   font-size: 0.75rem;
+// }
+
+.red {
+  color: #be0000;
+}
+
+/* Allocated bags */
+.pd-section h4 {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #7a0000;
+}
+
+.pd-table-wrapper {
+  border: 1px solid #ffd6d6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pd-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.pd-table thead {
+  background: #be0000;
+  color: #fff;
+}
+
+.pd-table th,
+.pd-table td {
+  padding: 0.6rem;
+  text-align: left;
+}
+
+.pd-table tbody tr:nth-child(even) {
+  background: #fff5f5;
+}
+
+/* Status badge */
+.status-badge {
+  background: #ffe4e4;
+  color: #7a0000;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+/* Empty */
+.pd-empty {
+  text-align: center;
+  padding: 0.75rem;
+  font-size: 0.8rem;
+  color: #9b1c1c;
+}

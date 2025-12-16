@@ -60,11 +60,31 @@ export class HemoVigilHttpService {
     public releaseAllocatedBag(allocationId: string, releaseUserName: string): Observable<ApiResponse<any>> {
         return this.http.patch<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}/release`, { releaseUserName });
     }
-    public reserveAllocatedBag(allocationId: string, allocatedOn: string, reserved: string): Observable<ApiResponse<any>> {
-        const payload = {
-            status: reserved,
-            allocatedOn: allocatedOn
-        };
-        return this.http.patch<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}`, payload);
+    public reserveAllocatedBag(allocationId: string): Observable<ApiResponse<any>> {
+        return this.http.patch<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}/reserve`, {});
+    }
+    getPatientDetailsWithBags(patientId: string): Observable<any> {
+        return this.http.get<any>(`${this.baseUrl}api/patient/${patientId}/details-with-bags`);
+    }
+
+    // ✅ PAGINATED ALLOCATION API
+    getAllocationBagPaginated(page: number, limit: number, status?: string) {
+        let url = `${this.baseUrl}api/allocation?page=${page}&limit=${limit}`;
+
+        if (status) {
+            url += `&status=${status}`;
+        }
+
+        return this.http.get(url);
+    }
+
+    checkAllocationLimit(patientId: string): Observable<any> {
+        return this.http.get<any>(`${this.baseUrl}api/patient/${patientId}/allocation-check`);
+    }
+    rotateHaemovigil(patientId: string): Observable<any> {
+        return this.http.post<any>(`${this.baseUrl}api/patient/${patientId}/rotate-haemovigil`, {});
+    }
+    getAllAllocationsNoPagination() {
+        return this.http.get<any>(`${this.baseUrl}api/allocation/all`);
     }
 }

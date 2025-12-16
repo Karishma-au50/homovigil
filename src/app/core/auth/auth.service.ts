@@ -4,6 +4,9 @@ import { jwtDecode } from 'jwt-decode';
 import { User } from '../models/user.model';
 import { MessageService } from 'primeng/api';
 import { HemoVigilHttpService } from '../services/hemovigil.http.service';
+import { HttpClient } from '@angular/common/http';
+import { ApiResponse } from '../models/api-response.model';
+import { BagAllocation } from '../models/bag.modal';
 
 export interface Credentials {
     mobile: string;
@@ -90,8 +93,8 @@ export class AuthService {
     }
 
     // Patient search
-    searchPatient(uhid: string, label:string): Observable<any> {
-        return this.hemoVigilService.searchPatient(uhid,label).pipe(
+    searchPatient(uhid: string, label: string): Observable<any> {
+        return this.hemoVigilService.searchPatient(uhid, label).pipe(
             tap(() => {
                 this.messageService.add({
                     severity: 'success',
@@ -136,16 +139,22 @@ export class AuthService {
     }
 
     // Get all allocation bags
-    getAllocationBag(): Observable<any> {
+    getAllocationBag(): Observable<ApiResponse<BagAllocation[]>> {
         return this.hemoVigilService.getAllocationBag().pipe(
-            tap(() => {
-                // this.messageService.add({
-                //     severity: 'success',
-                //     summary: 'Bags Loaded',
-                //     detail: 'All Bags loaded successfully.',
-                //     life: 3000
-                // });
-            }),
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Load Failed',
+                    detail: error.error?.message || 'An error occurred while loading bags.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
+    getAllocationBagPaginated(page: number, limit: number, status?: string): Observable<any> {
+        return this.hemoVigilService.getAllocationBagPaginated(page, limit, status).pipe(
             catchError((error) => {
                 this.messageService.add({
                     severity: 'error',
@@ -283,8 +292,8 @@ export class AuthService {
         );
     }
     // Reserve allocated bag
-    reserveAllocatedBag(allocationId: string, allocatedOn: string, reserved: string): Observable<any> {
-        return this.hemoVigilService.reserveAllocatedBag(allocationId, allocatedOn,reserved).pipe(
+    reserveAllocatedBag(allocationId: string): Observable<any> {
+        return this.hemoVigilService.reserveAllocatedBag(allocationId).pipe(
             tap(() => {
                 this.messageService.add({
                     severity: 'success',
@@ -303,5 +312,28 @@ export class AuthService {
                 return throwError(() => error);
             })
         );
+    }
+
+    getPatientDetailsWithBags(patientId: string): Observable<any> {
+        return this.hemoVigilService.getPatientDetailsWithBags(patientId).pipe(
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Load Failed',
+                    detail: error.error?.message || 'An error occurred while fetching patient details.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+    checkAllocationLimit(patientId: string): Observable<any> {
+        return this.hemoVigilService.checkAllocationLimit(patientId);
+    }
+    rotateHaemovigil(patientId: string): Observable<any> {
+        return this.hemoVigilService.rotateHaemovigil(patientId);
+    }
+    getAllAllocationsNoPagination() {
+        return this.hemoVigilService.getAllAllocationsNoPagination();
     }
 }
