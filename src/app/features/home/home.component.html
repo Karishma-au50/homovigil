@@ -1,4 +1,4 @@
-<div class="flex flex-wrap justify-between items-center gap-4 p-4">
+<div class="flex flex-wrap justify-between flex-col-reverse items-end md:flex-row md:items-center gap-4 p-4">
     <div class="flex bg-white border rounded-md shadow-sm">
         <input type="text" pInputText placeholder="Search..." class="p-2 rounded-l-md outline-none w-[200px]"
             (input)="onGlobalFilter(dt, $event)" />
@@ -30,15 +30,15 @@
         <!-- HEADER -->
         <ng-template pTemplate="header">
             <tr class="bg-red-700 text-white text-left text-m font-semibold">
-                <th class="!px-5 !py-3">SR.No</th>
-                <th class="!px-5 !py-3">Bag ID</th>
-                <th class="!px-5 !py-3">UhID</th>
-                <th class="!px-5 !py-3">Haemovigil ID</th>
-                <th class="!px-5 !py-3">Patient Name</th>
-                <th class="!px-5 !py-3">Blood<br />Group</th>
-                <th class="!px-5 !py-3">Blood<br />Component</th>
-                <th class="!px-5 !py-3">Status</th>
-                <th class="!px-5 !py-3">Allocated On</th>
+                <th class="!px-5 !py-3 whitespace-nowrap">SR.No</th>
+                <th class="!px-5 !py-3 whitespace-nowrap">Bag ID</th>
+                <th class="!px-5 !py-3 whitespace-nowrap">UhID</th>
+                <th class="!px-5 !py-3 whitespace-nowrap">Haemovigil ID</th>
+                <th class="!px-5 !py-3 whitespace-nowrap">Patient Name</th>
+                <th class="!px-5 !py-3 whitespace-nowrap">Blood<br />Group</th>
+                <th class="!px-5 !py-3 whitespace-nowrap">Blood<br />Component</th>
+                <th class="!px-5 !py-3 whitespace-nowrap">Status</th>
+                <th class="!px-5 !py-3 whitespace-nowrap">Allocated On</th>
             </tr>
         </ng-template>
 

@@ -1,16 +1,16 @@
 <div class="flex min-h-screen bg-white">
-  <div class="form-section">
-    <p class="logo">HaemoVigil</p>
+  <div class="form-section !w-full !p-[50px] md:!w-[40%] md:p-![100px]">
+    <p class="logo !mb-0">HaemoVigil</p>
     <h2>Create an account</h2>
     <p>Let's begin your Blood Bank</p>
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <input formControlName="phone" placeholder="Phone" />
+      <input formControlName="phone" placeholder="Phone" maxlength="10" />
       <input formControlName="password" placeholder="Password" type="password" />
       <button class="primary" type="submit">Login</button>
     </form>
   </div>
 
-  <div class="image-section">
+  <div class="!hidden md:!flex image-section">
     <div class="overlay-text ml-36">
       <h2>Let’s empower your Blood Bank today with Haemovigil</h2>
       <p>

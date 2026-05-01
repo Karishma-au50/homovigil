@@ -9,13 +9,13 @@
     <!-- Phone Field -->
     <div class="flex flex-col gap-2">
         <label for="phone" class="font-semibold text-gray-700">Phone Number</label>
-        <input pInputText id="phone" [(ngModel)]="user.phone" placeholder="e.g., 9876543210" class="w-full" />
+        <input pInputText id="phone" [(ngModel)]="user.phone" maxlength="10" placeholder="e.g., 9876543210" class="w-full" />
     </div>
 
     <!-- Email Field -->
     <div class="flex flex-col gap-2">
         <label for="email" class="font-semibold text-gray-700">Email Address</label>
-        <input pInputText id="email" [(ngModel)]="user.email" placeholder="Enter email (optional)" class="w-full" />
+        <input pInputText id="email" [(ngModel)]="user.email" placeholder="Enter email" class="w-full" />
     </div>
 
     <!-- Role Dropdown -->
@@ -34,13 +34,13 @@
     <!-- Password Field (Only show when creating a new user, not editing) -->
     <div class="flex flex-col gap-2" *ngIf="!user._id">
         <label for="password" class="font-semibold text-gray-700">Password</label>
-        <input pInputText type="password" id="password" [(ngModel)]="user.password" placeholder="Create a password" class="w-full" />
+        <input pInputText type="password" id="password" [(ngModel)]="user.password" placeholder="6-digit password" class="w-full" />
     </div>
 
     <!-- Action Buttons -->
     <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-100">
         <p-button label="Cancel" severity="secondary" [outlined]="true" (click)="cancel()"></p-button>
-        <p-button label="Save User" severity="danger" (click)="saveUser()"></p-button>
+        <p-button label="Save User" severity="danger" [disabled]="isFormInvalid()" (click)="saveUser()" styleClass="!bg-red-600 hover:!bg-red-700"></p-button>
     </div>
 
 </div>

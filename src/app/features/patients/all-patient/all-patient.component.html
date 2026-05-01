@@ -1,4 +1,4 @@
-<div class="flex flex-wrap justify-between items-center gap-4 p-4">
+<div class="flex flex-wrap justify-between flex-col-reverse items-end md:flex-row md:items-center gap-4 p-4">
     <div class="flex bg-white border rounded-md shadow-sm">
         <input type="text" pInputText placeholder="Search..." class="p-2 rounded-l-md outline-none w-[200px]"
             (input)="onGlobalFilter(dt, $event)" />
@@ -100,13 +100,13 @@
 
     <ng-template pTemplate="header">
         <tr class="bg-red-700 text-white text-m px-5 py-3 font-semibold">
-            <th class="rounded-tl-xl !px-5 !py-3">SR.No</th>
-            <th class="!px-5 !py-3">Patient Name</th>
-            <th class="!px-5 !py-3">UhId No</th>
-            <th class="!px-5 !py-3">Created On</th>
-            <th class="!px-5 !py-3">Haemovigil Id</th>
-            <th class="!px-5 !py-3">Blood Group</th>
-            <th class="rounded-tr-xl !px-5 !py-3">Action</th>
+            <th class="rounded-tl-xl !px-5 !py-3 whitespace-nowrap">SR.No</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">Patient Name</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">UhId No</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">Created On</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">Haemovigil Id</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">Blood Group</th>
+            <th class="rounded-tr-xl !px-5 !py-3 whitespace-nowrap">Action</th>
         </tr>
     </ng-template>
 
@@ -119,7 +119,7 @@
                 </button>
             </td>
             <td class="!px-5 !py-3">{{ row.UHID }}</td>
-            <td class="!px-5 !py-3">{{ row.createdAt | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+            <td class="!px-5 !py-3 whitespace-nowrap">{{ row.createdAt | date: 'MMM dd, yyyy | hh:mm a' }}</td>
             <td class="!px-5 !py-3">
                 <span class="border border-red-600 px-3 py-1 rounded-full text-xs font-bold">
                     {{ row.haemovigilId }}

@@ -8,24 +8,31 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { DialogModule } from 'primeng/dialog';
 import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 // Services & Child Components
 import { UsersDetailComponent } from '../users-detail/users-detail.component';
 import { UsersService, User } from '../../service/users.service';
 
+import { ToastModule } from 'primeng/toast'; 
+import { MessageService } from 'primeng/api';
+
 @Component({
   selector: 'app-users-list',
   standalone: true,
   imports: [
-    CommonModule, 
-    TableModule, 
-    ButtonModule, 
-    TooltipModule, 
-    FormsModule, 
-    DialogModule, 
-    UsersDetailComponent, 
-    TitleCasePipe
+    CommonModule,
+    TableModule,
+    ButtonModule,
+    TooltipModule,
+    FormsModule,
+    DialogModule,
+    UsersDetailComponent,
+    TitleCasePipe,
+    ConfirmDialogModule,
+    ToastModule
   ],
+  providers: [ConfirmationService, MessageService],
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.scss'
 })
@@ -41,7 +48,7 @@ export class UsersListComponent implements OnInit {
   constructor(
     private usersService: UsersService,
     private confirmationService: ConfirmationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadUsers();
@@ -53,7 +60,7 @@ export class UsersListComponent implements OnInit {
     this.usersService.getAllUsers().subscribe({
       next: (res: any) => {
         // Assuming ApiResponse wraps data in 'data'
-        this.rows = res.data; 
+        this.rows = res.data;
 
         // Force paginator to page 1
         setTimeout(() => {
@@ -74,7 +81,7 @@ export class UsersListComponent implements OnInit {
       role: 'user',
       isDeleted: false
     } as User;
-    
+
     this.modalTitle = 'Add New User';
     this.showDialog();
   }
@@ -85,6 +92,20 @@ export class UsersListComponent implements OnInit {
     this.showDialog();
   }
 
+  getRoleColors(role: string): string {
+    switch (role?.toLowerCase()) {
+      case 'superadmin':
+        return 'border-green-600 bg-green-100 text-green-700';
+      case 'admin':
+        return 'border-red-600 bg-red-100 text-red-700';
+      case 'sales':
+        return 'border-blue-600 bg-blue-100 text-blue-700';
+      case 'user':
+      default:
+        return 'bg-gray-50 text-gray-700 border-gray-500';
+    }
+  }
+
   confirmDelete(user: User): void {
     this.confirmationService.confirm({
       message: `Are you sure you want to delete ${user.name}?`,
@@ -92,15 +113,15 @@ export class UsersListComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         // Ensure user._id exists before calling delete
-        if(user._id) {
-            this.usersService.deleteUser(user._id).subscribe({
+        if (user._id) {
+          this.usersService.deleteUser(user._id).subscribe({
             next: () => {
-                this.loadUsers(); 
+              this.loadUsers();
             },
             error: () => {
-                alert('Failed to delete user.');
+              alert('Failed to delete user.');
             }
-            });
+          });
         }
       }
     });
@@ -116,7 +137,7 @@ export class UsersListComponent implements OnInit {
   closeDialog(fetchData: boolean): void {
     this.visible = false;
     if (fetchData) {
-      this.loadUsers(); 
+      this.loadUsers();
     }
   }
 

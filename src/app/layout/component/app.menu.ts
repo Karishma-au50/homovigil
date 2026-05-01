@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
     selector: 'app-menu',
@@ -16,12 +17,17 @@ import { AppMenuitem } from './app.menuitem';
     </ul> `
 })
 export class AppMenu {
+    private authService = inject(AuthService);
     model: MenuItem[] = [];
 
     ngOnInit() {
-        this.model = [
+        const userRole = this.authService.currentUser?.role;
+        // console.log(userRole);
+
+        const fullMenu = [
             {
                 label: 'Overview',
+                role: 'Admin',
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/home'] },
                     { label: 'User Management', icon: 'pi pi-fw pi-user', routerLink: ['/users'] }
@@ -29,6 +35,7 @@ export class AppMenu {
             },
             {
                 label: 'Patient Management',
+                role: 'Admin',
                 items: [
                     // { label: 'New Patient Entry', icon: 'pi pi-fw pi-users', routerLink: ['/patient'] },
                     { label: 'Patient List', icon: 'pi pi-fw pi-users', routerLink: ['/allPatient'] }
@@ -36,10 +43,18 @@ export class AppMenu {
             },
             {
                 label: 'Bag Management',
+                role: 'Admin',
                 items: [
                     { label: 'Allocate Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocateBag'] },
                     { label: 'Release Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/releaseBag'] },
                     { label: 'Blood Component Management', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocationHistory'] }
+                ]
+            },
+            {
+                label: 'Sales Management',
+                role: 'sales', // Custom property for filtering
+                items: [
+                    { label: 'Sales Reports', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/sales-reports'] }
                 ]
             }
             //  {
@@ -181,5 +196,38 @@ export class AppMenu {
             //     ]
             // }
         ];
+
+        this.model = this.filterMenuByRole(fullMenu, userRole);
     }
+
+    // Inside AppMenu class
+    filterMenuByRole(menu: any[], role: string | undefined): MenuItem[] {
+        // 1. Normalize the role to lowercase for safe comparison
+        const currentRole = role?.toLowerCase();
+
+        // 2. Define privileged roles in lowercase
+        const privilegedRoles = ['admin', 'superadmin', 'user'];
+
+        // 3. If the user has a privileged role, return a copy of the full menu[cite: 6]
+        if (currentRole && privilegedRoles.includes(currentRole)) {
+            return [...menu];
+        }
+
+        // 4. Otherwise, filter items for restricted roles (like 'sales')[cite: 6]
+        return menu
+            .filter(item => {
+                // If item has no role, it's public. If it has a role, it must match.[cite: 6]
+                const itemRole = item.role?.toLowerCase();
+                return !itemRole || itemRole === currentRole;
+            })
+            .map(item => {
+                // Use .map to return a new object so we don't mutate the original fullMenu[cite: 6]
+                const newItem = { ...item };
+                if (newItem.items) {
+                    newItem.items = this.filterMenuByRole(newItem.items, role);
+                }
+                return newItem;
+            });
+    }
+
 }
