@@ -147,7 +147,7 @@ export class SalesComponent implements OnInit {
         });
       },
       error: (error) => {
-        alert('Patient not found in the database or server is down.');
+        alert('Patient not found.');
         this.resetScan();
       }
     });
@@ -238,7 +238,7 @@ export class SalesComponent implements OnInit {
       
       this.isCompletedRecord = true;
       this.isSavedStatus = true;
-      alert('Saved securely to Offline Queue. Will sync automatically when internet returns.');
+      alert('Saved securely to Offline. Will sync automatically when internet returns.');
   }
 
 }
