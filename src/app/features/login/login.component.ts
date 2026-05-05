@@ -28,8 +28,19 @@ export class LoginComponent {
             this.authService.login(this.registerForm.value).subscribe(
                 (response) => {
                     // handle success, maybe store token, etc.
-                    console.log('Login successful', response);
-                    this.router.navigate(['home']);
+                    // console.log('Login successful', response);
+                    // this.router.navigate(['home']);
+
+                    // Retrieve the role from the auth service (or fallback to response if your API returns it there)
+                    const userRole = this.authService.currentUser?.role || response?.role;
+
+                    // Conditionally route based on the role
+                    if (userRole && userRole.toLowerCase() === 'sales') {
+                        this.router.navigate(['/sales']);
+                    } else {
+                        // Default redirection for Admin and other roles
+                        this.router.navigate(['/home']);
+                    }
                 },
                 (error) => {
                     // handle error, show message, etc.

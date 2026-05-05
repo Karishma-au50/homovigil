@@ -54,7 +54,7 @@ export class AppMenu {
                 label: 'Sales Management',
                 role: 'sales', // Custom property for filtering
                 items: [
-                    { label: 'Sales Reports', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/sales-reports'] }
+                    { label: 'Sales', icon: 'pi pi-fw pi-user', routerLink: ['/sales'] }
                 ]
             }
             //  {
