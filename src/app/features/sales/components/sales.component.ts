@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { BarcodeFormat } from '@zxing/library';
-import { SalesService, TransclusionRecord } from '../service/sales.service';
+import { SalesService } from '../service/sales.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
@@ -20,7 +20,7 @@ export class SalesComponent implements OnInit {
 
   // Data holders
   scannedPatient: any = null;
-  activeRecord: TransclusionRecord | null = null;
+  activeRecord: any | null = null;
   selectedEndTime: string = '';
 
   // NEW: Store the DB ID created in Step 1
@@ -28,6 +28,7 @@ export class SalesComponent implements OnInit {
 
   isCompletedRecord: boolean = false;
   isSavedStatus: boolean = false;
+  isOfflineQueueTempId: boolean = false;
 
   constructor(
     private salesService: SalesService,
@@ -47,6 +48,24 @@ export class SalesComponent implements OnInit {
     if (!patientId) {
       alert('Invalid QR Code. No valid Patient ID found.');
       return;
+    }
+
+    // ✅ OFFLINE FALLBACK: If no internet, parse the QR JSON directly
+    if (!this.isOnline) {
+      const parsedData = this.salesService.parseQrForFullData(scannedData);
+
+      this.scannedPatient = {
+        id: patientId,
+        uhId: parsedData?.UHID || 'N/A',
+        patientName: `${parsedData?.firstname || 'Offline'} ${parsedData?.lastname || 'Patient'}`.trim(),
+        bloodGroup: parsedData?.bloodGroup || 'Unknown',
+        haemovigilId: parsedData?.haemovigilId || 'N/A',
+        mobile: parsedData?.mobile || 'N/A',
+        qrData: scannedData
+      };
+
+      alert('You are offline. Scanned data has been loaded locally.');
+      return; // Stop here, wait for user to click Next
     }
 
     // 1. Fetch patient details to display on UI
@@ -136,6 +155,7 @@ export class SalesComponent implements OnInit {
         this.salesService.createTransclusionApi(payload).subscribe({
           next: (salesRes: any) => {
             this.createdSalesRecordId = salesRes.data._id;
+            this.isOfflineQueueTempId = false;
             // Record created! Move to step 2.
             this.currentStep = 2;
           },
@@ -146,7 +166,18 @@ export class SalesComponent implements OnInit {
           }
         });
       } else {
-        // Offline Fallback
+        // ✅ OFFLINE CREATE DRAFT: Generate a temporary ID and queue it
+        const loggedInUser: any = this.authService.currentUser;
+        this.createdSalesRecordId = `temp_offline_${Date.now()}`;
+        this.isOfflineQueueTempId = true;
+
+        this.salesService.saveDraftToQueue({
+          tempId: this.createdSalesRecordId,
+          salesId: loggedInUser._id || loggedInUser.id,
+          patientId: this.scannedPatient.id,
+          status: 'draft'
+        });
+
         this.currentStep = 2;
       }
     } else if (this.currentStep < 3) {
@@ -167,32 +198,23 @@ export class SalesComponent implements OnInit {
   startTransclusion() {
     if (!this.scannedPatient) return;
 
-    if (this.isOnline && this.createdSalesRecordId) {
-      // Call the UPDATE route
-      this.salesService.updateStartTransclusionApi(this.createdSalesRecordId).subscribe({
-        next: (response: any) => {
-          console.log('Start Time Updated:', response.message);
+    const currentStartTime = new Date().toISOString();
 
-          this.activeRecord = {
-            id: this.createdSalesRecordId!,
-            patientName: this.scannedPatient.patientName,
-            bloodGroup: this.scannedPatient.bloodGroup,
-            qrData: this.scannedPatient.qrData,
-            startTime: response.data.patient.transclusion.startTransclusion,
-            status: 'synced'
-          };
+    // ✅ Only call API if online AND we have a real MongoDB ID
+    if (this.isOnline && !this.isOfflineQueueTempId) {
+      this.salesService.updateStartTransclusionApi(this.createdSalesRecordId!).subscribe({
+        next: (response: any) => {
+          this.activeRecord = { startTime: response.data.patient.transclusion.startTransclusion };
           this.currentStep = 3;
         },
-        error: (error) => {
-          console.error('Failed to update start transclusion:', error);
-          alert('Failed to connect to the server.');
-        }
+        error: () => alert('Failed to connect to the server.')
       });
     } else {
-      // OFFLINE fallback
-      this.activeRecord = this.salesService.saveStartTransclusion(this.scannedPatient);
-      // Generate a temporary offline ID if needed
-      this.createdSalesRecordId = this.activeRecord.id;
+      // ✅ OFFLINE UPDATE DRAFT: Save start time to queue
+      this.salesService.updateDraftInQueue(this.createdSalesRecordId!, {
+        startTime: currentStartTime
+      });
+      this.activeRecord = { startTime: currentStartTime };
       this.currentStep = 3;
     }
   }
@@ -203,31 +225,20 @@ export class SalesComponent implements OnInit {
 
     const endTimePayload = this.selectedEndTime ? this.selectedEndTime : undefined;
 
-    if (this.isOnline) {
+    // ✅ Only call API if online AND we have a real MongoDB ID
+    if (this.isOnline && !this.isOfflineQueueTempId) {
       this.salesService.updateEndTransclusionApi(this.createdSalesRecordId, endTimePayload).subscribe({
-        next: (response: any) => {
-          console.log('End Time Updated:', response.message);
-
-          // ✅ MODIFIED: Do NOT call resetFlow() here. 
-          // Set flags to true so the UI shows the "Completed View"
+        next: () => {
           this.isCompletedRecord = true;
           this.isSavedStatus = true;
         },
-        error: (error) => {
-          console.error('Failed to end transclusion:', error);
-          this.salesService.saveEndTransclusion(this.activeRecord!.id, endTimePayload);
-
-          this.isCompletedRecord = true;
-          this.isSavedStatus = true;
-        }
+        error: () => this.fallbackToOfflineQueue(endTimePayload)
       });
     } else {
-      // OFFLINE fallback
-      this.salesService.saveEndTransclusion(this.activeRecord.id, endTimePayload);
-
-      this.isCompletedRecord = true;
-      this.isSavedStatus = true;
+      // ✅ OFFLINE UPDATE DRAFT: Save end time to queue
+      this.fallbackToOfflineQueue(endTimePayload);
     }
+
   }
 
   // Ensure your resetFlow looks like this so the "Scan Next Patient" button works:
@@ -239,6 +250,20 @@ export class SalesComponent implements OnInit {
     this.createdSalesRecordId = null;
     this.isCompletedRecord = false;
     this.isSavedStatus = false;
+    this.isOfflineQueueTempId = false;
+  }
+
+  private fallbackToOfflineQueue(endTimePayload: string | undefined) {
+      // Use 'BLANK' as a flag if they intentionally left the calendar empty
+      const finalEndData = endTimePayload ? new Date(endTimePayload).toISOString() : 'BLANK';
+      
+      this.salesService.updateDraftInQueue(this.createdSalesRecordId!, {
+          endTime: finalEndData
+      });
+      
+      this.isCompletedRecord = true;
+      this.isSavedStatus = true;
+      alert('Saved securely to Offline Queue. Will sync automatically when internet returns.');
   }
 
 }
