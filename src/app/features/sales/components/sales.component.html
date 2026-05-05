@@ -1,16 +1,16 @@
 <div class="mt-2">
     <div class="flex justify-between items-center mb-2">
-        <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-0">Patient's Transclusion</h2>
+        <h2 class="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-0">Patient's Transclusion</h2>
     </div>
 
-    <div class="bg-white rounded-lg p-6 md:p-10 shadow-sm border border-slate-100 mx-auto mt-6">
+    <div class="bg-white dark:bg-[#18181b] rounded-lg p-6 md:p-10 shadow-sm border border-slate-100 mx-auto mt-6">
 
         <!-- 3-Step Header Layout -->
         <div class="flex items-center justify-center w-full max-w-2xl mx-auto mb-16 relative">
 
             <!-- Step 1: Scan -->
             <div class="flex flex-col items-center relative z-10 w-24">
-                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center bg-white transition-colors duration-300"
+                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center bg-white dark:bg-[#18181b] transition-colors duration-300"
                     [ngClass]="(currentStep === 1 && !isCompletedRecord) ? 'text-rose-500 border-rose-500' : 'text-emerald-500 border-emerald-500'">
                     <!-- Number 1 for active step -->
                     <span *ngIf="currentStep === 1 && !isCompletedRecord" class="font-medium text-lg">1</span>
@@ -31,7 +31,7 @@
 
             <!-- Step 2: Start -->
             <div class="flex flex-col items-center relative z-10 w-24">
-                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center bg-white transition-colors duration-300"
+                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center bg-white dark:bg-[#18181b] transition-colors duration-300"
                     [ngClass]="(currentStep === 2 && !isCompletedRecord) ? 'text-rose-500 border-rose-500' : ((currentStep > 2 || isCompletedRecord) ? 'text-emerald-500 border-emerald-500' : 'border-slate-200 text-slate-400')">
                     <!-- Number 2 for active or pending step -->
                     <span *ngIf="currentStep <= 2 && !isCompletedRecord" class="font-medium text-lg">2</span>
@@ -52,7 +52,7 @@
 
             <!-- Step 3: End -->
             <div class="flex flex-col items-center relative z-10 w-24">
-                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center bg-white transition-colors duration-300"
+                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center bg-white dark:bg-[#18181b] transition-colors duration-300"
                     [ngClass]="isCompletedRecord ? 'text-emerald-500 border-emerald-500' : (currentStep === 3 ? 'text-rose-500 border-rose-500' : 'border-slate-200 text-slate-400')">
                     <span *ngIf="!isCompletedRecord" class="font-medium text-lg">3</span>
                     <!-- Show Tick on Step 3 if Completed! -->
@@ -145,7 +145,7 @@
 
             <!-- ✅ VIEW B: PENDING COMPLETION (The Form with Date/Time) -->
             <ng-container *ngIf="!isCompletedRecord">
-                <div class="w-full max-w-md p-8 border-2 border-emerald-100 rounded-xl bg-emerald-50/50 mb-6">
+                <div class="w-full max-w-md p-8 border-2 border-emerald-100 rounded-xl bg-emerald-50/50 dark:bg-white mb-6">
                     <h3 class="font-semibold text-slate-800 text-lg mb-2">Complete Transclusion</h3>
                     <p class="text-sm text-slate-500 mb-6 italic">Started at: {{ activeRecord?.startTime |
                         date:'shortTime' }}</p>
