@@ -6,57 +6,63 @@
     <div class="bg-white rounded-lg p-6 md:p-10 shadow-sm border border-slate-100 mx-auto mt-6">
 
         <!-- 3-Step Header Layout -->
-        <div class="flex items-baseline justify-center w-full max-w-2xl mx-auto mb-16 relative">
+        <div class="flex items-center justify-center w-full max-w-2xl mx-auto mb-16 relative">
 
             <!-- Step 1: Scan -->
             <div class="flex flex-col items-center relative z-10 w-24">
-                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center bg-white mb-2 transition-colors duration-300"
+                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center bg-white transition-colors duration-300"
                     [ngClass]="(currentStep === 1 && !isCompletedRecord) ? 'text-rose-500 border-rose-500' : 'text-emerald-500 border-emerald-500'">
                     <!-- Number 1 for active step -->
                     <span *ngIf="currentStep === 1 && !isCompletedRecord" class="font-medium text-lg">1</span>
                     <!-- Show Tick if past step 1 OR if completed -->
-                    <svg *ngIf="currentStep > 1 || isCompletedRecord" class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                    <svg *ngIf="currentStep > 1 || isCompletedRecord" class="w-6 h-6 text-emerald-500" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7">
+                        </path>
                     </svg>
                 </div>
-                <span class="absolute top-12 whitespace-nowrap text-sm font-medium transition-colors"
+                <span class="absolute top-11 whitespace-nowrap text-sm font-medium transition-colors"
                     [ngClass]="(currentStep === 1 && !isCompletedRecord) ? 'text-rose-500' : 'text-emerald-600'">Scan</span>
             </div>
 
             <!-- Line 1 -->
-            <div class="flex-1 h-[2px] -mt-6 mx-2 transition-colors duration-300"
+            <div class="flex-1 h-[2px] mx-2 transition-colors duration-300"
                 [ngClass]="(currentStep > 1 || isCompletedRecord) ? 'bg-emerald-500' : 'bg-slate-200'"></div>
 
             <!-- Step 2: Start -->
             <div class="flex flex-col items-center relative z-10 w-24">
-                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center bg-white mb-2 transition-colors duration-300"
+                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center bg-white transition-colors duration-300"
                     [ngClass]="(currentStep === 2 && !isCompletedRecord) ? 'text-rose-500 border-rose-500' : ((currentStep > 2 || isCompletedRecord) ? 'text-emerald-500 border-emerald-500' : 'border-slate-200 text-slate-400')">
                     <!-- Number 2 for active or pending step -->
                     <span *ngIf="currentStep <= 2 && !isCompletedRecord" class="font-medium text-lg">2</span>
                     <!-- Show Tick if past step 2 OR if completed -->
-                    <svg *ngIf="currentStep > 2 || isCompletedRecord" class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                    <svg *ngIf="currentStep > 2 || isCompletedRecord" class="w-6 h-6 text-emerald-500" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7">
+                        </path>
                     </svg>
                 </div>
-                <span class="absolute top-12 whitespace-nowrap text-sm transition-colors"
+                <span class="absolute top-11 whitespace-nowrap text-sm transition-colors"
                     [ngClass]="(currentStep === 2 && !isCompletedRecord) ? 'text-rose-500 font-medium' : ((currentStep > 2 || isCompletedRecord) ? 'text-emerald-600 font-medium' : 'text-slate-400')">Start</span>
             </div>
 
             <!-- Line 2 -->
-            <div class="flex-1 h-[2px] -mt-6 mx-2 transition-colors duration-300"
+            <div class="flex-1 h-[2px] mx-2 transition-colors duration-300"
                 [ngClass]="(currentStep > 2 || isCompletedRecord) ? 'bg-emerald-500' : 'bg-slate-200'"></div>
 
             <!-- Step 3: End -->
             <div class="flex flex-col items-center relative z-10 w-24">
-                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center bg-white mb-2 transition-colors duration-300"
+                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center bg-white transition-colors duration-300"
                     [ngClass]="isCompletedRecord ? 'text-emerald-500 border-emerald-500' : (currentStep === 3 ? 'text-rose-500 border-rose-500' : 'border-slate-200 text-slate-400')">
                     <span *ngIf="!isCompletedRecord" class="font-medium text-lg">3</span>
                     <!-- Show Tick on Step 3 if Completed! -->
-                    <svg *ngIf="isCompletedRecord" class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                    <svg *ngIf="isCompletedRecord" class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7">
+                        </path>
                     </svg>
                 </div>
-                <span class="absolute top-12 whitespace-nowrap text-sm transition-colors"
+                <span class="absolute top-11 whitespace-nowrap text-sm transition-colors"
                     [ngClass]="isCompletedRecord ? 'text-emerald-600 font-medium' : (currentStep === 3 ? 'text-rose-500 font-medium' : 'text-slate-400')">End</span>
             </div>
         </div>
@@ -64,56 +70,38 @@
         <!-- Content Sections -->
 
         <!-- STEP 1: Scan -->
-        <div *ngIf="currentStep === 1 && !isCompletedRecord" class="flex flex-col items-center text-center animate-fade-in w-full">
+        <div *ngIf="currentStep === 1 && !isCompletedRecord"
+            class="flex flex-col items-center text-center animate-fade-in w-full">
             <!-- Scanner Container -->
             <div *ngIf="!scannedPatient"
                 class="w-full max-w-md h-64 border-2 border-dashed border-slate-300 rounded-xl overflow-hidden bg-black flex items-center justify-center mb-6 relative shadow-inner">
-                <zxing-scanner [autofocusEnabled]="true" [formats]="allowedFormats" (scanSuccess)="onQrScanSuccess($event)"
-                    class="w-full h-full object-cover"></zxing-scanner>
+                <zxing-scanner [autofocusEnabled]="true" [formats]="allowedFormats"
+                    (scanSuccess)="onQrScanSuccess($event)" class="w-full h-full object-cover"></zxing-scanner>
             </div>
 
-            <!-- Show fetched details if scan was successful -->
-            <div *ngIf="scannedPatient" class="mb-6 w-full max-w-md flex flex-col items-center">
-                <div
-                    class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg w-full mb-3 shadow-sm text-left">
-                    <p
-                        class="font-semibold text-emerald-700 mb-3 flex items-center gap-2 border-b border-emerald-200 pb-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
-                            </path>
-                        </svg>
-                        Patient Found
-                    </p>
-                    <div class="grid grid-cols-1 gap-y-0 gap-x-4 text-sm">
-                        <p><span class="opacity-75">Name:</span> <strong class="ml-1">{{ scannedPatient.patientName }}</strong></p>
-                        <p><span class="opacity-75">UHID:</span> <strong class="ml-1">{{ scannedPatient.uhId }}</strong></p>
-                        <p *ngIf="scannedPatient.bloodGroup"><span class="opacity-75">Blood:</span> <strong class="ml-1 text-rose-600">{{ scannedPatient.bloodGroup }}</strong></p>
-                        <p *ngIf="scannedPatient.haemovigilId"><span class="opacity-75">HV-ID:</span> <strong class="ml-1">{{ scannedPatient.haemovigilId }}</strong></p>
-                        <!-- <p *ngIf="scannedPatient.mobile" class="col-span-2"><span class="opacity-75">Mobile:</span> <strong class="ml-1">{{ scannedPatient.mobile }}</strong></p> -->
-                        <!-- <p *ngIf="scannedPatient.dob" class="col-span-2"><span class="opacity-75">DOB:</span> <strong class="ml-1">{{ scannedPatient.dob }}</strong></p> -->
-                    </div>
-                </div>
-                <button (click)="resetScan()"
-                    class="text-sm text-slate-500 hover:text-slate-700 underline transition-colors">Scan a different QR Code</button>
+            <!-- Showing a loading state is good UX while the API calls run -->
+            <div *ngIf="scannedPatient" class="text-emerald-600 font-medium py-10 animate-pulse">
+                Processing Patient Data...
             </div>
-
-            <button (click)="nextStep()" [disabled]="!scannedPatient"
-                [ngClass]="!scannedPatient ? 'bg-slate-300 cursor-not-allowed' : 'bg-[#f43f5e] hover:bg-rose-600 shadow-sm'"
-                class="text-white font-medium px-10 py-2.5 rounded-md transition-all">
-                Next
-            </button>
         </div>
 
         <!-- STEP 2: Start Transclusion -->
-        <div *ngIf="currentStep === 2 && !isCompletedRecord" class="flex flex-col items-center text-center animate-fade-in w-full">
+        <div *ngIf="currentStep === 2 && !isCompletedRecord"
+            class="flex flex-col items-center text-center animate-fade-in w-full">
             <div class="w-full max-w-md p-6 border border-slate-200 rounded-xl bg-slate-50 mb-8 text-left">
                 <h3 class="font-semibold text-slate-700 mb-4 border-b pb-2">Confirm Details</h3>
                 <div class="space-y-3 text-sm">
-                    <p class="text-slate-600 flex justify-between items-center"><span>UHID:</span> <strong class="text-slate-800">{{ scannedPatient?.uhId }}</strong></p>
-                    <p class="text-slate-600 flex justify-between items-center"><span>Haemovigil ID:</span> <strong class="text-slate-800">{{ scannedPatient?.haemovigilId }}</strong></p>
-                    <p class="text-slate-600 flex justify-between items-center"><span>Patient Name:</span> <strong class="text-slate-800">{{ scannedPatient?.patientName }}</strong></p>
-                    <p class="text-slate-600 flex justify-between items-center"><span>Blood Group:</span> <strong class="text-rose-500 text-base">{{ scannedPatient?.bloodGroup }}</strong></p>
-                    <p *ngIf="scannedPatient?.mobile" class="text-slate-600 flex justify-between items-center"><span>Mobile:</span> <strong class="text-slate-800">{{ scannedPatient?.mobile }}</strong></p>
+                    <p class="text-slate-600 flex justify-between items-center !mb-0"><span>UHID:</span> <strong
+                            class="text-slate-800">{{ scannedPatient?.uhId }}</strong></p>
+                    <p class="text-slate-600 flex justify-between items-center"><span>Haemovigil ID:</span> <strong
+                            class="text-slate-800">{{ scannedPatient?.haemovigilId }}</strong></p>
+                    <p class="text-slate-600 flex justify-between items-center"><span>Patient Name:</span> <strong
+                            class="text-slate-800">{{ scannedPatient?.patientName }}</strong></p>
+                    <p class="text-slate-600 flex justify-between items-center"><span>Blood Group:</span> <strong
+                            class="text-rose-500 text-base">{{ scannedPatient?.bloodGroup }}</strong></p>
+                    <!-- <p *ngIf="scannedPatient?.mobile" class="text-slate-600 flex justify-between items-center">
+                        <span>Mobile:</span> <strong class="text-slate-800">{{ scannedPatient?.mobile }}</strong>
+                    </p> -->
                 </div>
             </div>
 
@@ -131,21 +119,26 @@
 
         <!-- STEP 3: Complete Transclusion (Both Views) -->
         <div *ngIf="currentStep === 3" class="flex flex-col items-center text-center animate-fade-in w-full">
-            
+
             <!-- ✅ VIEW A: ALREADY COMPLETED (Clean Success View) -->
-            <div *ngIf="isCompletedRecord" class="w-full max-w-md p-8 border-2 border-emerald-400 rounded-xl bg-emerald-50 mb-6 shadow-sm">
+            <div *ngIf="isCompletedRecord"
+                class="w-full max-w-md p-8 border-2 border-emerald-400 rounded-xl bg-emerald-50 mb-6 shadow-sm">
                 <div class="flex flex-col items-center justify-center text-emerald-600 mb-6">
                     <div class="bg-emerald-100 p-3 rounded-full mb-3">
                         <svg class="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7">
+                            </path>
                         </svg>
                     </div>
                     <h2 class="text-2xl font-bold text-slate-800 !mb-0">Transclusion Completed</h2>
                     <p class="text-sm text-slate-500 mt-1">This patient's record is complete.</p>
                 </div>
 
-                <button (click)="resetFlow()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-8 py-3 rounded-md shadow-sm transition-all flex justify-center items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <button (click)="resetFlow()"
+                    class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-8 py-3 rounded-md shadow-sm transition-all flex justify-center items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
                     Scan Next Patient
                 </button>
             </div>
@@ -154,7 +147,8 @@
             <ng-container *ngIf="!isCompletedRecord">
                 <div class="w-full max-w-md p-8 border-2 border-emerald-100 rounded-xl bg-emerald-50/50 mb-6">
                     <h3 class="font-semibold text-slate-800 text-lg mb-2">Complete Transclusion</h3>
-                    <p class="text-sm text-slate-500 mb-6 italic">Started at: {{ activeRecord?.startTime | date:'shortTime' }}</p>
+                    <p class="text-sm text-slate-500 mb-6 italic">Started at: {{ activeRecord?.startTime |
+                        date:'shortTime' }}</p>
 
                     <div class="text-left">
                         <label class="block text-sm font-medium text-slate-700 mb-2">End Date & Time (Optional)</label>
