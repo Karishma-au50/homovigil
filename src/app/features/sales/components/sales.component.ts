@@ -15,6 +15,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 })
 export class SalesComponent implements OnInit {
   currentStep: number = 1;
+  temp: boolean = true;
   isOnline: boolean = true;
   allowedFormats = [BarcodeFormat.QR_CODE];
 
@@ -103,6 +104,11 @@ export class SalesComponent implements OnInit {
           // Notice: We removed checkOnly, so it creates the DB record instantly!
         };
 
+        if (this.temp) {
+          this.currentStep = 2;
+          return;
+        }
+
         this.salesService.createTransflusionApi(payload).subscribe({
           next: (salesRes: any) => {
             this.createdSalesRecordId = salesRes.data._id;
@@ -171,6 +177,11 @@ export class SalesComponent implements OnInit {
 
   // --- STEP 2: START Transflusion ---
   startTransflusion() {
+    if (this.temp) {
+      this.currentStep = 3;
+      return;
+    }
+
     if (!this.scannedPatient) return;
 
     const currentStartTime = new Date().toISOString();
@@ -196,6 +207,11 @@ export class SalesComponent implements OnInit {
 
   // --- STEP 3: END Transflusion ---
   saveTransflusion() {
+    if (this.temp) {
+      this.isCompletedRecord = true;
+      this.isSavedStatus = true;
+      return;
+    }
     if (!this.activeRecord || !this.createdSalesRecordId) return;
 
     const endTimePayload = this.selectedEndTime ? this.selectedEndTime : undefined;
@@ -229,16 +245,16 @@ export class SalesComponent implements OnInit {
   }
 
   private fallbackToOfflineQueue(endTimePayload: string | undefined) {
-      // Use 'BLANK' as a flag if they intentionally left the calendar empty
-      const finalEndData = endTimePayload ? new Date(endTimePayload).toISOString() : 'BLANK';
-      
-      this.salesService.updateDraftInQueue(this.createdSalesRecordId!, {
-          endTime: finalEndData
-      });
-      
-      this.isCompletedRecord = true;
-      this.isSavedStatus = true;
-      alert('Saved securely to Offline. Will sync automatically when internet returns.');
+    // Use 'BLANK' as a flag if they intentionally left the calendar empty
+    const finalEndData = endTimePayload ? new Date(endTimePayload).toISOString() : 'BLANK';
+
+    this.salesService.updateDraftInQueue(this.createdSalesRecordId!, {
+      endTime: finalEndData
+    });
+
+    this.isCompletedRecord = true;
+    this.isSavedStatus = true;
+    alert('Saved securely to Offline. Will sync automatically when internet returns.');
   }
 
 }
