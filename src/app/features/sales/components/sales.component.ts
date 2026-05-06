@@ -103,14 +103,14 @@ export class SalesComponent implements OnInit {
           // Notice: We removed checkOnly, so it creates the DB record instantly!
         };
 
-        this.salesService.createTransclusionApi(payload).subscribe({
+        this.salesService.createTransflusionApi(payload).subscribe({
           next: (salesRes: any) => {
             this.createdSalesRecordId = salesRes.data._id;
             this.isOfflineQueueTempId = false;
 
             if (salesRes.statusCode === 200) {
               // Existing Record found - Auto Resume
-              const tData = salesRes.data.patient.transclusion;
+              const tData = salesRes.data.patient.transflusion;
               this.isSavedStatus = tData.isSaved || false;
 
               this.activeRecord = {
@@ -118,19 +118,19 @@ export class SalesComponent implements OnInit {
                 patientName: this.scannedPatient.patientName,
                 bloodGroup: this.scannedPatient.bloodGroup,
                 qrData: this.scannedPatient.qrData,
-                startTime: tData.startTransclusion,
+                startTime: tData.startTransflusion,
                 status: 'synced'
               };
 
               if (this.isSavedStatus) {
                 this.currentStep = 3;
                 this.isCompletedRecord = true;
-                if (tData.endTransclusion) {
-                  const dateObj = new Date(tData.endTransclusion);
+                if (tData.endTransflusion) {
+                  const dateObj = new Date(tData.endTransflusion);
                   dateObj.setMinutes(dateObj.getMinutes() - dateObj.getTimezoneOffset());
                   this.selectedEndTime = dateObj.toISOString().slice(0, 16);
                 }
-              } else if (!tData.startTransclusion) {
+              } else if (!tData.startTransflusion) {
                 this.currentStep = 2;
               } else {
                 this.currentStep = 3;
@@ -141,7 +141,7 @@ export class SalesComponent implements OnInit {
             }
           },
           error: (err) => {
-            alert(err.error?.message || 'Failed to create transclusion record.');
+            alert(err.error?.message || 'Failed to create transflusion record.');
             this.resetScan();
           }
         });
@@ -169,17 +169,17 @@ export class SalesComponent implements OnInit {
     this.createdSalesRecordId = null;
   }
 
-  // --- STEP 2: START TRANSCLUSION ---
-  startTransclusion() {
+  // --- STEP 2: START Transflusion ---
+  startTransflusion() {
     if (!this.scannedPatient) return;
 
     const currentStartTime = new Date().toISOString();
 
     // ✅ Only call API if online AND we have a real MongoDB ID
     if (this.isOnline && !this.isOfflineQueueTempId) {
-      this.salesService.updateStartTransclusionApi(this.createdSalesRecordId!).subscribe({
+      this.salesService.updateStartTransflusionApi(this.createdSalesRecordId!).subscribe({
         next: (response: any) => {
-          this.activeRecord = { startTime: response.data.patient.transclusion.startTransclusion };
+          this.activeRecord = { startTime: response.data.patient.transflusion.startTransflusion };
           this.currentStep = 3;
         },
         error: () => alert('Failed to connect to the server.')
@@ -194,15 +194,15 @@ export class SalesComponent implements OnInit {
     }
   }
 
-  // --- STEP 3: END TRANSCLUSION ---
-  saveTransclusion() {
+  // --- STEP 3: END Transflusion ---
+  saveTransflusion() {
     if (!this.activeRecord || !this.createdSalesRecordId) return;
 
     const endTimePayload = this.selectedEndTime ? this.selectedEndTime : undefined;
 
     // ✅ Only call API if online AND we have a real MongoDB ID
     if (this.isOnline && !this.isOfflineQueueTempId) {
-      this.salesService.updateEndTransclusionApi(this.createdSalesRecordId, endTimePayload).subscribe({
+      this.salesService.updateEndTransflusionApi(this.createdSalesRecordId, endTimePayload).subscribe({
         next: () => {
           this.isCompletedRecord = true;
           this.isSavedStatus = true;

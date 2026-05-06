@@ -64,30 +64,30 @@ export class SalesService {
   }
 
   // Step 1: Create record on QR scan
-  createTransclusionApi(payload: any): Observable<any> {
+  createTransflusionApi(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/sales/scan`, payload);
   }
 
   // Step 2: Update start time
-  updateStartTransclusionApi(salesRecordId: string, payload?: any): Observable<any> {
+  updateStartTransflusionApi(salesRecordId: string, payload?: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/sales/${salesRecordId}/start`, payload || {});
   }
 
   // Step 3: Update end time
-  updateEndTransclusionApi(salesRecordId: string, endTime?: string): Observable<any> {
+  updateEndTransflusionApi(salesRecordId: string, endTime?: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/sales/${salesRecordId}/end`, { endTime });
   }
 
   // --- OFFLINE QUEUE MANAGEMENT ---
   getAllRecords(): OfflineQueueItem[] {
-    const data = localStorage.getItem('transclusions_queue');
+    const data = localStorage.getItem('transflusions_queue');
     return data ? JSON.parse(data) : [];
   }
 
   saveDraftToQueue(draft: OfflineQueueItem) {
     const records = this.getAllRecords();
     records.push(draft);
-    localStorage.setItem('transclusions_queue', JSON.stringify(records));
+    localStorage.setItem('transflusions_queue', JSON.stringify(records));
   }
 
   updateDraftInQueue(tempId: string, updates: Partial<OfflineQueueItem>) {
@@ -95,7 +95,7 @@ export class SalesService {
     const index = records.findIndex(r => r.tempId === tempId);
     if (index !== -1) {
       records[index] = { ...records[index], ...updates };
-      localStorage.setItem('transclusions_queue', JSON.stringify(records));
+      localStorage.setItem('transflusions_queue', JSON.stringify(records));
       
       // Auto-trigger sync if internet is back
       if (navigator.onLine) this.syncDrafts();
@@ -105,7 +105,7 @@ export class SalesService {
   removeDraftFromQueue(tempId: string) {
     let records = this.getAllRecords();
     records = records.filter(r => r.tempId !== tempId);
-    localStorage.setItem('transclusions_queue', JSON.stringify(records));
+    localStorage.setItem('transflusions_queue', JSON.stringify(records));
   }
 
   public async syncDrafts() {
@@ -128,9 +128,9 @@ export class SalesService {
            throw new Error('Patient verification failed. Invalid ID.');
         }
 
-        // STEP 2: Create (or Resume) Transclusion
+        // STEP 2: Create (or Resume) Transflusion
         const createPayload = { salesId: draft.salesId, patient: { patientId: draft.patientId } };
-        const createRes: any = await lastValueFrom(this.createTransclusionApi(createPayload));
+        const createRes: any = await lastValueFrom(this.createTransflusionApi(createPayload));
         
         // Grab the real MongoDB ID (handles both new 201 records and existing 200 records)
         const realSalesRecordId = createRes.data._id;
@@ -138,14 +138,14 @@ export class SalesService {
         // STEP 3: Update Start Time (if recorded)
         if (draft.startTime) {
           const startPayload = { startTime: draft.startTime };
-          await lastValueFrom(this.updateStartTransclusionApi(realSalesRecordId, startPayload));
+          await lastValueFrom(this.updateStartTransflusionApi(realSalesRecordId, startPayload));
         }
 
         // STEP 4: Update End Time (if recorded)
         if (draft.endTime || draft.endTime === null) {
           // Send undefined if it was intentionally left blank, otherwise send the time string
           const formattedEndTime = draft.endTime === 'BLANK' ? undefined : draft.endTime;
-          await lastValueFrom(this.updateEndTransclusionApi(realSalesRecordId, formattedEndTime));
+          await lastValueFrom(this.updateEndTransflusionApi(realSalesRecordId, formattedEndTime));
         }
 
         // SUCCESS: Remove this record from the queue entirely!
