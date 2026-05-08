@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
@@ -14,21 +14,16 @@ import { AuthService } from '../../../core/auth/auth.service';
   styleUrl: './sales.component.scss'
 })
 export class SalesComponent implements OnInit {
+  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+
   currentStep: number = 1;
-  temp: boolean = true;
   isOnline: boolean = true;
   allowedFormats = [BarcodeFormat.QR_CODE];
 
-  // Data holders
   scannedPatient: any = null;
-  activeRecord: any | null = null;
-  selectedEndTime: string = '';
-
-  // NEW: Store the DB ID created in Step 1
   createdSalesRecordId: string | null = null;
-
+  
   isCompletedRecord: boolean = false;
-  isSavedStatus: boolean = false;
   isOfflineQueueTempId: boolean = false;
 
   constructor(
@@ -42,219 +37,206 @@ export class SalesComponent implements OnInit {
     window.addEventListener('offline', () => this.isOnline = false);
   }
 
+  isBagAlreadyScanned(bagId: string): boolean {
+    if (!this.scannedPatient || !this.scannedPatient.bags) return false;
+    return this.scannedPatient.bags.some((b: any) => b.bagId === bagId);
+  }
+
+  // Helper method to check if any bag is currently in progress
+  hasInProgressBags(): boolean {
+    if (!this.scannedPatient || !this.scannedPatient.bags) return false;
+    return this.scannedPatient.bags.some((b: any) => b.status === 'In Progress');
+  }
+
   // --- STEP 1: SCAN LOGIC ---
   onQrScanSuccess(scannedData: string) {
-    const patientId = this.salesService.parseQrForId(scannedData);
-
+    const parsedQrData = this.salesService.parseQrForFullData(scannedData);
+    const patientId = parsedQrData?.patientId || this.salesService.parseQrForId(scannedData);
+    
     if (!patientId) {
-      alert('Invalid QR Code. No valid Patient ID found.');
+      alert("Invalid QR Code! Scan a valid one.");
       return;
     }
 
-    // ✅ OFFLINE FLOW: Parse JSON, queue draft, and immediately go to Step 2
-    if (!this.isOnline) {
-      const parsedData = this.salesService.parseQrForFullData(scannedData);
+    const bagId = parsedQrData?.bagId || null;
+    const bloodBagId = parsedQrData?.bloodBagId || null;
 
+    if (this.scannedPatient && this.scannedPatient.patientId !== patientId) {
+      this.scannedPatient = null; 
+    }
+
+    if (bagId && this.isBagAlreadyScanned(bagId)) return;
+
+    if (!this.scannedPatient) {
       this.scannedPatient = {
-        id: patientId,
-        uhId: parsedData?.UHID || 'N/A',
-        patientName: `${parsedData?.firstname || 'Offline'} ${parsedData?.lastname || 'Patient'}`.trim(),
-        bloodGroup: parsedData?.bloodGroup || 'Unknown',
-        haemovigilId: parsedData?.haemovigilId || 'N/A',
-        mobile: parsedData?.mobile || 'N/A',
-        qrData: scannedData
+        patientId: patientId,
+        patientName: 'Fetching patient data...',
+        uhId: 'Loading...',
+        haemovigilId: 'Loading...',
+        bloodGroup: '',
+        status: 'Loading',
+        // ✅ NAYA: Global Symptoms object for Step 3
+        symptoms: {
+            cough: false,
+            fever: false,
+            rash: false,
+            pain: false
+        },
+        bags: []
       };
 
-      const loggedInUser: any = this.authService.currentUser;
+      if (this.isOnline) {
+        this.salesService.getPatientFromBackend(patientId).subscribe({
+          next: (res: any) => {
+            const pData = res.data || res;
+            this.scannedPatient.patientName = `${pData.firstname} ${pData.lastname || ''}`.trim();
+            this.scannedPatient.uhId = pData.UHID;
+            this.scannedPatient.haemovigilId = pData.haemovigilId || 'N/A';
+            this.scannedPatient.bloodGroup = pData.bloodGroup;
+            this.scannedPatient.status = 'Ready';
+          },
+          error: () => this.scannedPatient.patientName = 'Patient not found'
+        });
+      }
+    }
+
+    const newBag = {
+      bagId: bagId,
+      bloodBagId: bloodBagId,
+      bloodBagNumber: 'Fetching...',
+      bloodComponent: '...',
+      bagBloodGroup: '...',
+      status: 'Pending Start',
+      startTime: null,
+      selectedEndTime: '',
+      qrData: scannedData
+    };
+    
+    this.scannedPatient.bags.push(newBag);
+    const activeBag = this.scannedPatient.bags[this.scannedPatient.bags.length - 1];
+    this.scrollToBottom();
+
+    if (this.isOnline && bloodBagId) {
+      this.salesService.getBloodBagFromBackend(bloodBagId).subscribe({
+        next: (res: any) => {
+          const bData = res.data || res;
+          activeBag.bloodBagNumber = bData.bloodBagId;
+          activeBag.bloodComponent = bData.bloodcomponent;
+          activeBag.bagBloodGroup = bData.bloodGroup;
+        },
+        error: () => activeBag.bloodBagNumber = bloodBagId
+      });
+    } else if (!this.isOnline) {
+      activeBag.bloodBagNumber = bloodBagId || 'Offline Bag';
+    }
+  }
+
+  processAllScanned() {
+    if (!this.scannedPatient || this.scannedPatient.bags.length === 0) {
+      alert("Please scan at least one valid QR code.");
+      return;
+    }
+    
+    const loggedInUser: any = this.authService.currentUser;
+
+    const payload = {
+      salesId: loggedInUser._id || loggedInUser.id,
+      patient: {
+        patientId: this.scannedPatient.patientId,
+        bags: this.scannedPatient.bags.map((b: any) => ({
+          bagId: b.bagId,
+          bloodBagId: b.bloodBagId
+        }))
+      }
+    };
+
+    if (this.isOnline) {
+      this.salesService.createTransfusionApi(payload).subscribe({
+        next: (res: any) => {
+          this.createdSalesRecordId = res.data?._id || res._id;
+          this.currentStep = 2; 
+        },
+        error: () => alert("Failed to create session on server.")
+      });
+    } else {
       this.createdSalesRecordId = `temp_offline_${Date.now()}`;
       this.isOfflineQueueTempId = true;
-
-      this.salesService.saveDraftToQueue({
-        tempId: this.createdSalesRecordId,
-        salesId: loggedInUser._id || loggedInUser.id,
-        patientId: this.scannedPatient.id,
-        status: 'draft'
-      });
-
       this.currentStep = 2;
-      return;
     }
+  }
 
-    // ✅ ONLINE FLOW: Fetch details, create/resume DB record, and automatically advance
-    this.salesService.getPatientFromBackend(patientId).subscribe({
-      next: (response: any) => {
-        const backendData = response.data;
-        this.scannedPatient = {
-          id: backendData._id,
-          uhId: backendData.UHID,
-          firstname: backendData.firstname,
-          lastname: backendData.lastname,
-          patientName: `${backendData.firstname} ${backendData.lastname || ''}`.trim(),
-          bloodGroup: backendData.bloodGroup,
-          haemovigilId: backendData.haemovigilId,
-          dob: backendData.dob,
-          mobile: backendData.mobile,
-          qrData: scannedData
-        };
-
-        const loggedInUser: any = this.authService.currentUser;
-        const payload = {
-          salesId: loggedInUser._id || loggedInUser.id,
-          patient: { patientId: this.scannedPatient.id }
-          // Notice: We removed checkOnly, so it creates the DB record instantly!
-        };
-
-        if (this.temp) {
-          this.currentStep = 2;
-          return;
-        }
-
-        this.salesService.createTransflusionApi(payload).subscribe({
-          next: (salesRes: any) => {
-            this.createdSalesRecordId = salesRes.data._id;
-            this.isOfflineQueueTempId = false;
-
-            if (salesRes.statusCode === 200) {
-              // Existing Record found - Auto Resume
-              const tData = salesRes.data.patient.transflusion;
-              this.isSavedStatus = tData.isSaved || false;
-
-              this.activeRecord = {
-                id: this.createdSalesRecordId!,
-                patientName: this.scannedPatient.patientName,
-                bloodGroup: this.scannedPatient.bloodGroup,
-                qrData: this.scannedPatient.qrData,
-                startTime: tData.startTransflusion,
-                status: 'synced'
-              };
-
-              if (this.isSavedStatus) {
-                this.currentStep = 3;
-                this.isCompletedRecord = true;
-                if (tData.endTransflusion) {
-                  const dateObj = new Date(tData.endTransflusion);
-                  dateObj.setMinutes(dateObj.getMinutes() - dateObj.getTimezoneOffset());
-                  this.selectedEndTime = dateObj.toISOString().slice(0, 16);
-                }
-              } else if (!tData.startTransflusion) {
-                this.currentStep = 2;
-              } else {
-                this.currentStep = 3;
-              }
-            } else {
-              // New Record created! Move to Step 2
-              this.currentStep = 2;
-            }
-          },
-          error: (err) => {
-            alert(err.error?.message || 'Failed to create transflusion record.');
-            this.resetScan();
-          }
-        });
-      },
-      error: (error) => {
-        alert('Patient not found.');
-        this.resetScan();
+  scrollToBottom(): void {
+    setTimeout(() => {
+      if (this.scrollContainer) {
+        this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
       }
-    });
+    }, 100); 
   }
 
-  // --- PROGRESSION LOGIC ---
   prevStep() {
-    if (this.currentStep === 2) {
-      // ✅ If going back to Step 1, clear all data so the scanner reappears
-      this.resetFlow();
-    } else if (this.currentStep > 1) {
-      // Normal back behavior for other steps (e.g., Step 3 -> Step 2)
-      this.currentStep--;
-    }
+    if (this.currentStep === 2) this.resetFlow();
+    else if (this.currentStep > 1) this.currentStep--;
   }
 
-  resetScan() {
-    this.scannedPatient = null;
-    this.createdSalesRecordId = null;
-  }
-
-  // --- STEP 2: START Transflusion ---
-  startTransflusion() {
-    if (this.temp) {
-      this.currentStep = 3;
-      return;
-    }
-
-    if (!this.scannedPatient) return;
+  // --- STEP 2: START TRANSFUSION (PER BAG) ---
+  startTransfusion(bag: any) {
+    if (!this.createdSalesRecordId) return;
 
     const currentStartTime = new Date().toISOString();
 
-    // ✅ Only call API if online AND we have a real MongoDB ID
     if (this.isOnline && !this.isOfflineQueueTempId) {
-      this.salesService.updateStartTransflusionApi(this.createdSalesRecordId!).subscribe({
-        next: (response: any) => {
-          this.activeRecord = { startTime: response.data.patient.transflusion.startTransflusion };
-          this.currentStep = 3;
+      this.salesService.updateStartTransfusionApi(this.createdSalesRecordId, bag.bagId).subscribe({
+        next: () => {
+          bag.startTime = currentStartTime;
+          bag.status = 'In Progress';
+          this.currentStep = 3; // ✅ NAYA: Start hote hi Step 3 par bhej do
         },
         error: () => alert('Failed to connect to the server.')
       });
     } else {
-      // ✅ OFFLINE UPDATE DRAFT: Save start time to queue
-      this.salesService.updateDraftInQueue(this.createdSalesRecordId!, {
-        startTime: currentStartTime
+      bag.startTime = currentStartTime;
+      bag.status = 'In Progress';
+      this.currentStep = 3; // ✅ NAYA: Start hote hi Step 3 par bhej do
+    }
+  }
+
+  // --- STEP 3: END TRANSFUSION (PER BAG) ---
+  saveTransfusion(bag: any) {
+    if (!this.createdSalesRecordId) return;
+
+    const endTimePayload = bag.selectedEndTime ? bag.selectedEndTime : undefined;
+
+    // Backend payload update logic (if API supports global symptoms, you can pass this.scannedPatient.symptoms here)
+    if (this.isOnline && !this.isOfflineQueueTempId) {
+      this.salesService.updateEndTransfusionApi(this.createdSalesRecordId, bag.bagId, endTimePayload).subscribe({
+        next: () => {
+          bag.status = 'Completed';
+          this.checkAllBagsCompleted();
+        },
+        error: () => {
+          bag.status = 'Completed';
+          this.checkAllBagsCompleted();
+        }
       });
-      this.activeRecord = { startTime: currentStartTime };
+    } else {
+      bag.status = 'Completed';
+      this.checkAllBagsCompleted();
+    }
+  }
+
+  checkAllBagsCompleted() {
+    const allCompleted = this.scannedPatient.bags.every((b: any) => b.status === 'Completed');
+    if (allCompleted) {
+      this.isCompletedRecord = true;
       this.currentStep = 3;
     }
   }
 
-  // --- STEP 3: END Transflusion ---
-  saveTransflusion() {
-    if (this.temp) {
-      this.isCompletedRecord = true;
-      this.isSavedStatus = true;
-      return;
-    }
-    if (!this.activeRecord || !this.createdSalesRecordId) return;
-
-    const endTimePayload = this.selectedEndTime ? this.selectedEndTime : undefined;
-
-    // ✅ Only call API if online AND we have a real MongoDB ID
-    if (this.isOnline && !this.isOfflineQueueTempId) {
-      this.salesService.updateEndTransflusionApi(this.createdSalesRecordId, endTimePayload).subscribe({
-        next: () => {
-          this.isCompletedRecord = true;
-          this.isSavedStatus = true;
-        },
-        error: () => this.fallbackToOfflineQueue(endTimePayload)
-      });
-    } else {
-      // ✅ OFFLINE UPDATE DRAFT: Save end time to queue
-      this.fallbackToOfflineQueue(endTimePayload);
-    }
-
-  }
-
-  // Ensure your resetFlow looks like this so the "Scan Next Patient" button works:
   resetFlow() {
     this.currentStep = 1;
     this.scannedPatient = null;
-    this.activeRecord = null;
-    this.selectedEndTime = '';
     this.createdSalesRecordId = null;
     this.isCompletedRecord = false;
-    this.isSavedStatus = false;
     this.isOfflineQueueTempId = false;
   }
-
-  private fallbackToOfflineQueue(endTimePayload: string | undefined) {
-    // Use 'BLANK' as a flag if they intentionally left the calendar empty
-    const finalEndData = endTimePayload ? new Date(endTimePayload).toISOString() : 'BLANK';
-
-    this.salesService.updateDraftInQueue(this.createdSalesRecordId!, {
-      endTime: finalEndData
-    });
-
-    this.isCompletedRecord = true;
-    this.isSavedStatus = true;
-    alert('Saved securely to Offline. Will sync automatically when internet returns.');
-  }
-
 }

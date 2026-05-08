@@ -201,6 +201,35 @@ export class AppMenu {
     }
 
     // Inside AppMenu class
+    // filterMenuByRole(menu: any[], role: string | undefined): MenuItem[] {
+    //     // 1. Normalize the role to lowercase for safe comparison
+    //     const currentRole = role?.toLowerCase();
+
+    //     // 2. Define privileged roles in lowercase
+    //     const privilegedRoles = ['admin', 'superadmin', 'user'];
+
+    //     // 3. If the user has a privileged role, return a copy of the full menu[cite: 6]
+    //     if (currentRole && privilegedRoles.includes(currentRole)) {
+    //         return [...menu];
+    //     }
+
+    //     // 4. Otherwise, filter items for restricted roles (like 'sales')[cite: 6]
+    //     return menu
+    //         .filter(item => {
+    //             // If item has no role, it's public. If it has a role, it must match.[cite: 6]
+    //             const itemRole = item.role?.toLowerCase();
+    //             return !itemRole || itemRole === currentRole;
+    //         })
+    //         .map(item => {
+    //             // Use .map to return a new object so we don't mutate the original fullMenu[cite: 6]
+    //             const newItem = { ...item };
+    //             if (newItem.items) {
+    //                 newItem.items = this.filterMenuByRole(newItem.items, role);
+    //             }
+    //             return newItem;
+    //         });
+    // }
+
     filterMenuByRole(menu: any[], role: string | undefined): MenuItem[] {
         // 1. Normalize the role to lowercase for safe comparison
         const currentRole = role?.toLowerCase();
@@ -208,22 +237,29 @@ export class AppMenu {
         // 2. Define privileged roles in lowercase
         const privilegedRoles = ['admin', 'superadmin', 'user'];
 
-        // 3. If the user has a privileged role, return a copy of the full menu[cite: 6]
-        if (currentRole && privilegedRoles.includes(currentRole)) {
-            return [...menu];
-        }
-
-        // 4. Otherwise, filter items for restricted roles (like 'sales')[cite: 6]
         return menu
             .filter(item => {
-                // If item has no role, it's public. If it has a role, it must match.[cite: 6]
                 const itemRole = item.role?.toLowerCase();
+
+                // 3. Explicitly check for the 'sales' role restriction. 
+                // If the item is marked for sales, ONLY sales can see it.
+                if (itemRole === 'sales') {
+                    return currentRole === 'sales';
+                }
+
+                // 4. If the user is an admin/superadmin, they can see all OTHER items
+                if (currentRole && privilegedRoles.includes(currentRole)) {
+                    return true;
+                }
+
+                // 5. Otherwise, the item must either be public (no role) or match the user's role
                 return !itemRole || itemRole === currentRole;
             })
             .map(item => {
-                // Use .map to return a new object so we don't mutate the original fullMenu[cite: 6]
+                // Use .map to return a new object so we don't mutate the original fullMenu
                 const newItem = { ...item };
                 if (newItem.items) {
+                    // Recursively filter sub-items
                     newItem.items = this.filterMenuByRole(newItem.items, role);
                 }
                 return newItem;

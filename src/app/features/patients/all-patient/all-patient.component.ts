@@ -15,12 +15,13 @@ import { PatientComponent } from '../patient/patient.component';
 import { ConfirmationService } from 'primeng/api';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DropdownModule } from 'primeng/dropdown';
+import { QrCodeScanComponent } from '../qr-code-scan/qr-code-scan.component';
 
 @Component({
     selector: 'app-all-patient',
     templateUrl: './all-patient.component.html',
     styleUrl: './all-patient.component.scss',
-    imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule]
+    imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule, QrCodeScanComponent]
 })
 export class AllPatientComponent {
     @ViewChild('dt') table!: Table;
@@ -35,6 +36,11 @@ export class AllPatientComponent {
         { label: 'Blood Group', value: 'bloodGroup' },
         { label: 'Component', value: 'component' }
     ];
+
+    // --- QR Code Dialog State ---
+    qrVisible: boolean = false;
+    selectedPatientForQr: Patient | null = null;
+
     constructor(
         private authService: AuthService,
         private confirmationService: ConfirmationService
@@ -106,6 +112,12 @@ export class AllPatientComponent {
             key: 'confirmDialog'
         });
     }
+
+    openQrDialog(row: Patient){
+        this.selectedPatientForQr = row;
+        this.qrVisible = true;
+    }
+
     stripe = (i: number) => (i % 2 === 0 ? 'bg-gray-50' : '');
 
     visible: boolean = false;
