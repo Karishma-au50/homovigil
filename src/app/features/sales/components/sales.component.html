@@ -103,7 +103,7 @@
 
                 <button (click)="processAllScanned()"
                     class="w-full mt-5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2.5 rounded-md shadow-sm transition-colors">
-                    Process {{ scannedPatient.bags?.length || 0 }} Bag(s)
+                    Proceed {{ scannedPatient.bags?.length || 0 }} Bag(s)
                 </button>
             </div>
 
@@ -205,6 +205,11 @@
                     class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-6 py-2.5 rounded-md shadow-sm transition-colors">
                     Go to End Phase
                 </button>
+
+                <p *ngIf="showStep2Error" class="text-rose-500 text-sm font-medium text-center animate-pulse !m-0">
+                    Please start at least one transfusion to proceed!
+                </p>
+
             </div>
         </div>
 
@@ -287,7 +292,8 @@
 
             <div *ngIf="!hasInProgressBags()"
                 class="w-full max-w-md p-6 text-center text-slate-500 border border-dashed rounded-xl border-slate-300">
-                <p class="text-md mb-2 text-slate-600">No bags are currently in progress. Please start a transfusion for the remaining bags.</p>
+                <!-- <p class="text-md mb-2 text-slate-600">No bags are currently in progress. Please start a transfusion for the remaining bags.</p> -->
+                <p class="text-md mb-2 text-slate-600">No transfusion is currently in progress. Start the next transfusion.</p>
                 <button (click)="currentStep = 2"
                     class="px-6 py-2 mt-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md shadow-sm transition-colors font-medium">Go
                     to Start Phase</button>
