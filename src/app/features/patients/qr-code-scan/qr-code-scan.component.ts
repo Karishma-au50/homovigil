@@ -35,16 +35,35 @@ export class QrCodeScanComponent implements OnInit {
         if(this.isAnyBag){
           allocationBags.forEach((bag: any) => {
             
+            let bagLabel = bag.bloodBagId?.bloodBagId || bag.bloodBagId?._id || bag._id;
+
+            // let essentialIds = {
+            //   bagId: bag._id,
+            //   patientId: this.patientData._id,
+            //   bloodBagId: bag.bloodBagId?._id,
+            //   patientName: `${this.patientData.firstname} ${this.patientData.lastname || ''}`.trim(),
+            //   uhId: this.patientData.UHID || 'N/A',
+            //   haemovigilId: this.patientData.haemovigilId || 'N/A',
+            //   bloodGroup: this.patientData.bloodGroup || 'N/A',
+            //   bloodBagNumber: bagLabel
+            // };
+
+            // MINIFIED PAYLOAD: Short keys = less data = larger, readable QR blocks
             let essentialIds = {
-              bagId: bag._id,
-              patientId: this.patientData._id,
-              bloodBagId: bag.bloodBagId?._id
+              bId: bag._id,
+              pId: this.patientData._id,
+              bbId: bag.bloodBagId?._id,
+              pN: `${this.patientData.firstname} ${this.patientData.lastname || ''}`.trim(),
+              uId: this.patientData.UHID || 'N/A',
+              hId: this.patientData.haemovigilId || 'N/A',
+              bG: this.patientData.bloodGroup || 'N/A',
+              bbN: bagLabel
             };
 
             let bagQrStr = JSON.stringify(essentialIds);
             // this.qrDataString.push(bagQrStr);
 
-            let bagLabel = bag.bloodBagId?.bloodBagId || bag.bloodBagId?._id || bag._id;
+            // let bagLabel = bag.bloodBagId?.bloodBagId || bag.bloodBagId?._id || bag._id;
 
             this.qrItems.push({
               qrStr: bagQrStr,
@@ -72,6 +91,15 @@ export class QrCodeScanComponent implements OnInit {
 
     // Open a temporary window
     let printWindow = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');
+    // <style>
+    //   body { font-family: Arial, sans-serif; padding: 20px; }
+    //   .print-header { text-align: center; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 2px solid #ccc; }
+    //   .print-grid { display: flex; flex-wrap: wrap; gap: 15px; }
+    //   .print-grid > div { text-align: center; display: flex; flex-direction: column; align-items: center; }
+    //   .qr-card { text-align: center; padding: 10px; border: 1px dashed #999; border-radius: 8px; }
+    //   .qr-card img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+    //   .bag-label { margin-top: 10px; font-weight: bold; font-size: 14px; }
+    // </style>
     
     // Write a clean HTML page just for printing
     printWindow?.document.open();
@@ -85,7 +113,15 @@ export class QrCodeScanComponent implements OnInit {
             .print-grid { display: flex; flex-wrap: wrap; gap: 15px; }
             .print-grid > div { text-align: center; display: flex; flex-direction: column; align-items: center; }
             .qr-card { text-align: center; padding: 10px; border: 1px dashed #999; border-radius: 8px; }
-            .qr-card img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+            
+            /* NEW: Forces the high-res 520px image to print exactly at 130px */
+            .qr-image-container img, .print-grid img { 
+                width: 130px !important; 
+                height: 130px !important; 
+                display: block; 
+                margin: 0 auto; 
+            }
+            
             .bag-label { margin-top: 10px; font-weight: bold; font-size: 14px; }
           </style>
         </head>

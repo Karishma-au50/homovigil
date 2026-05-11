@@ -15,6 +15,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 })
 export class SalesComponent implements OnInit {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+  isOnline: boolean = navigator.onLine;
 
   currentStep: number = 1;
   allowedFormats = [BarcodeFormat.QR_CODE];
@@ -30,6 +31,9 @@ export class SalesComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.isOnline = navigator.onLine;
+    window.addEventListener('online', () => this.isOnline = true);
+    window.addEventListener('offline', () => this.isOnline = false);
   }
 
   isBagAlreadyScanned(bagId: string): boolean {
@@ -43,7 +47,30 @@ export class SalesComponent implements OnInit {
   }
 
   onQrScanSuccess(scannedData: string) {
-    const parsedQrData = this.salesService.parseQrForFullData(scannedData);
+    let parsedQrData: any = null;
+
+    try {
+      // 1. Try to parse the raw JSON from the scanner directly
+      const rawData = JSON.parse(scannedData);
+      
+      // 2. Map the new short keys back to the standard names.
+      // We use || rawData.oldKey to ensure backwards compatibility with older printed bags!
+      parsedQrData = {
+        bagId: rawData.bId || rawData.bagId,
+        patientId: rawData.pId || rawData.patientId,
+        bloodBagId: rawData.bbId || rawData.bloodBagId,
+        patientName: rawData.pN || rawData.patientName,
+        uhId: rawData.uId || rawData.uhId,
+        haemovigilId: rawData.hId || rawData.haemovigilId,
+        bloodGroup: rawData.bG || rawData.bloodGroup,
+        bloodBagNumber: rawData.bbN || rawData.bloodBagNumber
+      };
+    } catch (e) {
+      // 3. Fallback to your old service method if standard JSON parsing fails
+      parsedQrData = this.salesService.parseQrForFullData(scannedData);
+    }
+
+    // Now use our safely mapped parsedQrData to get the IDs
     const patientId = parsedQrData?.patientId || this.salesService.parseQrForId(scannedData);
 
     if (!patientId) {
@@ -61,67 +88,83 @@ export class SalesComponent implements OnInit {
     if (bagId && this.isBagAlreadyScanned(bagId)) return;
 
     if (!this.scannedPatient) {
+      // this.scannedPatient = {
+      //   patientId: patientId,
+      //   patientName: 'Fetching patient data...',
+      //   uhId: 'Loading...',
+      //   haemovigilId: 'Loading...',
+      //   bloodGroup: '',
+      //   status: 'Loading',
+      //   symptoms: { cough: false, fever: false, rash: false, pain: false },
+      //   bags: [],
+      //   existingDbBags: []
+      // };
+
       this.scannedPatient = {
         patientId: patientId,
-        patientName: 'Fetching patient data...',
-        uhId: 'Loading...',
-        haemovigilId: 'Loading...',
-        bloodGroup: '',
-        status: 'Loading',
+        // ✅ OFFLINE UPDATE: Online hai toh "Fetching...", offline hai toh QR Code se naam uthao
+        patientName: this.isOnline ? 'Fetching patient data...' : (parsedQrData?.patientName || patientId),
+        uhId: this.isOnline ? 'Loading...' : (parsedQrData?.uhId || 'Offline'),
+        haemovigilId: this.isOnline ? 'Loading...' : (parsedQrData?.haemovigilId || 'Offline'),
+        bloodGroup: this.isOnline ? '' : (parsedQrData?.bloodGroup || 'Offline'),
+        status: this.isOnline ? 'Loading' : 'Ready',
         symptoms: { cough: false, fever: false, rash: false, pain: false },
         bags: [],
         existingDbBags: []
       };
 
-      this.salesService.getPatientFromBackend(patientId).subscribe({
-        next: (res: any) => {
-          const pData = res.data || res;
-          this.scannedPatient.patientName = `${pData.firstname} ${pData.lastname || ''}`.trim();
-          this.scannedPatient.uhId = pData.UHID;
-          this.scannedPatient.haemovigilId = pData.haemovigilId || 'N/A';
-          this.scannedPatient.bloodGroup = pData.bloodGroup;
-          this.scannedPatient.status = 'Ready';
-        },
-        error: () => this.scannedPatient.patientName = 'Patient not found'
-      });
-
-      const loggedInUser: any = this.authService.currentUser;
-      const payload = {
-        salesId: loggedInUser._id || loggedInUser.id,
-        patient: { patientId: patientId, bags: [] }
-      };
-      
-      this.salesService.createTransfusionApi(payload).subscribe({
-        next: (res: any) => {
-          this.createdSalesRecordId = res.data?._id || res._id;
-
-          const existingPatientData = res.data?.patient;
-          this.scannedPatient.existingDbBags = existingPatientData?.bags || [];
-
-          if (existingPatientData?.symptoms) {
-            this.scannedPatient.symptoms = { 
+      if (this.isOnline) {
+        this.salesService.getPatientFromBackend(patientId).subscribe({
+          next: (res: any) => {
+            const pData = res.data || res;
+            this.scannedPatient.patientName = `${pData.firstname} ${pData.lastname || ''}`.trim();
+            this.scannedPatient.uhId = pData.UHID;
+            this.scannedPatient.haemovigilId = pData.haemovigilId || 'N/A';
+            this.scannedPatient.bloodGroup = pData.bloodGroup;
+            this.scannedPatient.status = 'Ready';
+          },
+          error: () => this.scannedPatient.patientName = 'Patient not found'
+        });
+  
+        const loggedInUser: any = this.authService.currentUser;
+        const payload = {
+          salesId: loggedInUser._id || loggedInUser.id,
+          patient: { patientId: patientId, bags: [] }
+        };
+  
+        this.salesService.createTransfusionApi(payload).subscribe({
+          next: (res: any) => {
+            this.createdSalesRecordId = res.data?._id || res._id;
+  
+            const existingPatientData = res.data?.patient;
+            this.scannedPatient.existingDbBags = existingPatientData?.bags || [];
+  
+            if (existingPatientData?.symptoms) {
+              this.scannedPatient.symptoms = {
                 cough: existingPatientData.symptoms.cough || false,
                 rash: existingPatientData.symptoms.rash || false,
                 fever: existingPatientData.symptoms.fever || false,
                 pain: existingPatientData.symptoms.pain || false
-            };
-
-            const hasPreviousSymptoms = Object.values(this.scannedPatient.symptoms).some(val => val === true);
-            
-            if (hasPreviousSymptoms) {
-              // alert(`⚠️ WARNING: This patient previously showed reactions (symptoms) during transfusion! Please proceed with caution.`);
-              this.scannedPatient.hasPreviousSymptoms = true; 
+              };
+  
+              const hasPreviousSymptoms = Object.values(this.scannedPatient.symptoms).some(val => val === true);
+  
+              if (hasPreviousSymptoms) {
+                // alert(`⚠️ WARNING: This patient previously showed reactions (symptoms) during transfusion! Please proceed with caution.`);
+                this.scannedPatient.hasPreviousSymptoms = true;
+              }
             }
+  
+            this.scannedPatient.bags.forEach((b: any) => {
+              if (this.scannedPatient.existingDbBags.some((dbBag: any) => dbBag.bagId === b.bagId)) {
+                b.status = 'Completed';
+                b.isAlreadyCompleted = true;
+              }
+            });
           }
-          
-          this.scannedPatient.bags.forEach((b: any) => {
-            if (this.scannedPatient.existingDbBags.some((dbBag: any) => dbBag.bagId === b.bagId)) {
-              b.status = 'Completed';
-              b.isAlreadyCompleted = true;
-            }
-          });
-        }
-      });
+        });
+      }
+
     }
 
     const newBag = {
@@ -134,21 +177,29 @@ export class SalesComponent implements OnInit {
       startTime: null,
       selectedEndTime: '',
       qrData: scannedData,
-      isAlreadyCompleted: false 
+      isAlreadyCompleted: false
     };
 
-    if (this.scannedPatient.existingDbBags?.length > 0) {
-      if (this.scannedPatient.existingDbBags.some((dbBag: any) => dbBag.bagId === bagId)) {
-        newBag.status = 'Completed';
-        newBag.isAlreadyCompleted = true;
+    if (this.isOnline){
+      if (this.scannedPatient.existingDbBags?.length > 0) {
+        if (this.scannedPatient.existingDbBags.some((dbBag: any) => dbBag.bagId === bagId)) {
+          newBag.status = 'Completed';
+          newBag.isAlreadyCompleted = true;
+        }
       }
+    }else {
+      // ✅ OFFLINE UPDATE: Ab bag number bhi directly QR se aayega!
+      newBag.bloodBagNumber = parsedQrData?.bloodBagNumber || bloodBagId || bagId;
+      newBag.bloodComponent = 'Offline Data';
+      newBag.bagBloodGroup = parsedQrData?.bloodGroup || 'Offline';
     }
+    
 
     this.scannedPatient.bags.push(newBag);
     const activeBag = this.scannedPatient.bags[this.scannedPatient.bags.length - 1];
     this.scrollToBottom();
 
-    if (bloodBagId) {
+    if (this.isOnline && bloodBagId) {
       this.salesService.getBloodBagFromBackend(bloodBagId).subscribe({
         next: (res: any) => {
           const bData = res.data || res;
@@ -182,19 +233,22 @@ export class SalesComponent implements OnInit {
         bags: []
       }
     };
-
-    this.salesService.createTransfusionApi(payload).subscribe({
-      next: (res: any) => {
-        this.createdSalesRecordId = res.data?._id || res._id;
-        
-        if (this.scannedPatient.hasPreviousSymptoms) {
-          alert(`⚠️ WARNING: This patient previously showed reactions (symptoms) during transfusion! Please proceed with caution.`);
-        }
-
-        this.currentStep = 2;
-      },
-      error: () => alert("Failed to create/update session on server.")
-    });
+    if (this.isOnline){
+      this.salesService.createTransfusionApi(payload).subscribe({
+        next: (res: any) => {
+          this.createdSalesRecordId = res.data?._id || res._id;
+  
+          if (this.scannedPatient.hasPreviousSymptoms) {
+            alert(`⚠️ WARNING: This patient previously showed reactions (symptoms) during transfusion! Please proceed with caution.`);
+          }
+  
+          this.currentStep = 2;
+        },
+        error: () => alert("Failed to create/update session on server.")
+      });
+    }else{
+      this.currentStep = 2;
+    }
   }
 
   saveTransfusion(bag: any) {
@@ -209,13 +263,30 @@ export class SalesComponent implements OnInit {
       symptoms: this.scannedPatient.symptoms
     };
 
-    this.salesService.saveTransfusionApi(payload).subscribe({
-      next: () => {
-        bag.status = 'Completed';
-        this.checkAllBagsCompleted();
-      },
-      error: () => alert('Failed to save the transfusion record.')
-    });
+    if (this.isOnline) {
+      this.salesService.saveTransfusionApi(payload).subscribe({
+        next: () => {
+          bag.status = 'Completed';
+          this.checkAllBagsCompleted();
+        },
+        error: () => alert('Failed to save the transfusion record.')
+      });
+    }else{
+      const loggedInUser: any = this.authService.currentUser;
+      const offlineRecord = {
+          ...payload,
+          salesId: loggedInUser._id || loggedInUser.id,
+          offlineSyncId: Date.now().toString()
+      };
+      
+      const records = JSON.parse(localStorage.getItem('transfusions_queue') || '[]');
+      records.push(offlineRecord);
+      localStorage.setItem('transfusions_queue', JSON.stringify(records));
+      
+      bag.status = 'Completed';
+      this.checkAllBagsCompleted();
+    }
+
   }
 
   scrollToBottom(): void {

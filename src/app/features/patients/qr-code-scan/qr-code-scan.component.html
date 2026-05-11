@@ -10,13 +10,26 @@
         <p class="text-gray-600 font-medium py-6">No Bag allocated to this Patient.</p>
         }@else{
         <div id="print-section"
-            class="flex flex-wrap justify-center gap-12 bg-white border border-gray-200 rounded-xl p-2 shadow-sm w-full">
+            class="flex flex-wrap justify-center gap-4 bg-white border border-gray-200 rounded-xl p-2 shadow-sm w-full">
 
             @for(item of qrItems; track $index){
                 <div class="flex flex-col items-center rounded-lg bg-white">
-                    <qrcode [qrdata]="item.qrStr" [width]="100" [margin]="2" [errorCorrectionLevel]="'L'" [colorDark]="'#000000'"
+                    <!-- <qrcode [qrdata]="item.qrStr" [width]="130" [margin]="2" [errorCorrectionLevel]="'L'" [colorDark]="'#000000'"
                         [colorLight]="'#ffffff'" [elementType]="'img'">
-                    </qrcode>
+                    </qrcode> -->
+
+                    <div class="qr-image-container" style="width: 130px; height: 130px;">
+                        <qrcode 
+                            [qrdata]="item.qrStr" 
+                            [width]="520" 
+                            [margin]="2" 
+                            [errorCorrectionLevel]="'M'" 
+                            [colorDark]="'#000000'"
+                            [colorLight]="'#ffffff'" 
+                            [elementType]="'img'"
+                            style="width: 100%; height: 100%; display: block;">
+                        </qrcode>
+                    </div>
 
                     <p class="bag-label text-sm text-gray-800 font-bold !mt-1 mb-0">
                         {{ item.displayBagId }}
