@@ -47,12 +47,13 @@ export class QrCodeScanComponent implements OnInit {
             //   bloodGroup: this.patientData.bloodGroup || 'N/A',
             //   bloodBagNumber: bagLabel
             // };
-
+            // console.log(bag);
             // MINIFIED PAYLOAD: Short keys = less data = larger, readable QR blocks
             let essentialIds = {
               bId: bag._id,
               pId: this.patientData._id,
               bbId: bag.bloodBagId?._id,
+              bbC: bag.bloodBagId?.bloodcomponent,
               pN: `${this.patientData.firstname} ${this.patientData.lastname || ''}`.trim(),
               uId: this.patientData.UHID || 'N/A',
               hId: this.patientData.haemovigilId || 'N/A',

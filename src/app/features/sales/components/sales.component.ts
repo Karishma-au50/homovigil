@@ -73,6 +73,7 @@ export class SalesComponent implements OnInit {
         bagId: rawData.bId || rawData.bagId,
         patientId: rawData.pId || rawData.patientId,
         bloodBagId: rawData.bbId || rawData.bloodBagId,
+        bloodComponent: rawData.bbC || rawData.bloodComponent,
         patientName: rawData.pN || rawData.patientName,
         uhId: rawData.uId || rawData.uhId,
         haemovigilId: rawData.hId || rawData.haemovigilId,
@@ -142,9 +143,9 @@ export class SalesComponent implements OnInit {
     const newBag = {
       bagId: bagId,
       bloodBagId: bloodBagId,
-      bloodBagNumber: 'Fetching...',
-      bloodComponent: '...',
-      bagBloodGroup: '...',
+      bloodBagNumber: parsedQrData?.bloodBagNumber || 'Fetching...',
+      bloodComponent: parsedQrData?.bloodComponent || '...', // ✅ Instantly display component
+      bagBloodGroup: parsedQrData?.bloodGroup || '...',      // ✅ Instantly display blood group
       status: 'Pending Start',
       startTime: null,
       selectedEndTime: '',
@@ -176,22 +177,22 @@ export class SalesComponent implements OnInit {
 
           this.createdSalesRecordId = res.data?._id || res._id;
 
-          if (isFirstScan) {
-            const existingPatientData = res.data?.patient;
-            this.scannedPatient.existingDbBags = existingPatientData?.bags || [];
+          // if (isFirstScan) {
+          //   const existingPatientData = res.data?.patient;
+          //   this.scannedPatient.existingDbBags = existingPatientData?.bags || [];
 
-            if (existingPatientData?.symptoms) {
-              this.scannedPatient.symptoms = {
-                cough: existingPatientData.symptoms.cough || false,
-                rash: existingPatientData.symptoms.rash || false,
-                fever: existingPatientData.symptoms.fever || false,
-                pain: existingPatientData.symptoms.pain || false
-              };
-              if (Object.values(this.scannedPatient.symptoms).some(val => val === true)) {
-                this.scannedPatient.hasPreviousSymptoms = true;
-              }
-            }
-          }
+          //   if (existingPatientData?.symptoms) {
+          //     this.scannedPatient.symptoms = {
+          //       cough: existingPatientData.symptoms.cough || false,
+          //       rash: existingPatientData.symptoms.rash || false,
+          //       fever: existingPatientData.symptoms.fever || false,
+          //       pain: existingPatientData.symptoms.pain || false
+          //     };
+          //     // if (Object.values(this.scannedPatient.symptoms).some(val => val === true)) {
+          //     //   this.scannedPatient.hasPreviousSymptoms = true;
+          //     // }
+          //   }
+          // }
 
           // ✅ SAFE TO PUSH: Backend confirmed it is not a duplicate. (No UI flashing!)
           this.scannedPatient.bags.push(newBag);
@@ -214,7 +215,7 @@ export class SalesComponent implements OnInit {
     } else {
       // Offline mode: push immediately
       newBag.bloodBagNumber = parsedQrData?.bloodBagNumber || bloodBagId || bagId;
-      newBag.bloodComponent = 'Offline Data';
+      newBag.bloodComponent = parsedQrData?.bloodComponent || 'Offline Data'; // ✅ Use real component offline!
       newBag.bagBloodGroup = parsedQrData?.bloodGroup || 'Offline';
       this.scannedPatient.bags.push(newBag);
       this.scrollToBottom();
@@ -348,5 +349,5 @@ export class SalesComponent implements OnInit {
     this.isCompletedRecord = false;
     this.sessionScannedBags = [];
   }
-  
+
 }

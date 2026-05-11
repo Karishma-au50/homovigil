@@ -11,7 +11,7 @@ export interface OfflineQueueItem {
   bloodBagId: string;
   startTime: string;
   endTime?: string;
-  symptoms?: any;
+  protocolMatched?: string;
 }
 
 @Injectable({
@@ -102,7 +102,9 @@ export class SalesService {
       try {
         await lastValueFrom(this.createTransfusionApi({
           salesId: record.salesId,
-          patient: { patientId: record.patientId, bags: [] }
+          patient: { patientId: record.patientId, bags: [] },
+          bagId: record.bagId,             
+          bloodBagId: record.bloodBagId
         }));
 
         const payload = { ...record, isOfflineSync: true };

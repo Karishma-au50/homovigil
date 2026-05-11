@@ -196,11 +196,11 @@
                 </ul>
             </div>
 
-            <div class="flex gap-4 w-full max-w-md">
-                <!-- <button (click)="prevStep()"
+            <!-- <div class="flex gap-4 w-full max-w-md">
+                <button (click)="prevStep()"
                     class="flex-1 bg-white hover:bg-slate-50 text-slate-600 font-medium px-6 py-2.5 rounded-md border border-slate-200 transition-colors shadow-sm">
                     Back to Scan
-                </button> -->
+                </button>
                 <button (click)="currentStep = 3"
                     class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-6 py-2.5 rounded-md shadow-sm transition-colors">
                     Go to End Phase
@@ -210,7 +210,7 @@
                     Please start at least one transfusion to proceed!
                 </p>
 
-            </div>
+            </div> -->
         </div>
 
         <div *ngIf="currentStep === 3 && !isCompletedRecord" class="flex flex-col items-center animate-fade-in w-full">
@@ -231,7 +231,7 @@
                                 class="text-slate-900">#{{i + 1}} ({{bag.bloodBagNumber}})</strong></p>
                     </div>
 
-                    <div *ngIf="scannedPatient.hasPreviousSymptoms" 
+                    <!-- <div *ngIf="scannedPatient.hasPreviousSymptoms" 
                          class="mb-6 mx-2 p-3 bg-rose-50 border-l-4 border-rose-500 rounded-r text-left flex items-start gap-3">
                         <svg class="w-6 h-6 text-rose-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
@@ -240,7 +240,7 @@
                             <h4 class="text-sm font-bold text-rose-700 m-0">Caution: Previous Symptoms Recorded</h4>
                             <p class="text-xs text-rose-600 m-0 mt-1">This patient experienced reactions during a previous bag in this session. The previously recorded symptoms are pre-checked below.</p>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div class="text-left flex flex-col gap-3 mb-6 pl-2">
                         <label class="flex items-center gap-3 cursor-pointer text-md text-slate-700 dark:text-white">
