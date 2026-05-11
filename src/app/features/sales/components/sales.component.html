@@ -87,10 +87,16 @@
                                 }})</span>
                         </div>
                         <span *ngIf="bag.status === 'Loading'" class="text-[10px] font-medium text-amber-500">...</span>
+
                         <span
                             *ngIf="bag.status === 'Ready' || bag.status === 'Created' || bag.status === 'Pending Start'"
                             class="text-[11px] font-medium text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-full">✓
                             Scanned</span>
+
+                        <span *ngIf="bag.status === 'Completed'"
+                            class="text-[11px] font-medium text-indigo-500 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">✓
+                            Transfused</span>
+
                         <span *ngIf="bag.status === 'Error'" class="text-[10px] font-medium text-rose-500">Error</span>
                     </div>
                 </div>
@@ -102,7 +108,7 @@
             </div>
 
             <div *ngIf="!scannedPatient" class="text-slate-500 text-sm mt-2 animate-pulse">
-                Align camera to scan patient and bag QR codes...
+                Align camera to scan QR codes...
             </div>
         </div>
 
@@ -143,11 +149,14 @@
                     <p class="text-slate-700 dark:text-slate-200 flex justify-between !mb-0"><span>UHID:</span> <strong
                             class="text-slate-900 dark:text-white">{{ scannedPatient?.uhId }}</strong></p>
                     <p class="text-slate-700 dark:text-slate-200 flex justify-between !mb-0"><span>Haemovigil Id:</span>
-                        <strong class="text-slate-900 dark:text-white">{{ scannedPatient?.haemovigilId }}</strong></p>
+                        <strong class="text-slate-900 dark:text-white">{{ scannedPatient?.haemovigilId }}</strong>
+                    </p>
                     <p class="text-slate-700 dark:text-slate-200 flex justify-between !mb-0"><span>Patient Name:</span>
-                        <strong class="text-slate-900 dark:text-white">{{ scannedPatient?.patientName }}</strong></p>
+                        <strong class="text-slate-900 dark:text-white">{{ scannedPatient?.patientName }}</strong>
+                    </p>
                     <p class="text-slate-700 dark:text-slate-200 flex justify-between !mb-0"><span>Blood Group:</span>
-                        <strong class="text-rose-500">{{ scannedPatient?.bloodGroup }}</strong></p>
+                        <strong class="text-rose-500">{{ scannedPatient?.bloodGroup }}</strong>
+                    </p>
 
                     <!-- <p class="text-slate-700 dark:text-slate-200 flex justify-between !mb-0"><span>UHID:</span> <strong class="text-slate-900 dark:text-white">{{ scannedPatient?.uhId }}</strong></p>
                     <p class="text-slate-700 dark:text-slate-200 flex justify-between !mb-0"><span>Patient Name:</span> <strong class="text-slate-900 dark:text-white">{{ scannedPatient?.patientName }}</strong></p> -->
@@ -160,23 +169,24 @@
                     <h4 class="font-semibold text-slate-700 dark:text-white text-sm m-0">Bags to Process</h4>
                 </div>
                 <ul class="divide-y divide-slate-100 dark:divide-slate-700">
-                    <li *ngFor="let bag of scannedPatient?.bags; let i = index"
-                        class="p-4 flex justify-between items-center transition-colors hover:bg-slate-50/50 dark:hover:bg-[#27272a]/50">
-                        <div class="flex flex-col">
-                            <span class="font-bold text-slate-800 dark:text-white text-sm">Bag #{{i + 1}}:
-                                {{bag.bloodBagNumber}}</span>
-                            <span class="text-[11px] text-slate-500">{{ bag.bloodComponent }}</span>
-                        </div>
+                    <ng-container *ngFor="let bag of scannedPatient?.bags; let i = index">
+                        <li *ngIf="!bag.isAlreadyCompleted"
+                            class="p-4 flex justify-between items-center transition-colors hover:bg-slate-50/50 dark:hover:bg-[#27272a]/50">
+                            <div class="flex flex-col">
+                                <span class="font-bold text-slate-800 dark:text-white text-sm">Bag #{{i + 1}}:
+                                    {{bag.bloodBagNumber}}</span>
+                                <span class="text-[11px] text-slate-500">{{ bag.bloodComponent }}</span>
+                            </div>
 
-                        <button *ngIf="!bag.startTime && bag.status !== 'Completed'" (click)="startTransfusion(bag)"
-                            class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium px-4 py-2 rounded shadow-sm transition-colors">
-                            Start Transfusion
-                        </button>
-                        <span *ngIf="bag.status === 'In Progress'"
-                            class="text-xs font-medium text-amber-500 bg-amber-50 px-2 py-1 rounded">In Progress</span>
-                        <span *ngIf="bag.status === 'Completed'" class="text-xs font-medium text-emerald-500">Completed
-                            ✓</span>
-                    </li>
+                            <button *ngIf="!bag.startTime && bag.status !== 'Completed'" (click)="startTransfusion(bag)"
+                                class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium px-4 py-2 rounded shadow-sm transition-colors">
+                                Start Transfusion
+                            </button>
+                            <span *ngIf="bag.status === 'In Progress'"
+                                class="text-xs font-medium text-amber-500 bg-amber-50 px-2 py-1 rounded">In
+                                Progress</span>
+                        </li>
+                    </ng-container>
                 </ul>
             </div>
 
@@ -196,17 +206,29 @@
 
             <ng-container *ngFor="let bag of scannedPatient?.bags; let i = index">
                 <div *ngIf="bag.status === 'In Progress'"
-                    class="w-full max-w-md mb-8 pb-8 border-b-2 border-dashed border-slate-200 dark:border-slate-700 last:border-0">
+                    class="w-full max-w-md border-b-2 border-dashed border-slate-200 dark:border-slate-700 last:border-0">
 
                     <div class="px-6 py-4 border-2 border-emerald-100 rounded-xl bg-emerald-50/50 mb-6 text-center">
                         <div class="flex items-center gap-2 mb-2 border-b pb-2 border-emerald-200/50 text-center">
-                            <h3 class="font-semibold text-slate-800 text-2xl mb-0 dark:text-white justify-center">Transfusion Status
+                            <h3 class="font-semibold text-slate-800 text-2xl mb-0 dark:text-white justify-center mx-auto">
+                                Transfusion Status
                             </h3>
                         </div>
                         <p class="text-sm text-slate-500 dark:text-white/65 italic mb-1">Started at: {{ bag.startTime |
                             date:'shortTime' }}</p>
                         <p class="text-sm text-slate-700 font-medium !mb-0">Current Bag: <strong
                                 class="text-slate-900">#{{i + 1}} ({{bag.bloodBagNumber}})</strong></p>
+                    </div>
+
+                    <div *ngIf="scannedPatient.hasPreviousSymptoms" 
+                         class="mb-6 mx-2 p-3 bg-rose-50 border-l-4 border-rose-500 rounded-r text-left flex items-start gap-3">
+                        <svg class="w-6 h-6 text-rose-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <div>
+                            <h4 class="text-sm font-bold text-rose-700 m-0">Caution: Previous Symptoms Recorded</h4>
+                            <p class="text-xs text-rose-600 m-0 mt-1">This patient experienced reactions during a previous bag in this session. The previously recorded symptoms are pre-checked below.</p>
+                        </div>
                     </div>
 
                     <div class="text-left flex flex-col gap-3 mb-6 pl-2">
@@ -245,12 +267,12 @@
                     </div>
 
                     <div class="flex gap-4">
-                        <button (click)="currentStep = 2"
-                            class="flex-1 bg-white hover:bg-slate-50 text-slate-600 font-medium px-8 py-3 rounded-md border border-slate-200 transition-colors shadow-sm text-lg">
+                        <button (click)="cancelInProgress(bag)"
+                            class="flex-1 bg-white hover:bg-slate-50 text-slate-600 font-medium px-6 py-2.5 rounded-md border border-slate-200 transition-colors shadow-sm">
                             Back
                         </button>
                         <button (click)="saveTransfusion(bag)"
-                            class="flex-1 bg-[#f43f5e] hover:bg-rose-600 text-white font-medium px-8 py-3 rounded-md shadow-sm transition-all text-lg">
+                            class="flex-1 bg-[#f43f5e] hover:bg-rose-600 text-white font-medium px-6 py-2.5 rounded-md shadow-sm transition-all">
                             Save
                         </button>
                     </div>
@@ -259,7 +281,7 @@
 
             <div *ngIf="!hasInProgressBags()"
                 class="w-full max-w-md p-6 text-center text-slate-500 border border-dashed rounded-xl border-slate-300">
-                <p class="text-md mb-2">No bags are currently in progress.</p>
+                <p class="text-md mb-2 text-slate-600">No bags are currently in progress. Please start a transfusion for the remaining bags.</p>
                 <button (click)="currentStep = 2"
                     class="px-6 py-2 mt-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md shadow-sm transition-colors font-medium">Go
                     to Start Phase</button>
@@ -277,8 +299,7 @@
                         </svg>
                     </div>
                     <h2 class="text-2xl font-bold text-slate-800 !mb-0">Transfusion Finished!</h2>
-                    <p class="text-sm text-slate-500 mt-1">All bags for <strong>{{ scannedPatient?.patientName
-                            }}</strong> are processed.</p>
+                    <p class="text-sm text-slate-500 mt-1">All blood bags for <strong>{{ scannedPatient?.patientName }}</strong> have been successfully recorded.</p>
                 </div>
 
                 <button (click)="resetFlow()"

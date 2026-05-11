@@ -58,14 +58,9 @@ export class SalesService {
     return this.http.post(`${this.apiUrl}/sales/scan`, payload);
   }
 
-  // Step 2: Update start time (Now requires bagId)
-  updateStartTransfusionApi(salesRecordId: string, bagId: string, payload?: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/sales/${salesRecordId}/bag/${bagId}/start`, payload || {});
-  }
-
-  // Step 3: Update end time (Now requires bagId)
-  updateEndTransfusionApi(salesRecordId: string, bagId: string, endTime?: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/sales/${salesRecordId}/bag/${bagId}/end`, { endTime });
+  // Step 3: Save Transfusion (Insert Bag into Array)
+  saveTransfusionApi(payload: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/sales/save-transfusion`, payload);
   }
 
   // --- OFFLINE QUEUE MANAGEMENT (Simplified for now) ---

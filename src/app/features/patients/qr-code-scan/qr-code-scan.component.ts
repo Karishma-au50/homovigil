@@ -17,7 +17,8 @@ export class QrCodeScanComponent implements OnInit {
 
   isAnyBag:boolean = false;
   
-  qrDataString: string[] = [];
+  // qrDataString: string[] = [];
+  qrItems: { qrStr: string, displayBagId: string }[] = [];
 
   constructor(private authService:AuthService){}
 
@@ -41,7 +42,14 @@ export class QrCodeScanComponent implements OnInit {
             };
 
             let bagQrStr = JSON.stringify(essentialIds);
-            this.qrDataString.push(bagQrStr);
+            // this.qrDataString.push(bagQrStr);
+
+            let bagLabel = bag.bloodBagId?.bloodBagId || bag.bloodBagId?._id || bag._id;
+
+            this.qrItems.push({
+              qrStr: bagQrStr,
+              displayBagId: bagLabel
+            });
 
           });
         }
@@ -75,6 +83,7 @@ export class QrCodeScanComponent implements OnInit {
             body { font-family: Arial, sans-serif; padding: 20px; }
             .print-header { text-align: center; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 2px solid #ccc; }
             .print-grid { display: flex; flex-wrap: wrap; gap: 15px; }
+            .print-grid > div { text-align: center; display: flex; flex-direction: column; align-items: center; }
             .qr-card { text-align: center; padding: 10px; border: 1px dashed #999; border-radius: 8px; }
             .qr-card img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
             .bag-label { margin-top: 10px; font-weight: bold; font-size: 14px; }

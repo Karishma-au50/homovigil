@@ -17,14 +17,12 @@ export class SalesComponent implements OnInit {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   currentStep: number = 1;
-  isOnline: boolean = true;
   allowedFormats = [BarcodeFormat.QR_CODE];
 
   scannedPatient: any = null;
   createdSalesRecordId: string | null = null;
-  
+
   isCompletedRecord: boolean = false;
-  isOfflineQueueTempId: boolean = false;
 
   constructor(
     private salesService: SalesService,
@@ -32,9 +30,6 @@ export class SalesComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.isOnline = navigator.onLine;
-    window.addEventListener('online', () => this.isOnline = true);
-    window.addEventListener('offline', () => this.isOnline = false);
   }
 
   isBagAlreadyScanned(bagId: string): boolean {
@@ -42,17 +37,15 @@ export class SalesComponent implements OnInit {
     return this.scannedPatient.bags.some((b: any) => b.bagId === bagId);
   }
 
-  // Helper method to check if any bag is currently in progress
   hasInProgressBags(): boolean {
     if (!this.scannedPatient || !this.scannedPatient.bags) return false;
     return this.scannedPatient.bags.some((b: any) => b.status === 'In Progress');
   }
 
-  // --- STEP 1: SCAN LOGIC ---
   onQrScanSuccess(scannedData: string) {
     const parsedQrData = this.salesService.parseQrForFullData(scannedData);
     const patientId = parsedQrData?.patientId || this.salesService.parseQrForId(scannedData);
-    
+
     if (!patientId) {
       alert("Invalid QR Code! Scan a valid one.");
       return;
@@ -62,7 +55,7 @@ export class SalesComponent implements OnInit {
     const bloodBagId = parsedQrData?.bloodBagId || null;
 
     if (this.scannedPatient && this.scannedPatient.patientId !== patientId) {
-      this.scannedPatient = null; 
+      this.scannedPatient = null;
     }
 
     if (bagId && this.isBagAlreadyScanned(bagId)) return;
@@ -75,29 +68,60 @@ export class SalesComponent implements OnInit {
         haemovigilId: 'Loading...',
         bloodGroup: '',
         status: 'Loading',
-        // ✅ NAYA: Global Symptoms object for Step 3
-        symptoms: {
-            cough: false,
-            fever: false,
-            rash: false,
-            pain: false
-        },
-        bags: []
+        symptoms: { cough: false, fever: false, rash: false, pain: false },
+        bags: [],
+        existingDbBags: []
       };
 
-      if (this.isOnline) {
-        this.salesService.getPatientFromBackend(patientId).subscribe({
-          next: (res: any) => {
-            const pData = res.data || res;
-            this.scannedPatient.patientName = `${pData.firstname} ${pData.lastname || ''}`.trim();
-            this.scannedPatient.uhId = pData.UHID;
-            this.scannedPatient.haemovigilId = pData.haemovigilId || 'N/A';
-            this.scannedPatient.bloodGroup = pData.bloodGroup;
-            this.scannedPatient.status = 'Ready';
-          },
-          error: () => this.scannedPatient.patientName = 'Patient not found'
-        });
-      }
+      this.salesService.getPatientFromBackend(patientId).subscribe({
+        next: (res: any) => {
+          const pData = res.data || res;
+          this.scannedPatient.patientName = `${pData.firstname} ${pData.lastname || ''}`.trim();
+          this.scannedPatient.uhId = pData.UHID;
+          this.scannedPatient.haemovigilId = pData.haemovigilId || 'N/A';
+          this.scannedPatient.bloodGroup = pData.bloodGroup;
+          this.scannedPatient.status = 'Ready';
+        },
+        error: () => this.scannedPatient.patientName = 'Patient not found'
+      });
+
+      const loggedInUser: any = this.authService.currentUser;
+      const payload = {
+        salesId: loggedInUser._id || loggedInUser.id,
+        patient: { patientId: patientId, bags: [] }
+      };
+      
+      this.salesService.createTransfusionApi(payload).subscribe({
+        next: (res: any) => {
+          this.createdSalesRecordId = res.data?._id || res._id;
+
+          const existingPatientData = res.data?.patient;
+          this.scannedPatient.existingDbBags = existingPatientData?.bags || [];
+
+          if (existingPatientData?.symptoms) {
+            this.scannedPatient.symptoms = { 
+                cough: existingPatientData.symptoms.cough || false,
+                rash: existingPatientData.symptoms.rash || false,
+                fever: existingPatientData.symptoms.fever || false,
+                pain: existingPatientData.symptoms.pain || false
+            };
+
+            const hasPreviousSymptoms = Object.values(this.scannedPatient.symptoms).some(val => val === true);
+            
+            if (hasPreviousSymptoms) {
+              // alert(`⚠️ WARNING: This patient previously showed reactions (symptoms) during transfusion! Please proceed with caution.`);
+              this.scannedPatient.hasPreviousSymptoms = true; 
+            }
+          }
+          
+          this.scannedPatient.bags.forEach((b: any) => {
+            if (this.scannedPatient.existingDbBags.some((dbBag: any) => dbBag.bagId === b.bagId)) {
+              b.status = 'Completed';
+              b.isAlreadyCompleted = true;
+            }
+          });
+        }
+      });
     }
 
     const newBag = {
@@ -109,14 +133,22 @@ export class SalesComponent implements OnInit {
       status: 'Pending Start',
       startTime: null,
       selectedEndTime: '',
-      qrData: scannedData
+      qrData: scannedData,
+      isAlreadyCompleted: false 
     };
-    
+
+    if (this.scannedPatient.existingDbBags?.length > 0) {
+      if (this.scannedPatient.existingDbBags.some((dbBag: any) => dbBag.bagId === bagId)) {
+        newBag.status = 'Completed';
+        newBag.isAlreadyCompleted = true;
+      }
+    }
+
     this.scannedPatient.bags.push(newBag);
     const activeBag = this.scannedPatient.bags[this.scannedPatient.bags.length - 1];
     this.scrollToBottom();
 
-    if (this.isOnline && bloodBagId) {
+    if (bloodBagId) {
       this.salesService.getBloodBagFromBackend(bloodBagId).subscribe({
         next: (res: any) => {
           const bData = res.data || res;
@@ -126,8 +158,6 @@ export class SalesComponent implements OnInit {
         },
         error: () => activeBag.bloodBagNumber = bloodBagId
       });
-    } else if (!this.isOnline) {
-      activeBag.bloodBagNumber = bloodBagId || 'Offline Bag';
     }
   }
 
@@ -136,33 +166,56 @@ export class SalesComponent implements OnInit {
       alert("Please scan at least one valid QR code.");
       return;
     }
-    
-    const loggedInUser: any = this.authService.currentUser;
 
+    const hasNewBagsToProcess = this.scannedPatient.bags.some((b: any) => !b.isAlreadyCompleted);
+
+    if (!hasNewBagsToProcess) {
+      alert("All scanned bags for this patient have already been transfused.");
+      return;
+    }
+
+    const loggedInUser: any = this.authService.currentUser;
     const payload = {
       salesId: loggedInUser._id || loggedInUser.id,
       patient: {
         patientId: this.scannedPatient.patientId,
-        bags: this.scannedPatient.bags.map((b: any) => ({
-          bagId: b.bagId,
-          bloodBagId: b.bloodBagId
-        }))
+        bags: []
       }
     };
 
-    if (this.isOnline) {
-      this.salesService.createTransfusionApi(payload).subscribe({
-        next: (res: any) => {
-          this.createdSalesRecordId = res.data?._id || res._id;
-          this.currentStep = 2; 
-        },
-        error: () => alert("Failed to create session on server.")
-      });
-    } else {
-      this.createdSalesRecordId = `temp_offline_${Date.now()}`;
-      this.isOfflineQueueTempId = true;
-      this.currentStep = 2;
-    }
+    this.salesService.createTransfusionApi(payload).subscribe({
+      next: (res: any) => {
+        this.createdSalesRecordId = res.data?._id || res._id;
+        
+        if (this.scannedPatient.hasPreviousSymptoms) {
+          alert(`⚠️ WARNING: This patient previously showed reactions (symptoms) during transfusion! Please proceed with caution.`);
+        }
+
+        this.currentStep = 2;
+      },
+      error: () => alert("Failed to create/update session on server.")
+    });
+  }
+
+  saveTransfusion(bag: any) {
+    if (!this.scannedPatient?.patientId) return;
+
+    const payload = {
+      patientId: this.scannedPatient.patientId,
+      bagId: bag.bagId,
+      bloodBagId: bag.bloodBagId,
+      startTime: bag.startTime,
+      endTime: bag.selectedEndTime ? bag.selectedEndTime : undefined,
+      symptoms: this.scannedPatient.symptoms
+    };
+
+    this.salesService.saveTransfusionApi(payload).subscribe({
+      next: () => {
+        bag.status = 'Completed';
+        this.checkAllBagsCompleted();
+      },
+      error: () => alert('Failed to save the transfusion record.')
+    });
   }
 
   scrollToBottom(): void {
@@ -170,58 +223,25 @@ export class SalesComponent implements OnInit {
       if (this.scrollContainer) {
         this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
       }
-    }, 100); 
+    }, 100);
   }
 
   prevStep() {
-    if (this.currentStep === 2) this.resetFlow();
-    else if (this.currentStep > 1) this.currentStep--;
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
   }
 
-  // --- STEP 2: START TRANSFUSION (PER BAG) ---
   startTransfusion(bag: any) {
-    if (!this.createdSalesRecordId) return;
-
-    const currentStartTime = new Date().toISOString();
-
-    if (this.isOnline && !this.isOfflineQueueTempId) {
-      this.salesService.updateStartTransfusionApi(this.createdSalesRecordId, bag.bagId).subscribe({
-        next: () => {
-          bag.startTime = currentStartTime;
-          bag.status = 'In Progress';
-          this.currentStep = 3; // ✅ NAYA: Start hote hi Step 3 par bhej do
-        },
-        error: () => alert('Failed to connect to the server.')
-      });
-    } else {
-      bag.startTime = currentStartTime;
-      bag.status = 'In Progress';
-      this.currentStep = 3; // ✅ NAYA: Start hote hi Step 3 par bhej do
-    }
+    bag.startTime = new Date().toISOString();
+    bag.status = 'In Progress';
+    this.currentStep = 3;
   }
 
-  // --- STEP 3: END TRANSFUSION (PER BAG) ---
-  saveTransfusion(bag: any) {
-    if (!this.createdSalesRecordId) return;
-
-    const endTimePayload = bag.selectedEndTime ? bag.selectedEndTime : undefined;
-
-    // Backend payload update logic (if API supports global symptoms, you can pass this.scannedPatient.symptoms here)
-    if (this.isOnline && !this.isOfflineQueueTempId) {
-      this.salesService.updateEndTransfusionApi(this.createdSalesRecordId, bag.bagId, endTimePayload).subscribe({
-        next: () => {
-          bag.status = 'Completed';
-          this.checkAllBagsCompleted();
-        },
-        error: () => {
-          bag.status = 'Completed';
-          this.checkAllBagsCompleted();
-        }
-      });
-    } else {
-      bag.status = 'Completed';
-      this.checkAllBagsCompleted();
-    }
+  cancelInProgress(bag: any) {
+    bag.startTime = null;
+    bag.status = 'Pending Start';
+    this.currentStep = 2;
   }
 
   checkAllBagsCompleted() {
@@ -237,6 +257,5 @@ export class SalesComponent implements OnInit {
     this.scannedPatient = null;
     this.createdSalesRecordId = null;
     this.isCompletedRecord = false;
-    this.isOfflineQueueTempId = false;
   }
 }
