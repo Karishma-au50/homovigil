@@ -278,10 +278,10 @@
                     </div>
 
                     <div class="flex gap-4">
-                        <button (click)="cancelInProgress(bag)"
+                        <!-- <button (click)="cancelInProgress(bag)"
                             class="flex-1 bg-white hover:bg-slate-50 text-slate-600 font-medium px-6 py-2.5 rounded-md border border-slate-200 transition-colors shadow-sm">
                             Back
-                        </button>
+                        </button> -->
                         <button (click)="saveTransfusion(bag)"
                             class="flex-1 bg-[#f43f5e] hover:bg-rose-600 text-white font-medium px-6 py-2.5 rounded-md shadow-sm transition-all">
                             Save
@@ -293,7 +293,7 @@
             <div *ngIf="!hasInProgressBags()"
                 class="w-full max-w-md p-6 text-center text-slate-500 border border-dashed rounded-xl border-slate-300">
                 <!-- <p class="text-md mb-2 text-slate-600">No bags are currently in progress. Please start a transfusion for the remaining bags.</p> -->
-                <p class="text-md mb-2 text-slate-600">No transfusion is currently in progress. Start the next transfusion.</p>
+                <p class="text-md mb-2 text-slate-600">The current blood bag transfusion is complete. Start the next transfusion to continue the process.</p>
                 <button (click)="currentStep = 2"
                     class="px-6 py-2 mt-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md shadow-sm transition-colors font-medium">Go
                     to Start Phase</button>
