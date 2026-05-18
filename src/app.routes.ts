@@ -14,6 +14,7 @@ import { AllocateBagHistoryComponent } from './app/features/bag/allocate-bag-his
 import { UsersListComponent } from './app/features/users/components/users-list/users-list.component';
 import { SalesComponent } from './app/features/sales/components/sales.component';
 import { HomeRedirectGuard } from './app/core/auth/guard/home-redirect.guard';
+import { TransfusionListComponent } from './app/features/transfusions/components/transfusion-list/transfusion-list.component';
 
 export const appRoutes: Routes = [
     {
@@ -57,6 +58,10 @@ export const appRoutes: Routes = [
             {
                 path:'sales',
                 component:SalesComponent
+            },
+            {
+                path:'transfusionUpdate',
+                component:TransfusionListComponent
             }
 
         ]
