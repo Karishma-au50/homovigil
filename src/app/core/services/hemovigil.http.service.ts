@@ -87,4 +87,9 @@ export class HemoVigilHttpService {
     getAllAllocationsNoPagination() {
         return this.http.get<any>(`${this.baseUrl}api/allocation/all`);
     }
+
+    getTransporterKey(patientId: string): Observable<any> {
+        return this.http.get(`${this.baseUrl}api/patient/${patientId}/transporter-key`); 
+    }
+
 }

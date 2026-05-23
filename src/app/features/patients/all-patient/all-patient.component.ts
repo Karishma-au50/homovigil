@@ -41,6 +41,11 @@ export class AllPatientComponent {
     qrVisible: boolean = false;
     selectedPatientForQr: Patient | null = null;
 
+    // --- Transporter Key Dialog State ---
+    transporterKeyVisible: boolean = false;
+    currentTransporterKey: string | null = null;
+    isLoadingKey: boolean = false;
+
     constructor(
         private authService: AuthService,
         private confirmationService: ConfirmationService
@@ -87,6 +92,23 @@ export class AllPatientComponent {
         this.selectedPatient = { ...patient };
         this.modalTitle = 'Edit Patient';
         this.showDialog();
+    }
+
+    viewTransporterKey(patient: Patient) {
+        this.isLoadingKey = true;
+        this.currentTransporterKey = null;
+        this.transporterKeyVisible = true;
+
+        this.authService.getTransporterKey(patient._id).subscribe({
+            next: (res: any) => {
+                this.currentTransporterKey = res.data.transporterKey;
+                this.isLoadingKey = false;
+            },
+            error: (err: any) => {
+                this.isLoadingKey = false;
+                this.transporterKeyVisible = false; // Close modal if it fails
+            }
+        });
     }
 
     confirmDelete(patient: Patient): void {

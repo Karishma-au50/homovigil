@@ -10,6 +10,7 @@ import { ButtonModule } from 'primeng/button';
 import { Patient } from '../../../core/models/patient.modal';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-allocate-bag',
@@ -35,7 +36,8 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private router: Router
     ) {}
 
     ngOnInit(): void {
@@ -99,14 +101,20 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
     // 🔍 Manual search + limit check
     handlePatientSearch(): void {
         const uhid = this.recordFormStep1.get('patientId')?.value?.trim();
+        const label = this.recordFormStep1.get('bloodBagId')?.value?.trim() || '';
 
-        if (!uhid) {
-            this.showError('Input Error', 'Please enter UHID');
+        // if (!uhid) {
+        //     this.showError('Input Error', 'Please enter UHID');
+        //     return;
+        // }
+
+        if (!uhid && !label) {
+            this.showError('Input Error', 'Please enter either Patient UHID or Haemovigil Label');
             return;
         }
 
         // 1️⃣ Search patient
-        this.authService.searchPatient(uhid, '').subscribe({
+        this.authService.searchPatient(uhid, label).subscribe({
             next: (res: any) => {
                 const patient = res.data?.[0];
                 if (!patient) {
@@ -141,20 +149,25 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
     }
 
     // 🔁 Rotate haemovigil ID (UHID SAME)
+    // rotateHaemovigil(): void {
+    //     if (!this.patientToClone) return;
+
+    //     this.authService.rotateHaemovigil(this.patientToClone._id).subscribe((res: any) => {
+    //         // 🔥 CRITICAL
+    //         this.patientData = null;
+    //         this.patientToClone = null;
+
+    //         // ✅ use fresh patient from backend
+    //         this.patientData = res.data;
+
+    //         this.showMaxBagsDialog = false;
+    //         this.activeIndex = 1;
+    //     });
+    // }
+
     rotateHaemovigil(): void {
-        if (!this.patientToClone) return;
-
-        this.authService.rotateHaemovigil(this.patientToClone._id).subscribe((res: any) => {
-            // 🔥 CRITICAL
-            this.patientData = null;
-            this.patientToClone = null;
-
-            // ✅ use fresh patient from backend
-            this.patientData = res.data;
-
-            this.showMaxBagsDialog = false;
-            this.activeIndex = 1;
-        });
+        this.showMaxBagsDialog = false;
+        this.router.navigate(['/allPatient']); // Navigate to Patient List
     }
 
     // 🩸 Allocate bag

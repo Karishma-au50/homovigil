@@ -1,17 +1,26 @@
-<p-steps [model]="steps" [(activeIndex)]="activeIndex"></p-steps>
+<!-- <p-steps [model]="steps" [(activeIndex)]="activeIndex"></p-steps> -->
 
 <p-dialog header="Maximum Bags Allocated" [(visible)]="showMaxBagsDialog" [modal]="true" [closable]="true"
     [style]="{width: '400px'}">
 
-    <div class="p-4">
-        <p class="text-gray-800 font-medium mb-4">
+    <div class="p-0">
+        <!-- <p class="text-gray-800 font-medium mb-4">
             This Haemovigil ID has completed 6 bags.
             A new Haemovigil ID will be generated automatically.
-        </p>
+        </p> -->
 
-        <button (click)="rotateHaemovigil()" [disabled]="!patientToClone"
+        <!-- <button (click)="rotateHaemovigil()" [disabled]="!patientToClone"
             class="w-full bg-red-600 text-white py-2 rounded">
             Generate New Haemovigil ID
+        </button> -->
+
+        <p class="text-gray-800 font-medium mb-4">
+           This Haemovigil ID has reached the 6-bag limit. Please edit the patient to generate a new Id.
+        </p>
+
+        <button (click)="rotateHaemovigil()"
+            class="w-full bg-red-600 hover:bg-red-700 transition text-white py-2 rounded font-semibold">
+            Go to Patient List
         </button>
 
     </div>

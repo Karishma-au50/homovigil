@@ -327,6 +327,21 @@ export class AuthService {
             })
         );
     }
+
+    getTransporterKey(patientId: string): Observable<any> {
+        return this.hemoVigilService.getTransporterKey(patientId).pipe(
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Fetch Failed',
+                    detail: error.error?.message || 'Could not fetch Transporter Key.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
     checkAllocationLimit(patientId: string): Observable<any> {
         return this.hemoVigilService.checkAllocationLimit(patientId);
     }
