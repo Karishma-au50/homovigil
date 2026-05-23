@@ -15,13 +15,13 @@ import { PatientComponent } from '../patient/patient.component';
 import { ConfirmationService } from 'primeng/api';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DropdownModule } from 'primeng/dropdown';
-import { QrCodeScanComponent } from '../qr-code-scan/qr-code-scan.component';
+import { BarCodeComponent } from '../bar-code/bar-code.component';
 
 @Component({
     selector: 'app-all-patient',
     templateUrl: './all-patient.component.html',
     styleUrl: './all-patient.component.scss',
-    imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule, QrCodeScanComponent]
+    imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule, BarCodeComponent]
 })
 export class AllPatientComponent {
     @ViewChild('dt') table!: Table;

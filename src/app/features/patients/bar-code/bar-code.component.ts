@@ -1,0 +1,150 @@
+import { Component, OnInit, Input, Output, EventEmitter, ViewChildren, QueryList, ElementRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ButtonModule } from 'primeng/button';
+import { AuthService } from '../../../core/auth/auth.service';
+import JsBarcode from 'jsbarcode';
+
+@Component({
+  selector: 'app-bar-code',
+  standalone: true,
+  imports: [CommonModule, ButtonModule],
+  templateUrl: './bar-code.component.html',
+  styleUrl: './bar-code.component.scss'
+})
+export class BarCodeComponent implements OnInit {
+  @Input() patientData: any;
+  @Output() closeDialog = new EventEmitter<void>();
+
+  @ViewChildren('barcodeCanvas') canvasRefs!: QueryList<ElementRef>;
+
+  isAnyBag: boolean = false;
+  barcodeItems: { bcStr: string, displayBagId: string }[] = [];
+
+  // qrDataString: string[] = [];
+  // qrItems: { qrStr: string, displayBagId: string }[] = [];
+
+  constructor(private authService: AuthService) { }
+
+  ngOnInit() {
+    if (!this.patientData?._id) return;
+
+    // console.log(this.patientData?._id);
+
+    this.authService.getPatientDetailsWithBags(this.patientData._id).subscribe({
+      next: (res) => {
+        let allocationBags = res?.data?.allocations || [];
+        this.isAnyBag = allocationBags.length > 0;
+
+        if (this.isAnyBag) {
+          allocationBags.forEach((bag: any) => {
+
+            let bagLabel = bag.bloodBagId?.bloodBagId || bag.bloodBagId?._id || bag._id;
+
+            // MINIFIED PAYLOAD: Short keys = less data = larger, readable QR blocks
+            // let essentialIds = {
+            //   bId: bag._id,
+            //   pId: this.patientData._id,
+            //   bbId: bag.bloodBagId?._id,
+            //   bbC: bag.bloodBagId?.bloodcomponent,
+            //   pN: `${this.patientData.firstname} ${this.patientData.lastname || ''}`.trim(),
+            //   uId: this.patientData.UHID || 'N/A',
+            //   hId: this.patientData.haemovigilId || 'N/A',
+            //   bG: this.patientData.bloodGroup || 'N/A',
+            //   bbN: bagLabel
+            // };
+
+            // let bagQrStr = JSON.stringify(essentialIds);
+
+            // this.qrItems.push({
+            //   qrStr: bagQrStr,
+            //   displayBagId: bagLabel
+            // });
+
+            let barcodeValue = bag.allocationShortId || bag._id;
+
+            this.barcodeItems.push({
+              bcStr: barcodeValue,
+              displayBagId: bagLabel
+            });
+
+          });
+
+          setTimeout(() => this.renderBarcodes(), 0);
+        }
+
+      },
+      error: (err) => {
+        console.error("Error fetching patient bags:", err);
+      }
+    });
+  }
+
+  renderBarcodes() {
+    this.canvasRefs.forEach((canvasRef, index) => {
+      JsBarcode(canvasRef.nativeElement, this.barcodeItems[index].bcStr, {
+        format: "CODE128",
+        lineColor: "#000",
+        width: 1.2,       // 👈 CHANGE THIS: Reduces the thickness of the bars (try 1.2 or 1.5)
+        height: 40,       // 👈 CHANGE THIS: Reduces the vertical height
+        displayValue: false, // Keeps the text hidden (as we discussed)
+        margin: 5
+      });
+    });
+  }
+
+  close() {
+    this.closeDialog.emit();
+  }
+
+  printQrCodes() {
+    let printContents = '';
+
+    // Convert each canvas into a Base64 image URL for printing
+    this.canvasRefs.forEach((canvasRef, index) => {
+      let dataUrl = canvasRef.nativeElement.toDataURL('image/png');
+      let bagLabel = this.barcodeItems[index].displayBagId;
+
+      printContents += `
+        <div class="qr-card">
+          <img src="${dataUrl}" />
+          <p class="bag-label">${bagLabel}</p>
+        </div>
+      `;
+    });
+
+    if (!printContents) return;
+
+    let printWindow = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');
+
+    printWindow?.document.open();
+    printWindow?.document.write(`
+      <html>
+        <head>
+          <title>Print Barcodes - ${this.patientData.firstname}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .print-header { text-align: center; margin-bottom: 30px; padding-bottom: 10px; }
+            .print-grid { display: flex; flex-wrap: wrap; justify-content: start; gap: 20px; }
+            .print-grid > div { text-align: center; display: flex; flex-direction: column; align-items: center; }
+            .qr-card { text-align: center; background: white; }
+            
+            /* Target the new image tags */
+            .qr-card img { display: block; margin: 0 auto; max-width: 250px; height: auto; }
+            .bag-label { margin-top: 10px; font-weight: bold; font-size: 16px; }
+          </style>
+        </head>
+        <body onload="window.print(); window.close();">
+          <div class="print-header">
+            <h2 style="margin-bottom:0px;">Patient: ${this.patientData.firstname} ${this.patientData.lastname}</h2>
+            <p>UHID: ${this.patientData.UHID} | HaemovigilID: ${this.patientData.HaemovigilID}</p>
+          </div>
+          <div class="print-grid">
+            ${printContents}
+          </div>
+        </body>
+      </html>
+    `);
+    printWindow?.document.close();
+  }
+
+}

@@ -142,8 +142,8 @@
 
                     <span class="text-gray-400">|</span>
 
-                    <button pButton type="button" icon="pi pi-qrcode"
-                        class="p-button-text text-red-600 hover:text-red-800" pTooltip="Generate QR"
+                    <button pButton type="button" icon="pi pi-barcode"
+                        class="p-button-text text-red-600 hover:text-red-800" pTooltip="Generate Barcode"
                         (click)="openQrDialog(row)">
                     </button>
 
@@ -172,8 +172,8 @@
 <p-dialog [(visible)]="qrVisible" [closable]="false" modal="true" dismissableMask="true" header="QR Code Scanner"
     [style]="{ minWidth: '280px', maxWidth: '800px' }">
     <ng-template pTemplate="content">
-        <app-qr-code-scan *ngIf="qrVisible" [patientData]="selectedPatientForQr"
-            (closeDialog)="qrVisible = false"></app-qr-code-scan>
+        <app-bar-code *ngIf="qrVisible" [patientData]="selectedPatientForQr"
+            (closeDialog)="qrVisible = false"></app-bar-code>
     </ng-template>
 </p-dialog>
 

@@ -12,12 +12,19 @@
         <div id="print-section"
             class="flex flex-wrap justify-center gap-4 bg-white border border-gray-200 rounded-xl p-2 shadow-sm w-full">
 
-            @for(item of qrItems; track $index){
-                <div class="flex flex-col items-center rounded-lg bg-white">
-                    <!-- <qrcode [qrdata]="item.qrStr" [width]="130" [margin]="2" [errorCorrectionLevel]="'L'" [colorDark]="'#000000'"
-                        [colorLight]="'#ffffff'" [elementType]="'img'">
-                    </qrcode> -->
+            @for(item of barcodeItems; track $index){
+                <div class="flex flex-col items-center rounded-lg bg-white p-2">
+                    
+                    <canvas #barcodeCanvas></canvas>
 
+                    <p class="bag-label text-sm text-gray-800 font-bold !mt-1 mb-0">
+                        {{ item.displayBagId }}
+                    </p>
+                </div>
+            }
+
+            <!-- @for(item of qrItems; track $index){
+                <div class="flex flex-col items-center rounded-lg bg-white">
                     <div class="qr-image-container" style="width: 130px; height: 130px;">
                         <qrcode 
                             [qrdata]="item.qrStr" 
@@ -35,7 +42,7 @@
                         {{ item.displayBagId }}
                     </p>
                 </div>
-            }
+            } -->
 
         </div>
         }
