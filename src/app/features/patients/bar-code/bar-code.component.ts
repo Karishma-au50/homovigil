@@ -84,7 +84,7 @@ export class BarCodeComponent implements OnInit {
       JsBarcode(canvasRef.nativeElement, this.barcodeItems[index].bcStr, {
         format: "CODE128",
         lineColor: "#000",
-        width: 1.2,       // 👈 CHANGE THIS: Reduces the thickness of the bars (try 1.2 or 1.5)
+        width: 1.5,       // 👈 CHANGE THIS: Reduces the thickness of the bars (try 1.2 or 1.5)
         height: 40,       // 👈 CHANGE THIS: Reduces the vertical height
         displayValue: false, // Keeps the text hidden (as we discussed)
         margin: 5

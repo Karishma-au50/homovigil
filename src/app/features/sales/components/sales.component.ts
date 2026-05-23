@@ -18,7 +18,11 @@ export class SalesComponent implements OnInit {
   isOnline: boolean = navigator.onLine;
 
   currentStep: number = 1;
-  allowedFormats = [BarcodeFormat.QR_CODE];
+  allowedFormats = [
+    BarcodeFormat.CODE_128,
+    BarcodeFormat.CODE_39,
+    BarcodeFormat.EAN_13
+  ];
 
   scannedPatient: any = null;
   createdSalesRecordId: string | null = null;
@@ -34,14 +38,37 @@ export class SalesComponent implements OnInit {
 
   ngOnInit() {
     this.isOnline = navigator.onLine;
-    window.addEventListener('online', () => this.isOnline = true);
+    window.addEventListener('online', () => { this.isOnline = true, this.syncOfflineData(); });
     window.addEventListener('offline', () => this.isOnline = false);
   }
 
-  isBagAlreadyScanned(bagId: string): boolean {
-    if (!this.scannedPatient || !this.scannedPatient.bags) return false;
-    return this.scannedPatient.bags.some((b: any) => b.bagId === bagId);
-  }
+  syncOfflineData() {
+    const queue = JSON.parse(localStorage.getItem('transfusions_queue') || '[]');
+    if (queue.length === 0) return;
+
+    const loggedInUser: any = this.authService.currentUser;
+    const payload = {
+        salesId: loggedInUser._id || loggedInUser.id,
+        offlineRecords: queue
+    };
+
+    // Call the new backend endpoint you created in step 4
+    this.salesService.syncOfflineApi(payload).subscribe({
+        next: (res: any) => {
+            console.log("Sync successful!", res);
+            // Clear the queue once successfully synced
+            localStorage.removeItem('transfusions_queue');
+        },
+        error: (err) => {
+            console.error("Sync failed, data remains in queue.", err);
+        }
+    });
+}
+
+  // isBagAlreadyScanned(bagId: string): boolean {
+  //   if (!this.scannedPatient || !this.scannedPatient.bags) return false;
+  //   return this.scannedPatient.bags.some((b: any) => b.bagId === bagId);
+  // }
 
   hasInProgressBags(): boolean {
     if (!this.scannedPatient || !this.scannedPatient.bags) return false;
@@ -87,7 +114,6 @@ export class SalesComponent implements OnInit {
   //   const patientId = parsedQrData?.patientId || this.salesService.parseQrForId(scannedData);
 
   //   if (!patientId) {
-  //     // ✅ CHANGE 3: Delayed alert prevents screen freeze
   //     setTimeout(() => alert("Invalid QR Code! Scan a valid one."), 400);
   //     return;
   //   }
@@ -101,51 +127,40 @@ export class SalesComponent implements OnInit {
 
   //   if (bagId) {
   //     if (this.isBagAlreadyScanned(bagId) || this.sessionScannedBags.includes(bagId)) {
-  //       return; // ✅ SILENT IGNORE: Prevents alert spam while camera is still pointing at the QR
+  //       return; // Silent Ignore for camera spam
   //     }
-  //     this.sessionScannedBags.push(bagId); // Lock this bagId immediately for this session
+  //     this.sessionScannedBags.push(bagId);
   //   }
 
   //   let isFirstScan = false;
+  //   let tempPatientData: any = null;
+
   //   if (!this.scannedPatient) {
   //     isFirstScan = true;
-  //     this.scannedPatient = {
+
+  //     // ✅ FIX: "Fetching..." text hata diya! QR code ka data instantly UI par show karein.
+  //     tempPatientData = {
   //       patientId: patientId,
-  //       patientName: this.isOnline ? 'Fetching patient data...' : (parsedQrData?.patientName || patientId),
-  //       uhId: this.isOnline ? 'Loading...' : (parsedQrData?.uhId || 'Offline'),
-  //       haemovigilId: this.isOnline ? 'Loading...' : (parsedQrData?.haemovigilId || 'Offline'),
-  //       bloodGroup: this.isOnline ? '' : (parsedQrData?.bloodGroup || 'Offline'),
-  //       status: this.isOnline ? 'Loading' : 'Ready',
+  //       patientName: parsedQrData?.patientName || patientId,
+  //       uhId: parsedQrData?.uhId || 'N/A',
+  //       haemovigilId: parsedQrData?.haemovigilId || 'N/A',
+  //       bloodGroup: parsedQrData?.bloodGroup || 'N/A',
+  //       status: 'Ready', // ✅ Isse amber color ka "Fetching..." tag gayab ho jayega!
   //       symptoms: { cough: false, fever: false, rash: false, pain: false },
   //       bags: [],
   //       existingDbBags: []
   //     };
 
-  //     if (this.isOnline) {
-  //       this.salesService.getPatientFromBackend(patientId).subscribe({
-  //         next: (res: any) => {
-  //           if (this.scannedPatient) {
-  //             const pData = res.data || res;
-  //             this.scannedPatient.patientName = `${pData.firstname} ${pData.lastname || ''}`.trim();
-  //             this.scannedPatient.uhId = pData.UHID;
-  //             this.scannedPatient.haemovigilId = pData.haemovigilId || 'N/A';
-  //             this.scannedPatient.bloodGroup = pData.bloodGroup;
-  //             this.scannedPatient.status = 'Ready';
-  //           }
-  //         },
-  //         error: () => {
-  //           if (this.scannedPatient) this.scannedPatient.patientName = 'Patient not found';
-  //         }
-  //       });
-  //     }
+
   //   }
 
+  //   // ✅ FIX: Naya bag banate waqt instantly QR ka data use karein (No "Fetching...")
   //   const newBag = {
   //     bagId: bagId,
   //     bloodBagId: bloodBagId,
-  //     bloodBagNumber: parsedQrData?.bloodBagNumber || 'Fetching...',
-  //     bloodComponent: parsedQrData?.bloodComponent || '...', // ✅ Instantly display component
-  //     bagBloodGroup: parsedQrData?.bloodGroup || '...',      // ✅ Instantly display blood group
+  //     bloodBagNumber: parsedQrData?.bloodBagNumber || bagId,
+  //     bloodComponent: parsedQrData?.bloodComponent || 'Unknown',
+  //     bagBloodGroup: parsedQrData?.bloodGroup || 'Unknown',
   //     status: 'Pending Start',
   //     startTime: null,
   //     selectedEndTime: '',
@@ -154,7 +169,6 @@ export class SalesComponent implements OnInit {
   //     protocols: { cough: false, rash: false, fever: false, pain: false }
   //   };
 
-  //   // ✅ CHANGE 4: Do not push to UI immediately. Check DB lock first!
   //   if (this.isOnline) {
   //     const loggedInUser: any = this.authService.currentUser;
   //     const payload = {
@@ -167,207 +181,207 @@ export class SalesComponent implements OnInit {
   //     this.salesService.createTransfusionApi(payload).subscribe({
   //       next: (res: any) => {
   //         if (res.alreadyScanned) {
-  //           // Destroy card if it was the very first scan and it failed
-  //           if (isFirstScan && this.scannedPatient?.bags.length === 0) {
-  //             this.scannedPatient = null;
-  //           }
-  //           setTimeout(() => alert("Invalid QR Code! Scan a valid one."), 400);
+  //           // if (isFirstScan && this.scannedPatient?.bags.length === 0) {
+  //           //   this.scannedPatient = null;
+  //           // }
+  //           setTimeout(() => alert("Invalid Qr code! scan valid one."), 400);
   //           return;
+  //         }
+
+  //         if (isFirstScan) {
+  //           this.scannedPatient = tempPatientData;
+
+  //           // Patient ki fresh details API se silently fetch karke update karein
+  //           this.salesService.getPatientFromBackend(patientId).subscribe({
+  //             next: (pRes: any) => {
+  //               if (this.scannedPatient) {
+  //                 const pData = pRes.data || pRes;
+  //                 this.scannedPatient.patientName = `${pData.firstname} ${pData.lastname || ''}`.trim() || this.scannedPatient.patientName;
+  //                 this.scannedPatient.uhId = pData.UHID || this.scannedPatient.uhId;
+  //                 this.scannedPatient.haemovigilId = pData.haemovigilId || this.scannedPatient.haemovigilId;
+  //                 this.scannedPatient.bloodGroup = pData.bloodGroup || this.scannedPatient.bloodGroup;
+  //               }
+  //             }
+  //           });
   //         }
 
   //         this.createdSalesRecordId = res.data?._id || res._id;
 
-  //         // if (isFirstScan) {
-  //         //   const existingPatientData = res.data?.patient;
-  //         //   this.scannedPatient.existingDbBags = existingPatientData?.bags || [];
-
-  //         //   if (existingPatientData?.symptoms) {
-  //         //     this.scannedPatient.symptoms = {
-  //         //       cough: existingPatientData.symptoms.cough || false,
-  //         //       rash: existingPatientData.symptoms.rash || false,
-  //         //       fever: existingPatientData.symptoms.fever || false,
-  //         //       pain: existingPatientData.symptoms.pain || false
-  //         //     };
-  //         //     // if (Object.values(this.scannedPatient.symptoms).some(val => val === true)) {
-  //         //     //   this.scannedPatient.hasPreviousSymptoms = true;
-  //         //     // }
-  //         //   }
-  //         // }
-
-  //         // ✅ SAFE TO PUSH: Backend confirmed it is not a duplicate. (No UI flashing!)
+  //         // ✅ FIX: API se duplicate lock check pass hone ke turant baad bag ko UI mein bhej dein! 
   //         this.scannedPatient.bags.push(newBag);
   //         this.scrollToBottom();
 
-  //         // Fetch bag details
+  //         // Background mein silent update (UI iska wait nahi karega)
   //         if (bloodBagId) {
   //           this.salesService.getBloodBagFromBackend(bloodBagId).subscribe({
   //             next: (bRes: any) => {
   //               const bData = bRes.data || bRes;
-  //               newBag.bloodBagNumber = bData.bloodBagId;
-  //               newBag.bloodComponent = bData.bloodcomponent;
-  //               newBag.bagBloodGroup = bData.bloodGroup;
-  //             },
-  //             error: () => newBag.bloodBagNumber = bloodBagId
+  //               newBag.bloodBagNumber = bData.bloodBagId || newBag.bloodBagNumber;
+  //               newBag.bloodComponent = bData.bloodcomponent || newBag.bloodComponent;
+  //               newBag.bagBloodGroup = bData.bloodGroup || newBag.bagBloodGroup;
+  //             }
   //           });
   //         }
   //       }
   //     });
   //   } else {
-  //     // Offline mode: push immediately
-  //     newBag.bloodBagNumber = parsedQrData?.bloodBagNumber || bloodBagId || bagId;
-  //     newBag.bloodComponent = parsedQrData?.bloodComponent || 'Offline Data'; // ✅ Use real component offline!
-  //     newBag.bagBloodGroup = parsedQrData?.bloodGroup || 'Offline';
+  //     // Offline mode
+  //     if (isFirstScan) {
+  //       this.scannedPatient = tempPatientData;
+  //     }
   //     this.scannedPatient.bags.push(newBag);
   //     this.scrollToBottom();
   //   }
   // }
 
   onQrScanSuccess(scannedData: string) {
-    let parsedQrData: any = null;
+    const allocationShortId = scannedData.trim();
+    
+    if (!allocationShortId) return;
 
-    try {
-      const rawData = JSON.parse(scannedData);
-      parsedQrData = {
-        bagId: rawData.bId || rawData.bagId,
-        patientId: rawData.pId || rawData.patientId,
-        bloodBagId: rawData.bbId || rawData.bloodBagId,
-        bloodComponent: rawData.bbC || rawData.bloodComponent,
-        patientName: rawData.pN || rawData.patientName,
-        uhId: rawData.uId || rawData.uhId,
-        haemovigilId: rawData.hId || rawData.haemovigilId,
-        bloodGroup: rawData.bG || rawData.bloodGroup,
-        bloodBagNumber: rawData.bbN || rawData.bloodBagNumber
-      };
-    } catch (e) {
-      parsedQrData = this.salesService.parseQrForFullData(scannedData);
+    // 2. Prevent duplicate processing if the scanner fires multiple times instantly
+    if (this.sessionScannedBags.includes(allocationShortId)) {
+      return; 
     }
+    
+    // Optimistically lock in UI to prevent camera spam
+    this.sessionScannedBags.push(allocationShortId);
 
-    const patientId = parsedQrData?.patientId || this.salesService.parseQrForId(scannedData);
+    // 3. Fetch data from backend using the Barcode string
+    if (this.isOnline) {
+      this.salesService.getDetailsFromBarcodeApi(allocationShortId).subscribe({
+        next: (res: any) => {
+          const allocation = res.data;
+          const patient = allocation.patientId; // Populated from backend
+          const bloodBag = allocation.bloodBagId; // Populated from backend
 
-    if (!patientId) {
-      setTimeout(() => alert("Invalid QR Code! Scan a valid one."), 400);
-      return;
+          this.processFetchedBarcodeData(allocation, patient, bloodBag, allocationShortId);
+        },
+        error: (err) => {
+          // Remove from session so ward boy can try scanning again
+          this.sessionScannedBags = this.sessionScannedBags.filter(id => id !== allocationShortId);
+          setTimeout(() => alert("Invalid Barcode or Data not found!"), 400);
+        }
+      });
+    } else {
+       // ✅ OFFLINE MODE: Just build a generic bag with the Short ID
+        if (!this.scannedPatient) {
+            this.scannedPatient = {
+                patientName: 'Offline Patient (Pending Sync)',
+                uhId: '---',
+                haemovigilId: '---',
+                bloodGroup: '---',
+                status: 'Offline',
+                bags: []
+            };
+        }
+
+        const newOfflineBag = {
+            bagId: null, // We don't know this yet
+            bloodBagId: null, // We don't know this yet
+            bloodBagNumber: allocationShortId, // Use barcode as identifier
+            bloodComponent: 'Unknown (Offline)', 
+            bagBloodGroup: '---',      
+            status: 'Pending Start',
+            startTime: null,
+            selectedEndTime: '',
+            qrData: allocationShortId,
+            isAlreadyCompleted: false,
+            protocols: { cough: false, rash: false, fever: false, pain: false }
+        };
+
+        this.scannedPatient.bags.push(newOfflineBag);
+        this.scrollToBottom();
     }
+  }
 
-    const bagId = parsedQrData?.bagId || null;
-    const bloodBagId = parsedQrData?.bloodBagId || null;
+  processFetchedBarcodeData(allocation: any, patient: any, bloodBag: any, shortId: string) {
+    const patientId = patient._id;
+    const bagId = allocation._id;
+    const bloodBagId = bloodBag._id;
 
+    // Safety check: if ward boy somehow scans a different patient's bag
     if (this.scannedPatient && this.scannedPatient.patientId !== patientId) {
+      alert("Warning: You scanned a bag belonging to a different patient. Resetting session.");
       this.scannedPatient = null;
     }
 
-    if (bagId) {
-      if (this.isBagAlreadyScanned(bagId) || this.sessionScannedBags.includes(bagId)) {
-        return; // Silent Ignore for camera spam
-      }
-      this.sessionScannedBags.push(bagId);
-    }
-
-    let isFirstScan = false;
-    let tempPatientData: any = null;
-
     if (!this.scannedPatient) {
-      isFirstScan = true;
-      
-      // ✅ FIX: "Fetching..." text hata diya! QR code ka data instantly UI par show karein.
-      tempPatientData = {
+      this.scannedPatient = {
         patientId: patientId,
-        patientName: parsedQrData?.patientName || patientId, 
-        uhId: parsedQrData?.uhId || 'N/A',
-        haemovigilId: parsedQrData?.haemovigilId || 'N/A',
-        bloodGroup: parsedQrData?.bloodGroup || 'N/A',
-        status: 'Ready', // ✅ Isse amber color ka "Fetching..." tag gayab ho jayega!
+        patientName: `${patient.firstname} ${patient.lastname || ''}`.trim(),
+        uhId: patient.UHID || 'N/A',
+        haemovigilId: patient.haemovigilId || 'N/A',
+        bloodGroup: patient.bloodGroup || 'N/A',
+        status: 'Ready',
         symptoms: { cough: false, fever: false, rash: false, pain: false },
         bags: [],
         existingDbBags: []
       };
-
-      
     }
 
-    // ✅ FIX: Naya bag banate waqt instantly QR ka data use karein (No "Fetching...")
     const newBag = {
       bagId: bagId,
       bloodBagId: bloodBagId,
-      bloodBagNumber: parsedQrData?.bloodBagNumber || bagId,
-      bloodComponent: parsedQrData?.bloodComponent || 'Unknown', 
-      bagBloodGroup: parsedQrData?.bloodGroup || 'Unknown',      
+      bloodBagNumber: bloodBag.bloodBagId || shortId,
+      bloodComponent: bloodBag.bloodcomponent || 'Unknown', 
+      bagBloodGroup: bloodBag.bloodGroup || 'Unknown',      
       status: 'Pending Start',
       startTime: null,
       selectedEndTime: '',
-      qrData: scannedData,
+      qrData: shortId,
       isAlreadyCompleted: false,
       protocols: { cough: false, rash: false, fever: false, pain: false }
     };
 
-    if (this.isOnline) {
-      const loggedInUser: any = this.authService.currentUser;
-      const payload = {
-        salesId: loggedInUser._id || loggedInUser.id,
-        patient: { patientId: patientId, bags: [] },
-        bagId: bagId,
-        bloodBagId: bloodBagId
-      };
+    // 5. Call your existing Transfusion API to "lock" the bag in the database
+    const loggedInUser: any = this.authService.currentUser;
+    const payload = {
+      salesId: loggedInUser._id || loggedInUser.id,
+      patient: { patientId: patientId, bags: [] },
+      bagId: bagId,
+      bloodBagId: bloodBagId
+    };
 
-      this.salesService.createTransfusionApi(payload).subscribe({
-        next: (res: any) => {
-          if (res.alreadyScanned) {
-            // if (isFirstScan && this.scannedPatient?.bags.length === 0) {
-            //   this.scannedPatient = null;
-            // }
-            setTimeout(() => alert("Invalid Qr code! scan valid one."), 400);
-            return;
+    this.salesService.createTransfusionApi(payload).subscribe({
+      next: (res: any) => {
+        if (res.alreadyScanned) {
+          setTimeout(() => alert("Invalid Barcode Scan Valid One."), 400);
+
+          // 1. Remove from session so they can try scanning again if needed
+          this.sessionScannedBags = this.sessionScannedBags.filter(id => id !== shortId);
+
+          // 2. Destroy the empty patient card if no other bags exist
+          if (this.scannedPatient && this.scannedPatient.bags.length === 0) {
+            this.scannedPatient = null;
           }
-
-          if (isFirstScan) {
-            this.scannedPatient = tempPatientData;
-
-            // Patient ki fresh details API se silently fetch karke update karein
-            this.salesService.getPatientFromBackend(patientId).subscribe({
-              next: (pRes: any) => {
-                if (this.scannedPatient) {
-                  const pData = pRes.data || pRes;
-                  this.scannedPatient.patientName = `${pData.firstname} ${pData.lastname || ''}`.trim() || this.scannedPatient.patientName;
-                  this.scannedPatient.uhId = pData.UHID || this.scannedPatient.uhId;
-                  this.scannedPatient.haemovigilId = pData.haemovigilId || this.scannedPatient.haemovigilId;
-                  this.scannedPatient.bloodGroup = pData.bloodGroup || this.scannedPatient.bloodGroup;
-                }
-              }
-            });
-          }
-
-          this.createdSalesRecordId = res.data?._id || res._id;
-
-          // ✅ FIX: API se duplicate lock check pass hone ke turant baad bag ko UI mein bhej dein! 
-          this.scannedPatient.bags.push(newBag);
-          this.scrollToBottom();
-
-          // Background mein silent update (UI iska wait nahi karega)
-          if (bloodBagId) {
-            this.salesService.getBloodBagFromBackend(bloodBagId).subscribe({
-              next: (bRes: any) => {
-                const bData = bRes.data || bRes;
-                newBag.bloodBagNumber = bData.bloodBagId || newBag.bloodBagNumber;
-                newBag.bloodComponent = bData.bloodcomponent || newBag.bloodComponent;
-                newBag.bagBloodGroup = bData.bloodGroup || newBag.bagBloodGroup;
-              }
-            });
-          }
+          // --------------------
+          
+          return;
         }
-      });
-    } else {
-      // Offline mode
-      if (isFirstScan) {
-        this.scannedPatient = tempPatientData;
+
+        this.createdSalesRecordId = res.data?._id || res._id;
+        
+        // Push to UI list
+        this.scannedPatient.bags.push(newBag);
+        this.scrollToBottom();
+      },
+      error: () => {
+         this.sessionScannedBags = this.sessionScannedBags.filter(id => id !== shortId);
+         
+         // ADD THIS BLOCK:
+         // Destroy the empty patient card if the API request fails
+         if (this.scannedPatient && this.scannedPatient.bags.length === 0) {
+            this.scannedPatient = null;
+         }
+         // --------------------
       }
-      this.scannedPatient.bags.push(newBag);
-      this.scrollToBottom();
-    }
+    });
   }
 
   processAllScanned() {
     if (!this.scannedPatient || this.scannedPatient.bags.length === 0) {
-      alert("Please scan at least one valid QR code.");
+      alert("Please scan at least one valid Barcode.");
       return;
     }
 
@@ -406,7 +420,7 @@ export class SalesComponent implements OnInit {
 
   saveTransfusion(bag: any) {
     // if (!this.scannedPatient?.patientId) return;
-    if (!this.scannedPatient?.patientId) return;
+    if (this.isOnline && !this.scannedPatient?.patientId) return;
 
     const activeProtocols = [];
     if (bag.protocols.cough) activeProtocols.push('Cough');
@@ -422,7 +436,8 @@ export class SalesComponent implements OnInit {
       startTime: bag.startTime,
       endTime: bag.selectedEndTime ? bag.selectedEndTime : undefined,
       // symptoms: this.scannedPatient.symptoms
-      protocolMatched: protocolString
+      protocolMatched: protocolString,
+      status: "completed"
     };
 
     if (this.isOnline) {
@@ -434,12 +449,13 @@ export class SalesComponent implements OnInit {
         error: () => alert('Failed to save the transfusion record.')
       });
     } else {
-      const loggedInUser: any = this.authService.currentUser;
       const offlineRecord = {
-        ...payload,
-        salesId: loggedInUser._id || loggedInUser.id,
-        offlineSyncId: Date.now().toString()
-      };
+            shortId: bag.bloodBagNumber, // The barcode string
+            startTime: bag.startTime,
+            endTime: bag.selectedEndTime ? bag.selectedEndTime : undefined,
+            protocolMatched: protocolString,
+            offlineSyncId: Date.now().toString()
+        };
 
       const records = JSON.parse(localStorage.getItem('transfusions_queue') || '[]');
       records.push(offlineRecord);
@@ -488,7 +504,8 @@ export class SalesComponent implements OnInit {
         bagId: bag.bagId,
         bloodBagId: bag.bloodBagId,
         startTime: bag.startTime,
-        protocolMatched: "" // Empty at the start phase
+        protocolMatched: "", 
+        status: "pending" 
       };
 
       this.salesService.saveTransfusionApi(payload).subscribe({
@@ -509,35 +526,36 @@ export class SalesComponent implements OnInit {
     }
   }
 
-  cancelInProgress(bag: any) {
-    bag.startTime = null;
-    const originalStatus = bag.status;
-    bag.status = 'Loading';
+  // cancelInProgress(bag: any) {
+  //   bag.startTime = null;
+  //   const originalStatus = bag.status;
+  //   bag.status = 'Loading';
 
-    if (this.isOnline) {
-      const payload = {
-        patientId: this.scannedPatient.patientId,
-        bagId: bag.bagId,
-        bloodBagId: bag.bloodBagId,
-        startTime: null, // Reset start time in DB to maintain the empty lock
-        protocolMatched: ""
-      };
+  //   if (this.isOnline) {
+  //     const payload = {
+  //       patientId: this.scannedPatient.patientId,
+  //       bagId: bag.bagId,
+  //       bloodBagId: bag.bloodBagId,
+  //       startTime: null, // Reset start time in DB to maintain the empty lock
+  //       protocolMatched: "",
+  //       status: "new"
+  //     };
 
-      this.salesService.saveTransfusionApi(payload).subscribe({
-        next: () => {
-          bag.status = 'Pending Start';
-          this.currentStep = 2;
-        },
-        error: () => {
-          bag.status = 'Pending Start';
-          this.currentStep = 2;
-        }
-      });
-    } else {
-      bag.status = 'Pending Start';
-      this.currentStep = 2;
-    }
-  }
+  //     this.salesService.saveTransfusionApi(payload).subscribe({
+  //       next: () => {
+  //         bag.status = 'Pending Start';
+  //         this.currentStep = 2;
+  //       },
+  //       error: () => {
+  //         bag.status = 'Pending Start';
+  //         this.currentStep = 2;
+  //       }
+  //     });
+  //   } else {
+  //     bag.status = 'Pending Start';
+  //     this.currentStep = 2;
+  //   }
+  // }
 
   checkAllBagsCompleted() {
     const allCompleted = this.scannedPatient.bags.every((b: any) => b.status === 'Completed');

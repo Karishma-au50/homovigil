@@ -35,8 +35,8 @@
                 </td>
                 <td class="!px-5 !py-3">
                     <span class="inline-block rounded-full px-3 py-1 text-sm font-medium capitalize"
-                        [ngClass]="badgeClass('completed')">
-                        {{ 'Completed' }}
+                        [ngClass]="badgeClass(row.status)">
+                        {{ row.status }}
                     </span>
                 </td>
                 <td class="text-center !px-5 !py-3">
@@ -108,8 +108,8 @@
                     </td>
                     <td class="!px-5 !py-4">
                         <span class="inline-block rounded-full px-3 py-1 text-sm font-medium capitalize"
-                            [ngClass]="badgeClass('completed')">
-                            {{ 'completed' }}
+                            [ngClass]="badgeClass(bag.status)">
+                            {{ bag.status }}
                         </span>
                     </td>
                     <td class="!px-5 !py-4">

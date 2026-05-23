@@ -169,7 +169,7 @@
 
 </p-table>
 
-<p-dialog [(visible)]="qrVisible" [closable]="false" modal="true" dismissableMask="true" header="QR Code Scanner"
+<p-dialog [(visible)]="qrVisible" [closable]="false" modal="true" dismissableMask="true" header="Bar Code Scanner"
     [style]="{ minWidth: '280px', maxWidth: '800px' }">
     <ng-template pTemplate="content">
         <app-bar-code *ngIf="qrVisible" [patientData]="selectedPatientForQr"

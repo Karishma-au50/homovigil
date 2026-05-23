@@ -47,6 +47,7 @@ export class TransfusionListComponent implements OnInit {
       next: (response) => {
         if (!response.error) {
           this.transfusions = response.data;
+          console.log(response);
         }
         this.loading = false;
         this.cdr.detectChanges();
@@ -75,6 +76,7 @@ export class TransfusionListComponent implements OnInit {
 
     this.transfusionService.getTransfusionDetails(row.id).subscribe({
       next: (response) => {
+        console.log(response)
         if (!response.error) {
           // Merge the detailed bags data into our selected object
           this.selectedDetails.bags = response.data.bags;

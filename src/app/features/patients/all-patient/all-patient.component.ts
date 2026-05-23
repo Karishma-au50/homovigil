@@ -37,7 +37,7 @@ export class AllPatientComponent {
         { label: 'Component', value: 'component' }
     ];
 
-    // --- QR Code Dialog State ---
+    // --- BarCode Dialog State ---
     qrVisible: boolean = false;
     selectedPatientForQr: Patient | null = null;
 
