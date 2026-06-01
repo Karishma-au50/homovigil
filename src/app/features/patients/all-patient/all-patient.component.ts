@@ -16,12 +16,15 @@ import { ConfirmationService } from 'primeng/api';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DropdownModule } from 'primeng/dropdown';
 import { BarCodeComponent } from '../bar-code/bar-code.component';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-all-patient',
     templateUrl: './all-patient.component.html',
     styleUrl: './all-patient.component.scss',
-    imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule, BarCodeComponent]
+    imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule, BarCodeComponent, ToastModule],
+    providers: [MessageService]
 })
 export class AllPatientComponent {
     @ViewChild('dt') table!: Table;
@@ -48,7 +51,8 @@ export class AllPatientComponent {
 
     constructor(
         private authService: AuthService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private messageService: MessageService
     ) {}
 
     // Component variables
@@ -106,7 +110,9 @@ export class AllPatientComponent {
             },
             error: (err: any) => {
                 this.isLoadingKey = false;
-                this.transporterKeyVisible = false; // Close modal if it fails
+                this.transporterKeyVisible = false;
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch Transporter Key.' });
+                console.log(err);
             }
         });
     }
@@ -119,12 +125,11 @@ export class AllPatientComponent {
             accept: () => {
                 this.authService.deletePatient(patient._id).subscribe({
                     next: () => {
-                        // Optionally show success message
-                        this.loadPatients(); // Reload updated list
+                        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Patient deleted successfully.' });
+                        this.loadPatients();
                     },
                     error: () => {
-                        // Optionally show error message
-                        alert('Failed to delete patient.');
+                        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete patient.' });
                     }
                 });
             },
@@ -177,7 +182,7 @@ export class AllPatientComponent {
                 this.detailsVisible = true;
             },
             error: () => {
-                alert('Failed to fetch patient details.');
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch patient details.' });
             }
         });
     }

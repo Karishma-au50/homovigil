@@ -11,11 +11,12 @@ import { ConfirmationService } from 'primeng/api';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { BagAllocation } from '../../../core/models/bag.modal';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-realeas-bag',
     standalone: true,
-    imports: [CommonModule, FormsModule, TableModule, InputTextModule, DropdownModule, DatePickerModule, TagModule, ConfirmDialogModule],
+    imports: [CommonModule, FormsModule, TableModule, InputTextModule, DropdownModule, DatePickerModule, TagModule, ConfirmDialogModule, TooltipModule],
     providers: [ConfirmationService],
     templateUrl: './realeas-bag.component.html',
     styleUrl: './realeas-bag.component.scss'

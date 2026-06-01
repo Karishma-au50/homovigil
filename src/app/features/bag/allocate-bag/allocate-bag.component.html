@@ -89,7 +89,11 @@
     <!-- Step 2: Allocate Bag -->
     <div *ngIf="activeIndex === 1" class="mt-6 w-full px-6">
         <form [formGroup]="recordFormStep2">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Transporter Box ID</label>
+                    <input formControlName="transporterBoxId" type="text" placeholder="Enter Box ID" class="w-full border p-3 rounded" />
+                </div>
                 <div>
                     <label class="block text-gray-700 mb-2 font-medium">Bag ID</label>
                     <input formControlName="bagId" type="text" class="w-full border p-3 rounded" />

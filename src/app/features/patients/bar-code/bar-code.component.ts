@@ -115,7 +115,7 @@ export class BarCodeComponent implements OnInit {
     if (!printContents) return;
 
     let printWindow = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');
-
+    // console.log(this.patientData);
     printWindow?.document.open();
     printWindow?.document.write(`
       <html>
@@ -136,7 +136,7 @@ export class BarCodeComponent implements OnInit {
         <body onload="window.print(); window.close();">
           <div class="print-header">
             <h2 style="margin-bottom:0px;">Patient: ${this.patientData.firstname} ${this.patientData.lastname}</h2>
-            <p>UHID: ${this.patientData.UHID} | HaemovigilID: ${this.patientData.HaemovigilID}</p>
+            <p>UHID: ${this.patientData.UHID} | HaemovigilID: ${this.patientData.haemovigilId}</p>
           </div>
           <div class="print-grid">
             ${printContents}

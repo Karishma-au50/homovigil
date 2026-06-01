@@ -4,7 +4,7 @@
             <i class="pi pi-bars"></i>
         </button>
         <a class="layout-topbar-logo" routerLink="/">
-            <img src="assets/logo.png" alt="Logo" style="height:45px;" />
+            <img src="assets/logo.png" alt="Logo" style="height:60px;" />
             <!-- <span>HaemoVigil</span> -->
         </a>
     </div>
@@ -32,13 +32,18 @@
         </button>
 
         <div class="layout-topbar-menu hidden lg:block">
-            <div class="layout-topbar-menu-content">
-
-
+            <div class="layout-topbar-menu-content !gap-2">
                 <button type="button" class="layout-topbar-action" routerLink="/login">
-                    <i class="pi pi-user"></i>
+                    <div class="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-gray-700">
+                        <i class="pi pi-user"></i>
+                    </div>
                     <span>Profile</span>
                 </button>
+
+                <div *ngIf="authService.currentUser" class="!m-0 flex items-center gap-2 text-base text-gray-700">
+                    Welcome, <span class="font-bold text-red-700">{{ authService.currentUser.name | titlecase }}</span>
+                </div>
+
             </div>
         </div>
     </div>

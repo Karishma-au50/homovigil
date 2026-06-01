@@ -92,4 +92,14 @@ export class HemoVigilHttpService {
         return this.http.get(`${this.baseUrl}api/patient/${patientId}/transporter-key`); 
     }
 
+    getHaemovigilIdTransporterKey(haemovigilId: string, isNew: boolean, patientId?: string): Observable<any> {
+        let url = `${this.baseUrl}api/patient/${haemovigilId}/haemovigil-id/transporter-key?isNew=${isNew}`;
+        
+        if (!isNew && patientId) {
+            url += `&patientId=${patientId}`;
+        }
+        
+        return this.http.get(url);
+    }
+
 }

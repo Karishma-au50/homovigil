@@ -4,7 +4,8 @@
         <div class="bg-red-700 text-white px-6 py-3 rounded-t-xl !w-full flex justify-between">
             <h2 class="text-2xl text-white tracking-wide m-0">{{ isEditMode ? 'Edit Patient Entry' : 'New Patient Entry'
                 }}</h2>
-            <p-button icon="pi pi-times" aria-label="Close" (click)="onClose(false)" styleClass="!rounded-full !text-sm !bg-red-700 !border-none" />
+            <p-button icon="pi pi-times" aria-label="Close" (click)="onClose(false)"
+                styleClass="!rounded-full !text-sm !bg-red-700 !border-none" />
         </div>
 
         <!-- Form -->
@@ -44,6 +45,12 @@
                         <input formControlName="lastname" type="text" placeholder="Enter Last Name"
                             class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
+
+                    <div>
+                        <label class="block text-muted-color mb-2 font-semibold">Ward Number</label>
+                        <input formControlName="wardNumber" type="text" placeholder="Enter Ward Number"
+                            class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                    </div>
                 </div>
 
                 <!-- Label Text -->
@@ -71,27 +78,25 @@
                             Haemovigil ID
                         </p>
                     </div>
-                    
+
                     <div class="flex items-center gap-4 w-full">
                         <div class="bg-gray-100 rounded-full p-1 inline-flex border border-gray-200 shadow-inner">
-                            <button type="button" 
-                                (click)="setEntryMode('manual')"
+                            <button type="button" (click)="setEntryMode('manual')"
                                 [class]="entryMode === 'manual' ? 'bg-white shadow text-red-700' : 'text-gray-500 hover:text-gray-700'"
                                 class="p-3 rounded-full font-medium transition-all duration-200 flex items-center gap-2 outline-none focus:outline-none">
                                 <i class="pi pi-pencil"></i>
                             </button>
-                            <button type="button" 
-                                (click)="setEntryMode('scan')"
+                            <button type="button" (click)="setEntryMode('scan')"
                                 [class]="entryMode === 'scan' ? 'bg-white shadow text-red-700' : 'text-gray-500 hover:text-gray-700'"
                                 class="p-3 rounded-full font-medium transition-all duration-200 flex items-center gap-2 outline-none focus:outline-none">
                                 <i class="pi pi-camera"></i>
                             </button>
                         </div>
-    
+
                         <div *ngIf="entryMode === 'manual'" class="w-full max-w-md animate-fadein">
                             <input formControlName="haemovigilId" type="text" placeholder="Enter Haemovigil ID manually"
                                 class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
-                            
+
                             <!-- <div class="text-center">
                                 <small class="text-red-500 mt-1 inline-block" *ngIf="registerPatient.get('haemovigilId')?.touched && registerPatient.get('haemovigilId')?.invalid">
                                     Haemovigil ID is required.
@@ -102,10 +107,9 @@
 
                     <div *ngIf="entryMode === 'scan'" class="w-full max-w-md animate-fadein">
                         <div class="mt-2 rounded-lg py-4 px-2 bg-gray-50 flex justify-center">
-                            <div class="w-full rounded overflow-hidden shadow-inner bg-black aspect-video relative flex items-center justify-center">
-                                <zxing-scanner 
-                                    [enable]="entryMode === 'scan'" 
-                                    [formats]="allowedFormats"
+                            <div
+                                class="w-full rounded overflow-hidden shadow-inner bg-black aspect-video relative flex items-center justify-center">
+                                <zxing-scanner [enable]="entryMode === 'scan'" [formats]="allowedFormats"
                                     (scanSuccess)="onCodeResult($event)"
                                     class="absolute inset-0 w-full h-full object-cover">
                                 </zxing-scanner>
@@ -115,14 +119,31 @@
                     </div>
                 </div>
 
-                <div class="flex justify-center w-full text-center mt-6">
+                <!-- <div>
+                    <button type="button"
+                        class="bg-[#BE0000] hover:from-red-700 hover:to-red-900 text-white font-semibold outline-none focus:outline-none py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">
+                        <i class="pi pi-key"></i>
+                        Get Transporter Key
+                    </button>
+                </div> -->
+
+                <div *ngIf="transporterKey" class="bg-gray-100 rounded-lg text-gray-600 text-center py-4 px-8 w-full mx-auto my-4 font-semibold border border-gray-300">
+                    <p class="text-2xl">{{ transporterKey }}</p>
+                </div>
+
+                <div class="flex justify-center gap-2 w-full text-center mt-6">
+                    <button type="button" (click)="getTranspoterKey()"
+                        class="bg-[#BE0000] hover:from-red-700 hover:to-red-900 text-white font-semibold outline-none focus:outline-none py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">
+                        <i class="pi pi-key"></i>
+                        <span>{{ isFetchingKey ? ' Fetching...' : ' Get Transporter Key' }}</span>
+                    </button>
                     <button type="submit"
                         class="bg-[#BE0000] hover:from-red-700 hover:to-red-900 text-white font-semibold outline-none focus:outline-none py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">
-                        <i *ngIf="isLoading" class="pi pi-spin pi-spinner"></i>
-                        <span>{{ isLoading ? 'Saving...' : 'Save' }}</span>
+                        <i *ngIf="isSaving" class="pi pi-spin pi-spinner"></i>
+                        <span>{{ isSaving ? 'Saving...' : 'Save' }}</span>
                     </button>
                 </div>
-                
+
             </div>
         </form>
     </div>

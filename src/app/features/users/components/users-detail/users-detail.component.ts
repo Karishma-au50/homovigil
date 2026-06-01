@@ -10,6 +10,7 @@ import { MessageService } from 'primeng/api';
 
 // Services
 import { UsersService, User } from '../../service/users.service';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-users-detail',
@@ -27,6 +28,9 @@ export class UsersDetailComponent implements OnInit {
 
   user: Partial<User> = {};
 
+  isAdminOrSuperAdmin: boolean = false;
+  showPassword = false;
+
   roles = [
     { label: 'User', value: 'user' },
     { label: 'Admin', value: 'admin' },
@@ -35,13 +39,23 @@ export class UsersDetailComponent implements OnInit {
   ];
 
   constructor(private usersService: UsersService,
-    private messageService: MessageService) { }
+    private messageService: MessageService,
+    private authService: AuthService) { }
 
   ngOnInit() {
     // Clone the passed data so we don't mutate the table row directly before saving
     if (this.formData) {
       this.user = { ...this.formData };
     }
+
+    const currentUser = this.authService.currentUser;
+    if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'superAdmin')) {
+      this.isAdminOrSuperAdmin = true;
+    }
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
   }
 
   isFormInvalid(): boolean {

@@ -49,6 +49,7 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
         });
 
         this.recordFormStep2 = this.fb.group({
+            transporterBoxId: ['', Validators.required],
             bagId: ['', Validators.required],
             bloodGroup: ['', Validators.required],
             componentType: ['', Validators.required]
@@ -174,8 +175,15 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
     onSubmit(): void {
         if (!this.patientData) return;
 
+        if (this.recordFormStep2.invalid) {
+            this.recordFormStep2.markAllAsTouched();
+            this.showError('Form Incomplete', 'Please fill all required fields');
+            return;
+        }
+
         const payload = {
             patientId: this.patientData._id,
+            transporterBoxId: this.recordFormStep2.value.transporterBoxId,
             bloodBagId: this.recordFormStep2.value.bagId,
             bloodGroup: this.recordFormStep2.value.bloodGroup,
             bloodcomponent: this.recordFormStep2.value.componentType

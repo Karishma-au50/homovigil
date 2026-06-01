@@ -10,11 +10,12 @@ import { FormsModule } from '@angular/forms';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { BagAllocation } from '../../../core/models/bag.modal';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-allocate-bag-history',
     standalone: true,
-    imports: [CommonModule, FormsModule, TableModule, InputTextModule, DropdownModule, DatePickerModule, TagModule, ButtonModule],
+    imports: [CommonModule, FormsModule, TableModule, InputTextModule, DropdownModule, DatePickerModule, TagModule, ButtonModule, TooltipModule],
     templateUrl: './allocate-bag-history.component.html',
     styleUrl: './allocate-bag-history.component.scss'
 })

@@ -7,11 +7,16 @@ import { BarcodeFormat } from '@zxing/library';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { HemoVigilHttpService } from '../../../core/services/hemovigil.http.service';
+
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-patient',
     standalone: true,
-    imports: [ReactiveFormsModule, ButtonModule, CommonModule, ZXingScannerModule],
+    imports: [ReactiveFormsModule, ButtonModule, CommonModule, ZXingScannerModule, ToastModule],
+    providers: [],
     templateUrl: './patient.component.html',
     styleUrls: ['./patient.component.scss']
 })
@@ -22,7 +27,10 @@ export class PatientComponent {
     // Track if this is an edit (true) or new entry (false)
     isEditMode = false;
     entryMode: 'manual' | 'scan' = 'manual';
-    isLoading = false;
+    isSaving = false;
+    isFetchingKey = false;
+
+    transporterKey: string | null = null;
 
     allowedFormats = [
         BarcodeFormat.QR_CODE,
@@ -32,12 +40,13 @@ export class PatientComponent {
         BarcodeFormat.DATA_MATRIX // Healthcare/Blood bags mein Data Matrix bhi use hota hai
     ];
 
-    constructor(private fb: FormBuilder, private router: Router) {
+    constructor(private fb: FormBuilder, private router: Router, private hemovigilService: HemoVigilHttpService, private messageService: MessageService) {
         this.registerPatient = this.fb.group({
             _id: ['0'],
             firstname: ['', Validators.required],
             lastname: ['', Validators.required],
             UHID: ['', Validators.required],
+            wardNumber: ['', Validators.required],
             bloodGroup: ['', Validators.required],
             haemovigilId: ['', Validators.required]
         });
@@ -49,6 +58,36 @@ export class PatientComponent {
             // If formData has an _id that's not '0', it's an edit
             this.isEditMode = this.formData._id && this.formData._id !== '0';
         }
+    }
+
+    getTranspoterKey() {
+        const idValue = this.registerPatient.get('haemovigilId')?.value;
+        const patientId = this.registerPatient.get('_id')?.value; 
+
+        if (!idValue || !idValue.trim()) {
+            this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Enter Haemovigil ID first!' });
+            return;
+        }
+        
+        this.isFetchingKey = true;
+        
+        // Determine if this is a brand new patient or an edit
+        const isNewPatient = !this.isEditMode;
+
+        // Pass the flag as the second parameter
+        this.hemovigilService.getHaemovigilIdTransporterKey(idValue, isNewPatient, patientId).subscribe({
+            next: (res) => {
+                this.isFetchingKey = false;
+                this.transporterKey = res.data.transporterKey;
+                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Transporter key retrieved successfully.' });
+            },
+            error: (error) => {
+                this.isFetchingKey = false;
+                console.error('Failed to get Transporter key', error);
+                const errorMessage = error.error?.message || 'Failed to get Transporter key.';
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMessage });
+            }
+        });
     }
 
     // Update the mode when the toggle is clicked
@@ -66,32 +105,29 @@ export class PatientComponent {
 
     onSubmit() {
         if (this.registerPatient.valid) {
-            this.isLoading = true;
+            this.isSaving = true;
 
             if (this.registerPatient.value._id == '0') {
                 // Remove the _id field if it's not needed for registration
                 delete this.registerPatient.value._id;
                 this.authService.registerPatient(this.registerPatient.value).subscribe({
-                    next:(response) => {
-                        this.isLoading = false;
+                    next: (response) => {
+                        this.isSaving = false;
                         this.onClose(true);
                     },
                     error: (error) => {
-                        this.isLoading = false;
-                        // handle error, show message, etc.
+                        this.isSaving = false;
                         console.error('Registration failed', error);
                     }
                 });
             } else {
                 this.authService.updatePatient(this.registerPatient.value, this.registerPatient.value._id).subscribe({
                     next: (response) => {
-                        // handle success, maybe store token, etc.
-                        this.isLoading = false;
+                        this.isSaving = false;
                         this.onClose(true);
                     },
                     error: (error) => {
-                        this.isLoading = false;
-                        // handle error, show message, etc.
+                        this.isSaving = false;
                         console.error('Update failed', error);
                     }
                 });

@@ -12,11 +12,12 @@ import { BagAllocation } from '../../core/models/bag.modal';
 import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-home',
     standalone: true,
-    imports: [CommonModule, FormsModule, DropdownModule, ButtonModule, DatePickerModule, TableModule, InputIconModule, ToolbarModule, IconFieldModule, InputTextModule],
+    imports: [CommonModule, FormsModule, DropdownModule, ButtonModule, DatePickerModule, TableModule, InputIconModule, ToolbarModule, IconFieldModule, InputTextModule, TooltipModule],
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss']
 })

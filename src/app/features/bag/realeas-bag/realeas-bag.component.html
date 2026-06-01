@@ -69,7 +69,9 @@
   ]" responsiveLayout="scroll" class="w-full text-m p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
   <ng-template pTemplate="header">
     <tr class="bg-red-700 text-white text-m px-5 py-3 font-semibold">
-      <th class="rounded-tl-xl !px-5 !py-3 whitespace-nowrap">Bag ID</th>
+      <th class="rounded-tl-xl !px-5 !py-3 whitespace-nowrap" pTooltip="Transporter Box ID" 
+                    tooltipPosition="bottom">TBID</th>
+      <th class="!px-5 !py-3 whitespace-nowrap">Bag ID</th>
       <th class="!px-5 !py-3 whitespace-nowrap">UHID</th>
       <th class="!px-5 !py-3 whitespace-nowrap">HaemovigilID</th>
       <th class="!px-5 !py-3 whitespace-nowrap">Patient Name</th>
@@ -83,6 +85,7 @@
 
   <ng-template pTemplate="body" let-row let-i="rowIndex">
     <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
+      <td class="!px-5 !py-3 !text-center">{{ row?.transporterBoxId }}</td>
       <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodBagId }}</td>
       <td class="!px-5 !py-3">{{ row.patientId?.UHID }}</td>
       <td class="!px-5 !py-3"> {{ row.HaemovigilID || row.patientId?.haemovigilId }}</td>
@@ -104,14 +107,14 @@
             (click)="releaseBag(row._id, i)"> Release </span>
           <span
             class="border border-green-600 bg-green-100 text-green-700 px-3 py-1 rounded-full text-s font-semibold cursor-pointer"
-            (click)="reserveAllocatedBag(row._id)"> Reserve </span>
+            (click)="reserveAllocatedBag(row._id)"> Issue </span>
         </div>
       </td>
     </tr>
   </ng-template>
   <ng-template pTemplate="emptymessage">
     <tr>
-      <td colspan="8" class="text-center py-8 text-gray-700 text-xl">
+      <td colspan="10" class="text-center py-8 text-gray-700 text-xl">
         <div class="flex justify-center items-center h-full">
           No data found
         </div>

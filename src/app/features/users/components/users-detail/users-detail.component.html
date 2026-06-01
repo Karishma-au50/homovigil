@@ -1,5 +1,5 @@
 <div class="flex flex-col gap-4 p-2">
-    
+
     <!-- Name Field -->
     <div class="flex flex-col gap-2">
         <label for="name" class="font-semibold text-gray-700">Full Name</label>
@@ -9,7 +9,8 @@
     <!-- Phone Field -->
     <div class="flex flex-col gap-2">
         <label for="phone" class="font-semibold text-gray-700">Phone Number</label>
-        <input pInputText id="phone" [(ngModel)]="user.phone" maxlength="10" placeholder="e.g., 9876543210" class="w-full" />
+        <input pInputText id="phone" [(ngModel)]="user.phone" maxlength="10" placeholder="e.g., 9876543210"
+            class="w-full" />
     </div>
 
     <!-- Email Field -->
@@ -21,26 +22,32 @@
     <!-- Role Dropdown -->
     <div class="flex flex-col gap-2">
         <label for="role" class="font-semibold text-gray-700">Role</label>
-        <p-dropdown 
-            [options]="roles" 
-            [(ngModel)]="user.role" 
-            optionLabel="label" 
-            optionValue="value" 
-            appendTo="body" 
+        <p-dropdown [options]="roles" [(ngModel)]="user.role" optionLabel="label" optionValue="value" appendTo="body"
             styleClass="w-full">
         </p-dropdown>
     </div>
 
     <!-- Password Field (Only show when creating a new user, not editing) -->
-    <div class="flex flex-col gap-2" *ngIf="!user._id">
-        <label for="password" class="font-semibold text-gray-700">Password</label>
-        <input pInputText type="password" id="password" [(ngModel)]="user.password" placeholder="6-digit password" class="w-full" />
+    <div class="flex flex-col gap-2" *ngIf="!user._id || isAdminOrSuperAdmin">
+        <label for="password" class="font-semibold text-gray-700">
+            {{ user._id ? 'Reset Password' : 'Password' }}
+        </label>
+
+        <div class="relative w-full">
+            <input pInputText [type]="showPassword ? 'text' : 'password'" id="password" [(ngModel)]="user.password"
+                [placeholder]="user._id ? 'Enter new password (min 6 chars)' : 'Min 6 characters'"
+                class="w-full pr-10" />
+
+            <i class="pi absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-800 transition-colors"
+                [ngClass]="showPassword ? 'pi-eye-slash' : 'pi-eye'" (click)="togglePasswordVisibility()"></i>
+        </div>
     </div>
 
     <!-- Action Buttons -->
     <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-100">
         <p-button label="Cancel" severity="secondary" [outlined]="true" (click)="cancel()"></p-button>
-        <p-button label="Save User" severity="danger" [disabled]="isFormInvalid()" (click)="saveUser()" styleClass="!bg-red-600 hover:!bg-red-700"></p-button>
+        <p-button label="Save User" severity="danger" [disabled]="isFormInvalid()" (click)="saveUser()"
+            styleClass="!bg-red-600 hover:!bg-red-700"></p-button>
     </div>
 
 </div>

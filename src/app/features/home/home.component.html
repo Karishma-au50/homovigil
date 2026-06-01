@@ -31,6 +31,8 @@
         <ng-template pTemplate="header">
             <tr class="bg-red-700 text-white text-left text-m font-semibold">
                 <th class="!px-5 !py-3 whitespace-nowrap">S.No</th>
+                <th class="!px-5 !py-3 whitespace-nowrap" pTooltip="Transporter Box ID" 
+                    tooltipPosition="bottom">TBID</th>
                 <th class="!px-5 !py-3 whitespace-nowrap">Bag ID</th>
                 <th class="!px-5 !py-3 whitespace-nowrap">UhID</th>
                 <th class="!px-5 !py-3 whitespace-nowrap">Haemovigil ID</th>
@@ -46,6 +48,7 @@
         <ng-template pTemplate="body" let-rec let-i="rowIndex">
             <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
                 <td class="!px-5 !py-3 font-medium">{{ i + 1 }}</td>
+                <td class="!px-5 !py-3 !text-center">{{ rec?.transporterBoxId }}</td>
                 <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodBagId }}</td>
                 <td class="!px-5 !py-3">{{ rec.patientId?.UHID }}</td>
                 <td class="!px-5 !py-3">
@@ -69,7 +72,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="8" class="text-center py-8 text-gray-700 text-xl">
+                <td colspan="10" class="text-center py-8 text-gray-700 text-xl">
                     <div class="flex justify-center items-center h-full">No data found</div>
                 </td>
             </tr>
