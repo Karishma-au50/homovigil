@@ -34,7 +34,8 @@
                 <th class="!px-5 !py-3 whitespace-nowrap" pTooltip="Transporter Box ID" 
                     tooltipPosition="bottom">TBID</th>
                 <th class="!px-5 !py-3 whitespace-nowrap">Bag ID</th>
-                <th class="!px-5 !py-3 whitespace-nowrap">UhID</th>
+                <th class="!px-5 !py-3 whitespace-nowrap">UHID No</th>
+                <th class="!px-5 !py-3 whitespace-nowrap">Ward No</th>
                 <th class="!px-5 !py-3 whitespace-nowrap">Haemovigil ID</th>
                 <th class="!px-5 !py-3 whitespace-nowrap">Patient Name</th>
                 <th class="!px-5 !py-3 whitespace-nowrap">Blood Group</th>
@@ -51,6 +52,7 @@
                 <td class="!px-5 !py-3 !text-center">{{ rec?.transporterBoxId }}</td>
                 <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodBagId }}</td>
                 <td class="!px-5 !py-3">{{ rec.patientId?.UHID }}</td>
+                <td class="!px-5 !py-3">{{ rec.patientId?.wardNumber }}</td>
                 <td class="!px-5 !py-3">
                     {{ rec.HaemovigilID || rec.patientId?.haemovigilId || 'N/A' }}
                 </td>
