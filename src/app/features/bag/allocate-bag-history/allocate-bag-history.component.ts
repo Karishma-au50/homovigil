@@ -51,6 +51,16 @@ export class AllocateBagHistoryComponent {
 
     stripe = (i: number) => (i % 2 === 0 ? 'bg-gray-50' : '');
 
+    formatStatus(status: string): string {
+        if (!status) return '';
+        // If the backend sends 'released' or 'Released', display 'Issued' instead
+        if (status.toLowerCase() === 'released') {
+            return 'Issued';
+        }
+        // Otherwise, display the status exactly as it came from the backend
+        return status;
+    }
+
     badgeClass(status: string) {
         return (
             {

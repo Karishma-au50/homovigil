@@ -67,6 +67,16 @@ export class HomeComponent {
             }[status] ?? 'bg-gray-100 text-gray-700'
         );
     }
+
+    formatStatus(status: string): string {
+        if (!status) return '';
+        // If the backend sends 'released', display 'Issued' instead
+        if (status.toLowerCase() === 'released') {
+            return 'Issued';
+        }
+        return status;
+    }
+
     // onFilterGlobal(event: Event): void {
     //     const inputElement = event.target as HTMLInputElement;
     //     this.dt.filterGlobal(inputElement.value, 'contains');

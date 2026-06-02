@@ -56,9 +56,10 @@
             <td class="!px-5 !py-3">{{ row.patientId?.bloodGroup }}</td>
             <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodcomponent }}</td>
             <td class="!px-5 !py-3">
+                <!-- {{ row.status }} -->
                 <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize"
                     [ngClass]="badgeClass(row.status)">
-                    {{ row.status }}
+                    {{ formatStatus(row.status) }}
                 </span>
             </td>
             <td class="!px-5 !py-3 whitespace-nowrap">{{ row.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>

@@ -61,9 +61,10 @@
 
                 <!-- Status badge -->
                 <td class="!px-5 !py-3">
+                    <!-- {{ rec.status }} -->
                     <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize"
                         [ngClass]="badgeClass(rec.status)">
-                        {{ rec.status }}
+                        {{ formatStatus(rec.status) }}
                     </span>
                 </td>
 
