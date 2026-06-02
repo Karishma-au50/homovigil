@@ -90,6 +90,16 @@ export class PatientComponent {
         });
     }
 
+    // Add this getter to check if the top 5 fields are filled and valid
+    get isTopFormValid(): boolean {
+        const controls = this.registerPatient.controls;
+        return controls['UHID'].valid && 
+               controls['bloodGroup'].valid && 
+               controls['wardNumber'].valid && 
+               controls['firstname'].valid && 
+               controls['lastname'].valid;
+    }
+
     // Update the mode when the toggle is clicked
     setEntryMode(mode: 'manual' | 'scan') {
         this.entryMode = mode;

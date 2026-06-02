@@ -12,7 +12,7 @@
 </div>
 
 <!-- ADD / EDIT PATIENT DIALOG -->
-<p-dialog [(visible)]="visible" [modal]="true" [closable]="false" [showHeader]="false" contentStyle="border: none">
+<p-dialog [(visible)]="visible" [modal]="true" [closable]="false" [showHeader]="false" [style]="{width: '28vw'}" contentStyle="border: none">
 
     <ng-template pTemplate="content">
         <app-patient [formData]="selectedPatient" (closeDialog)="closeDialog($event)">

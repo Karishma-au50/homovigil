@@ -10,18 +10,18 @@
 
         <!-- Form -->
         <form [formGroup]="registerPatient" (ngSubmit)="onSubmit()">
-            <div class="px-6 py-4 lg:px-6 lg:py-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-6">
-                    <div>
+            <div class="px-6 py-4 lg:px-6 lg:py-6">
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-3 !mb-4">
+                    <div class="col-span-1 md:col-span-2">
                         <label class="block text-muted-color mb-2 font-semibold">UHID</label>
                         <input type="text" formControlName="UHID" placeholder="Enter UHID"
-                            class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                            class="w-full placeholder:text-md border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
 
-                    <div>
+                    <div class="col-span-1 md:col-span-2">
                         <label class="block text-muted-color mb-2 font-semibold">Blood Group</label>
                         <select formControlName="bloodGroup"
-                            class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                            class="w-full placeholder:text-md border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
                             <option disabled selected hidden>--Select Blood Group--</option>
                             <option>A+</option>
                             <option>A-</option>
@@ -34,25 +34,27 @@
                         </select>
                     </div>
 
+                    <div class="col-span-1 md:col-span-2">
+                        <label class="block text-muted-color mb-2 font-semibold">Ward Number</label>
+                        <input formControlName="wardNumber" type="text" placeholder="Enter Ward Number"
+                            class="w-full placeholder:text-md border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                    </div>
+
+
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-muted-color mb-2 font-semibold">First Name</label>
                         <input formControlName="firstname" type="text" placeholder="Enter First Name"
-                            class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                            class="w-full placeholder:text-md border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
 
                     <div>
                         <label class="block text-muted-color mb-2 font-semibold">Last Name</label>
                         <input formControlName="lastname" type="text" placeholder="Enter Last Name"
-                            class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
-                    </div>
-
-                    <div>
-                        <label class="block text-muted-color mb-2 font-semibold">Ward Number</label>
-                        <input formControlName="wardNumber" type="text" placeholder="Enter Ward Number"
-                            class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                            class="w-full placeholder:text-md border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
                 </div>
-
                 <!-- Label Text -->
                 <!-- <div class="text-center mt-10 text-xl font-semibold text-muted-color">Scan the Haemovigil label on test
                     tube</div>
@@ -70,13 +72,15 @@
                     <button type="button" class="text-red-500 font-bold text-lg" (click)="onClose()">Close</button>
                 </div> -->
 
-                <div class="border-t border-gray-200 my-4"></div>
+                <div class="border-t border-gray-200 my-3"></div>
 
-                <div class="flex flex-col items-center w-full !min-w-[20rem]">
+                <div class="flex flex-col items-center w-full !min-w-[20rem] transition-opacity duration-300"
+                     [ngClass]="{'opacity-50 pointer-events-none': !isTopFormValid}">
                     <div class="block w-full !mb-2">
-                        <p class="text-muted-color font-semibold text-lg">
+                        <p class="text-muted-color font-semibold text-lg !mb-1">
                             Haemovigil ID
                         </p>
+                        <p *ngIf="!isTopFormValid" class="text-red-500 text-xs m-0">Please fill all top fields to unlock</p>
                     </div>
 
                     <div class="flex items-center gap-4 w-full">
@@ -94,7 +98,7 @@
                         </div>
 
                         <div *ngIf="entryMode === 'manual'" class="w-full max-w-md animate-fadein">
-                            <input formControlName="haemovigilId" type="text" placeholder="Enter Haemovigil ID manually"
+                            <input formControlName="haemovigilId" type="text" placeholder="Enter Haemovigil ID manually" [readonly]="!isTopFormValid"
                                 class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
 
                             <!-- <div class="text-center">
@@ -127,16 +131,27 @@
                     </button>
                 </div> -->
 
-                <div *ngIf="transporterKey" class="bg-gray-100 rounded-lg text-gray-600 text-center py-4 px-8 w-full mx-auto my-4 font-semibold border border-gray-300">
-                    <p class="text-2xl">{{ transporterKey }}</p>
+                <div class="w-full max-w-md mx-auto mt-4" *ngIf="isTopFormValid">
+                    <!-- <label class="block text-muted-color mb-2 font-semibold">Transporter Key</label> -->
+                    <div class="flex items-stretch w-full">
+                        
+                        <button type="button" (click)="getTranspoterKey()"
+                            [disabled]="isFetchingKey || !registerPatient.get('haemovigilId')?.value"
+                            class="bg-[#BE0000] hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-5 rounded-tl-lg rounded-bl-lg shadow transition whitespace-nowrap outline-none focus:outline-none">
+                            <i [class]="isFetchingKey ? 'pi pi-spin pi-spinner' : 'pi pi-key'"></i>
+                        </button>
+
+                        <input type="text" [value]="transporterKey || ''" readonly placeholder="Transporter Key"
+                            class="w-full !text-center bg-white border border-red-300 rounded-tr-lg rounded-br-lg p-3 text-gray-700 font-semibold focus:outline-none" />
+                    </div>
                 </div>
 
                 <div class="flex justify-center gap-2 w-full text-center mt-6">
-                    <button type="button" (click)="getTranspoterKey()"
+                    <!-- <button type="button" (click)="getTranspoterKey()"
                         class="bg-[#BE0000] hover:from-red-700 hover:to-red-900 text-white font-semibold outline-none focus:outline-none py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">
                         <i class="pi pi-key"></i>
                         <span>{{ isFetchingKey ? ' Fetching...' : ' Get Transporter Key' }}</span>
-                    </button>
+                    </button> -->
                     <button type="submit"
                         class="bg-[#BE0000] hover:from-red-700 hover:to-red-900 text-white font-semibold outline-none focus:outline-none py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">
                         <i *ngIf="isSaving" class="pi pi-spin pi-spinner"></i>
