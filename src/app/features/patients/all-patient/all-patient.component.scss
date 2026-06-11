@@ -126,3 +126,11 @@
   font-size: 0.8rem;
   color: #9b1c1c;
 }
+
+
+::ng-deep .zero-padding-modal .p-dialog-content {
+    padding: 0 !important;
+    border-radius: 12px !important;
+    overflow-y: auto !important;   /* 🔥 This restores your vertical scrolling! */
+    overflow-x: hidden !important; /* Keeps the sides clean */
+}

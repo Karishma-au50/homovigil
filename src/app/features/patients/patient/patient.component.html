@@ -1,5 +1,5 @@
 <div class="h-full flex items-center justify-center">
-    <div class="flex flex-col items-center">
+    <div class="w-full flex flex-col items-center">
         <!-- Header -->
         <div class="bg-red-700 text-white px-6 py-3 rounded-t-xl !w-full flex justify-between">
             <h2 class="text-2xl text-white tracking-wide m-0">{{ isEditMode ? 'Edit Patient Entry' : 'New Patient Entry'
@@ -9,7 +9,7 @@
         </div>
 
         <!-- Form -->
-        <form [formGroup]="registerPatient" (ngSubmit)="onSubmit()">
+        <form [formGroup]="registerPatient" (ngSubmit)="onSubmit()" class="w-full">
             <div class="px-6 py-4 lg:px-6 lg:py-6">
                 <div class="grid grid-cols-1 md:grid-cols-6 gap-3 !mb-4">
                     <div class="col-span-1 md:col-span-2">
@@ -74,7 +74,7 @@
 
                 <div class="border-t border-gray-200 my-3"></div>
 
-                <div class="flex flex-col items-center w-full !min-w-[20rem] transition-opacity duration-300"
+                <div class="flex flex-col items-center w-full  transition-opacity duration-300"
                     [ngClass]="{'opacity-50 pointer-events-none': !isTopFormValid}">
                     <div class="block w-full !mb-2">
                         <p class="text-muted-color font-semibold text-lg !mb-1">

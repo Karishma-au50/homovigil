@@ -12,7 +12,7 @@
 </div>
 
 <!-- ADD / EDIT PATIENT DIALOG -->
-<p-dialog [(visible)]="visible" [modal]="true" [closable]="false" [showHeader]="false" [style]="{width: '28vw'}" contentStyle="border: none">
+<p-dialog [(visible)]="visible" [modal]="true" [closable]="false" [showHeader]="false" [style]="{width: '28vw'}" styleClass="zero-padding-modal" [breakpoints]="{'1024px': '50vw', '640px': '95vw'}" contentStyle="border: none; padding: 0;">
 
     <ng-template pTemplate="content">
         <app-patient [formData]="selectedPatient" (closeDialog)="closeDialog($event)">
@@ -23,7 +23,7 @@
 
 <!-- PATIENT DETAILS DIALOG -->
 <p-dialog [(visible)]="detailsVisible" modal="true" dismissableMask="true" header="Patient Details"
-    [style]="{ minWidth: '520px' }" styleClass="patient-details-dialog">
+    [style]="{ width: '520px', maxWidth: '95vw' }" [breakpoints]="{'640px': '95vw'}" styleClass="patient-details-dialog">
 
     <ng-template pTemplate="content">
 
