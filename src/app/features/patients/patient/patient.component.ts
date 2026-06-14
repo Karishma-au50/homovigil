@@ -44,11 +44,11 @@ export class PatientComponent {
         this.registerPatient = this.fb.group({
             _id: ['0'],
             firstname: ['', Validators.required],
-            lastname: ['', Validators.required],
+            lastname: [''],
             UHID: ['', Validators.required],
-            wardNumber: ['', Validators.required],
-            bloodGroup: ['', Validators.required],
-            haemovigilId: ['', Validators.required]
+            wardNumber: [''],
+            bloodGroup: [''],
+            haemovigilId: ['']
         });
     }
 
@@ -94,10 +94,10 @@ export class PatientComponent {
     get isTopFormValid(): boolean {
         const controls = this.registerPatient.controls;
         return controls['UHID'].valid && 
-               controls['bloodGroup'].valid && 
-               controls['wardNumber'].valid && 
-               controls['firstname'].valid && 
-               controls['lastname'].valid;
+        controls['firstname'].valid; 
+            //    controls['bloodGroup'].valid && 
+            //    controls['wardNumber'].valid && 
+            //    controls['lastname'].valid;
     }
 
     // Update the mode when the toggle is clicked

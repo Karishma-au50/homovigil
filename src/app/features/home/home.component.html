@@ -20,7 +20,7 @@
 
 <!-- 📋 Allocation list -->
 <div class="overflow-auto rounded-xl bg-white shadow ring-1 ring-gray-200">
-    <p-table #dt [value]="records" [globalFilterFields]="['HaemovigilID',
+    <p-table #dt [value]="isLoading ? skeletonData : records" [globalFilterFields]="['HaemovigilID',
   'patientId.haemovigilId',
   'patientId.UHID',
   'patientId.firstname',
@@ -48,33 +48,52 @@
         <!-- BODY -->
         <ng-template pTemplate="body" let-rec let-i="rowIndex">
             <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
-                <td class="!px-5 !py-3 font-medium">{{ i + 1 }}</td>
-                <td class="!px-5 !py-3 !text-center">{{ rec?.transporterBoxId }}</td>
-                <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodBagId }}</td>
-                <td class="!px-5 !py-3">{{ rec.patientId?.UHID }}</td>
-                <td class="!px-5 !py-3">{{ rec.patientId?.wardNumber }}</td>
-                <td class="!px-5 !py-3">
-                    {{ rec.HaemovigilID || rec.patientId?.haemovigilId || 'N/A' }}
-                </td>
-                <td class="!px-5 !py-3">{{ rec.patientId?.firstname | titlecase }} {{ rec.patientId?.lastname |
-                    titlecase }}</td>
-                <td class="!px-5 !py-3">{{ rec.patientId?.bloodGroup }}</td>
-                <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodcomponent }}</td>
+                
+                <!-- SHIMMER/SKELETON STATE -->
+                <ng-container *ngIf="isLoading">
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton shape="circle" size="2rem"></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                </ng-container>
 
-                <!-- Status badge -->
-                <td class="!px-5 !py-3">
-                    <!-- {{ rec.status }} -->
-                    <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize"
-                        [ngClass]="badgeClass(rec.status)">
-                        {{ formatStatus(rec.status) }}
-                    </span>
-                </td>
+                <ng-container *ngIf="!isLoading">
+                    <td class="!px-5 !py-3 font-medium">{{ i + 1 }}</td>
+                    <td class="!px-5 !py-3 !text-center">{{ rec?.transporterBoxId }}</td>
+                    <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodBagId }}</td>
+                    <td class="!px-5 !py-3">{{ rec.patientId?.UHID }}</td>
+                    <td class="!px-5 !py-3">{{ rec.patientId?.wardNumber }}</td>
+                    <td class="!px-5 !py-3">
+                        {{ rec.HaemovigilID || rec.patientId?.haemovigilId || 'N/A' }}
+                    </td>
+                    <td class="!px-5 !py-3">{{ rec.patientId?.firstname | titlecase }} {{ rec.patientId?.lastname |
+                        titlecase }}</td>
+                    <td class="!px-5 !py-3">{{ rec.patientId?.bloodGroup }}</td>
+                    <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodcomponent }}</td>
+    
+                    <!-- Status badge -->
+                    <td class="!px-5 !py-3">
+                        <!-- {{ rec.status }} -->
+                        <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize"
+                            [ngClass]="badgeClass(rec.status)">
+                            {{ formatStatus(rec.status) }}
+                        </span>
+                    </td>
+    
+                    <td class="px-5 py-3 whitespace-nowrap">{{ rec.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+                </ng-container>
 
-                <td class="px-5 py-3 whitespace-nowrap">{{ rec.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
-            <tr>
+            <tr *ngIf="!isLoading">
                 <td colspan="11" class="text-center py-8 text-gray-700 text-xl">
                     <div class="flex justify-center items-center h-full">No data found</div>
                 </td>

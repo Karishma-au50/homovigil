@@ -18,17 +18,21 @@ import { DropdownModule } from 'primeng/dropdown';
 import { BarCodeComponent } from '../bar-code/bar-code.component';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
     selector: 'app-all-patient',
     templateUrl: './all-patient.component.html',
     styleUrl: './all-patient.component.scss',
-    imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule, BarCodeComponent, ToastModule],
+    imports: [SkeletonModule, CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule, BarCodeComponent, ToastModule],
     providers: [MessageService]
 })
 export class AllPatientComponent {
     @ViewChild('dt') table!: Table;
     rows: Patient[] = [];
+
+    isLoading: boolean = true;
+    skeletonData: any[] = new Array(5).fill({});
 
     router: any;
     selectedSearchBy: any;
@@ -53,7 +57,7 @@ export class AllPatientComponent {
         private authService: AuthService,
         private confirmationService: ConfirmationService,
         private messageService: MessageService
-    ) {}
+    ) { }
 
     // Component variables
     modalTitle: string = 'Add New Patient';
@@ -65,17 +69,25 @@ export class AllPatientComponent {
 
     loadPatients(): void {
         this.rows = []; // 🔥 STEP 1: clear table first
+        this.isLoading = true;
 
-        this.authService.getAllPatients().subscribe((data: any) => {
-            // 🔥 STEP 2: assign sorted data
-            this.rows = data.data;
+        this.authService.getAllPatients().subscribe({
+            next: (data: any) => {
+                // 🔥 STEP 2: assign sorted data
+                this.rows = data.data;
+                this.isLoading = false;
 
-            // 🔥 STEP 3: force paginator to page 1
-            setTimeout(() => {
-                if (this.table) {
-                    this.table.first = 0;
-                }
-            });
+                // 🔥 STEP 3: force paginator to page 1
+                setTimeout(() => {
+                    if (this.table) {
+                        this.table.first = 0;
+                    }
+                });
+            },
+            error: () => {
+                this.isLoading = false; // Stop loading on error
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load patients' });
+            }
         });
     }
 
@@ -140,7 +152,7 @@ export class AllPatientComponent {
         });
     }
 
-    openQrDialog(row: Patient){
+    openQrDialog(row: Patient) {
         this.selectedPatientForQr = row;
         this.qrVisible = true;
     }

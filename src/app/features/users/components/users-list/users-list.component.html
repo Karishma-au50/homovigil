@@ -23,7 +23,7 @@
 </p-dialog>
 
 <!-- MAIN TABLE -->
-<p-table #dt [value]="rows" [globalFilterFields]="['name', 'phone', 'email', 'role']" [paginator]="true" [rows]="10"
+<p-table #dt [value]="isLoading ? skeletonData : rows" [globalFilterFields]="['name', 'phone', 'email', 'role']" [paginator]="true" [rows]="10"
     styleClass="w-full text-m" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
 
     <ng-template pTemplate="header">
@@ -39,37 +39,59 @@
 
     <ng-template pTemplate="body" let-row let-i="rowIndex">
         <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
-            <td class="!px-5 !py-3">{{ i + 1 }}</td>
-            <td class="!px-5 !py-3 font-medium">
-                {{ row.name | titlecase }}
-            </td>
-            <td class="!px-5 !py-3">{{ row.phone }}</td>
-            <td class="!px-5 !py-3">{{ row.email || 'N/A' }}</td>
-            <td class="!px-5 !py-3">
-                <span class="border px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
-                    [ngClass]="getRoleColors(row.role)">
-                    {{ row.role }}
-                </span>
-            </td>
-            <td class="!px-5 !py-3">
-                <div class="flex items-center gap-2">
-                    <button pButton type="button" icon="pi pi-pencil"
-                        class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit" (click)="editUser(row)">
-                    </button>
 
-                    <span class="text-gray-400">|</span>
+            <!-- SHIMMER/SKELETON STATE -->
+            <ng-container *ngIf="isLoading">
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <!-- Custom skeleton for the role badge -->
+                <td class="!px-5 !py-3"><p-skeleton width="4rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
+                <!-- Custom skeleton for the action buttons -->
+                <td class="!px-5 !py-3">
+                    <div class="flex items-center gap-2">
+                        <p-skeleton shape="circle" size="2rem"></p-skeleton>
+                        <span class="text-gray-400">|</span>
+                        <p-skeleton shape="circle" size="2rem"></p-skeleton>
+                    </div>
+                </td>
+            </ng-container>
 
-                    <button pButton type="button" icon="pi pi-trash"
-                        class="p-button-text text-red-600 hover:text-red-800" pTooltip="Delete"
-                        (click)="confirmDelete(row)">
-                    </button>
-                </div>
-            </td>
+            <ng-container *ngIf="!isLoading">
+                <td class="!px-5 !py-3">{{ i + 1 }}</td>
+                <td class="!px-5 !py-3 font-medium">
+                    {{ row.name | titlecase }}
+                </td>
+                <td class="!px-5 !py-3">{{ row.phone }}</td>
+                <td class="!px-5 !py-3">{{ row.email || 'N/A' }}</td>
+                <td class="!px-5 !py-3">
+                    <span class="border px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+                        [ngClass]="getRoleColors(row.role)">
+                        {{ row.role }}
+                    </span>
+                </td>
+                <td class="!px-5 !py-3">
+                    <div class="flex items-center gap-2">
+                        <button pButton type="button" icon="pi pi-pencil"
+                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit" (click)="editUser(row)">
+                        </button>
+    
+                        <span class="text-gray-400">|</span>
+    
+                        <button pButton type="button" icon="pi pi-trash"
+                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Delete"
+                            (click)="confirmDelete(row)">
+                        </button>
+                    </div>
+                </td>
+            </ng-container>
+            
         </tr>
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
-        <tr>
+        <tr *ngIf="!isLoading">
             <td colspan="6" class="text-center py-8 text-gray-700 text-xl">
                 <div class="flex justify-center items-center h-full">No users found</div>
             </td>

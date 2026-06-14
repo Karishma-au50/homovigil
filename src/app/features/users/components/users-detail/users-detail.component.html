@@ -46,7 +46,7 @@
     <!-- Action Buttons -->
     <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-100">
         <p-button label="Cancel" severity="secondary" [outlined]="true" (click)="cancel()"></p-button>
-        <p-button label="Save User" severity="danger" [disabled]="isFormInvalid()" (click)="saveUser()"
+        <p-button label="Save User" severity="danger" [disabled]="isFormInvalid() || isSaving" [loading]="isSaving" (click)="saveUser()"
             styleClass="!bg-red-600 hover:!bg-red-700"></p-button>
     </div>
 

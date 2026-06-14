@@ -13,11 +13,12 @@ import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
     selector: 'app-home',
     standalone: true,
-    imports: [CommonModule, FormsModule, DropdownModule, ButtonModule, DatePickerModule, TableModule, InputIconModule, ToolbarModule, IconFieldModule, InputTextModule, TooltipModule],
+    imports: [SkeletonModule, CommonModule, FormsModule, DropdownModule, ButtonModule, DatePickerModule, TableModule, InputIconModule, ToolbarModule, IconFieldModule, InputTextModule, TooltipModule],
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss']
 })
@@ -28,26 +29,35 @@ export class HomeComponent {
     toDate: Date | null = null;
     allRecords: any[] = [];
 
+    isLoading: boolean = true;
+    skeletonData: any[] = new Array(5).fill({});
+
     @ViewChild('dt') dt!: Table;
+
     constructor(
         private authService: AuthService,
         private router: Router
     ) {}
+    
     ngOnInit(): void {
         this.loadPatients();
     }
 
     loadPatients(): void {
+        this.isLoading = true;
+
         this.authService.getAllAllocationsNoPagination().subscribe({
             next: (res: any) => {
                 this.records = res.data ?? [];
                 this.allRecords = [...this.records];
+                this.isLoading = false;
 
                 setTimeout(() => this.dt?.reset());
             },
             error: () => {
                 this.records = [];
                 this.allRecords = [];
+                this.isLoading = false;
             }
         });
     }

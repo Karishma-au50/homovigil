@@ -12,17 +12,20 @@ import { ConfirmationService } from 'primeng/api';
 import { AuthService } from '../../../core/auth/auth.service';
 import { BagAllocation } from '../../../core/models/bag.modal';
 import { TooltipModule } from 'primeng/tooltip';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
     selector: 'app-realeas-bag',
     standalone: true,
-    imports: [CommonModule, FormsModule, TableModule, InputTextModule, DropdownModule, DatePickerModule, TagModule, ConfirmDialogModule, TooltipModule],
+    imports: [SkeletonModule, CommonModule, FormsModule, TableModule, InputTextModule, DropdownModule, DatePickerModule, TagModule, ConfirmDialogModule, TooltipModule],
     providers: [ConfirmationService],
     templateUrl: './realeas-bag.component.html',
     styleUrl: './realeas-bag.component.scss'
 })
 export class ReleasBagComponent {
     row: BagAllocation[] = [];
+    isLoading: boolean = true;
+    skeletonData: any[] = new Array(5).fill({});
 
     @ViewChild('dt') dt!: Table;
 
@@ -31,7 +34,7 @@ export class ReleasBagComponent {
     constructor(
         private authService: AuthService,
         private confirmationService: ConfirmationService
-    ) {}
+    ) { }
 
     // ✅ SAME AS PATIENT LIST
     ngOnInit(): void {
@@ -40,13 +43,17 @@ export class ReleasBagComponent {
 
     // ✅ LOAD ALL, THEN FILTER CLIENT SIDE
     loadPatients(): void {
+        this.isLoading = true;
+
         this.authService.getAllAllocationsNoPagination().subscribe({
             next: (res: any) => {
                 const all = res.data?.allocations ?? res.data ?? [];
                 this.row = all.filter((a: BagAllocation) => a.status?.toLowerCase() === 'allocated');
+                this.isLoading = false;
             },
             error: () => {
                 this.row = [];
+                this.isLoading = false;
             }
         });
     }
@@ -73,8 +80,8 @@ export class ReleasBagComponent {
 
     releaseBag(allocationId: string, index: number): void {
         this.confirmationService.confirm({
-            message: 'Are you sure you want to release this bag?',
-            header: 'Confirm Release',
+            message: 'Are you sure you want to issue this bag?',
+            header: 'Confirm Issue',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
                 this.authService.releaseAllocatedBag(allocationId, this.releaseUserName).subscribe({

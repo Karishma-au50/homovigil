@@ -7,7 +7,7 @@
         </div>
     </div>
 
-    <p-table #dt [value]="transfusions" [loading]="loading" [paginator]="true" [rows]="10" dataKey="id"
+    <p-table #dt [value]="loading ? skeletonData : transfusions" [paginator]="true" [rows]="10" dataKey="id"
         [globalFilterFields]="['salesName', 'patientName', 'haemovigilId', 'status']" responsiveLayout="scroll"
         class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
 
@@ -25,31 +25,46 @@
 
         <ng-template pTemplate="body" let-row let-i="rowIndex">
             <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
-                <td class="!px-5 !py-3">{{ i+1 }}.</td>
-                <td class="!px-5 !py-3">{{ row.salesName }}</td>
-                <td class="!px-5 !py-3">{{ row.patientName }}</td>
-                <td class="!px-5 !py-3">{{ row.haemovigilId }}</td>
-                <td class="!px-5 !py-3">
-                    <span *ngIf="row.bagIds && row.bagIds.length > 0">{{ row.bagIds.join(', ') }}</span>
-                    <span *ngIf="!row.bagIds || row.bagIds.length === 0" class="text-gray-400">No Bags</span>
-                </td>
-                <td class="!px-5 !py-3">
-                    <span class="inline-block rounded-full px-3 py-1 text-sm font-medium capitalize"
-                        [ngClass]="badgeClass(row.status)">
-                        {{ row.status }}
-                    </span>
-                </td>
-                <td class="text-center !px-5 !py-3">
-                    <button pButton pRipple type="button" icon="pi pi-eye"
-                        class="p-button-text text-red-600 hover:text-red-800" (click)="viewDetails(row)"
-                        pTooltip="View Details" tooltipPosition="left">
-                    </button>
-                </td>
+
+                 <!-- SHIMMER STATE -->
+                <ng-container *ngIf="loading">
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                    <td class="!px-5 !py-3"><p-skeleton width="5rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
+                    <td class="text-center !px-5 !py-3"><p-skeleton shape="circle" size="2rem" styleClass="mx-auto"></p-skeleton></td>
+                </ng-container>
+
+                <ng-container *ngIf="!loading">
+                    <td class="!px-5 !py-3">{{ i+1 }}.</td>
+                    <td class="!px-5 !py-3">{{ row.salesName }}</td>
+                    <td class="!px-5 !py-3">{{ row.patientName }}</td>
+                    <td class="!px-5 !py-3">{{ row.haemovigilId }}</td>
+                    <td class="!px-5 !py-3">
+                        <span *ngIf="row.bagIds && row.bagIds.length > 0">{{ row.bagIds.join(', ') }}</span>
+                        <span *ngIf="!row.bagIds || row.bagIds.length === 0" class="text-gray-400">No Bags</span>
+                    </td>
+                    <td class="!px-5 !py-3">
+                        <span class="inline-block rounded-full px-3 py-1 text-sm font-medium capitalize"
+                            [ngClass]="badgeClass(row.status)">
+                            {{ row.status }}
+                        </span>
+                    </td>
+                    <td class="text-center !px-5 !py-3">
+                        <button pButton pRipple type="button" icon="pi pi-eye"
+                            class="p-button-text text-red-600 hover:text-red-800" (click)="viewDetails(row)"
+                            pTooltip="View Details" tooltipPosition="left">
+                        </button>
+                    </td>
+                </ng-container>
+
             </tr>
         </ng-template>
 
         <ng-template pTemplate="emptymessage">
-            <tr>
+            <tr *ngIf="!loading">
                 <td colspan="7" class="!text-center py-8 text-gray-700 text-sm">
                     No Data Found.
                 </td>
@@ -75,14 +90,14 @@
 
     <div *ngIf="selectedDetails">
 
-        <div *ngIf="loadingDetails" class="flex flex-col justify-center items-center py-12">
+        <!-- <div *ngIf="loadingDetails" class="flex flex-col justify-center items-center py-12">
             <i class="pi pi-spin pi-spinner text-4xl text-red-600 mb-4"></i>
             <span class="text-gray-600 font-medium">Fetching detailed bag records...</span>
-        </div>
+        </div> -->
 
 
 
-        <p-table *ngIf="!loadingDetails" [value]="selectedDetails.bags" responsiveLayout="scroll"
+        <p-table [value]="loadingDetails ? skeletonData : selectedDetails.bags" responsiveLayout="scroll"
             class="p-datatable-striped rounded-xl shadow-lg">
 
             <ng-template pTemplate="header">
@@ -100,39 +115,54 @@
 
             <ng-template pTemplate="body" let-bag let-i="rowIndex">
                 <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
-                    <td class="!px-5 !py-3 !text-center">{{ bag?.transporterBoxId }}</td>
-                    <td class="!px-5 !py-4 font-medium text-gray-900">{{ bag.bagId }}</td>
-                    <td class="!px-5 !py-4">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-red-700 block">{{ bag.bloodGroup }}</span>
-                            <span class="text-xs text-gray-500">|</span>
-                            <span class="text-xs text-gray-500">{{ bag.component }}</span>
-                        </div>
-                    </td>
-                    <td class="!px-5 !py-4">
-                        <span class="inline-block rounded-full px-3 py-1 text-sm font-medium capitalize"
-                            [ngClass]="badgeClass(bag.status)">
-                            {{ bag.status }}
-                        </span>
-                    </td>
-                    <td class="!px-5 !py-4">
-                        <span *ngIf="bag.startTransfusion">{{ bag.startTransfusion | date: 'MMM dd, hh:mm a' }}</span>
-                        <span *ngIf="!bag.startTransfusion" class="text-gray-400 italic">Not Started</span>
-                    </td>
-                    <td class="!px-5 !py-4">
-                        <span *ngIf="bag.endTransfusion">{{ bag.endTransfusion | date: 'MMM dd, hh:mm a' }}</span>
-                        <span *ngIf="!bag.endTransfusion" class="text-gray-400 italic">Pending</span>
-                    </td>
-                    <td class="!px-5 !py-4">
-                        <span class="text-sm px-3 py-1.5 font-semibold inline-block">
-                            {{ bag.protocolMatched || 'None' }}
-                        </span>
-                    </td>
+
+                    <!-- SHIMMER STATE -->
+                    <ng-container *ngIf="loadingDetails">
+                        <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                        <td class="!px-5 !py-4"><p-skeleton></p-skeleton></td>
+                        <td class="!px-5 !py-4"><p-skeleton></p-skeleton></td>
+                        <td class="!px-5 !py-4"><p-skeleton width="5rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
+                        <td class="!px-5 !py-4"><p-skeleton></p-skeleton></td>
+                        <td class="!px-5 !py-4"><p-skeleton></p-skeleton></td>
+                        <td class="!px-5 !py-4"><p-skeleton></p-skeleton></td>
+                    </ng-container>
+
+                    <ng-container *ngIf="!loadingDetails">
+                        <td class="!px-5 !py-3 !text-center">{{ bag?.transporterBoxId }}</td>
+                        <td class="!px-5 !py-4 font-medium text-gray-900">{{ bag.bagId }}</td>
+                        <td class="!px-5 !py-4">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-red-700 block">{{ bag.bloodGroup }}</span>
+                                <span class="text-xs text-gray-500">|</span>
+                                <span class="text-xs text-gray-500">{{ bag.component }}</span>
+                            </div>
+                        </td>
+                        <td class="!px-5 !py-4">
+                            <span class="inline-block rounded-full px-3 py-1 text-sm font-medium capitalize"
+                                [ngClass]="badgeClass(bag.status)">
+                                {{ bag.status }}
+                            </span>
+                        </td>
+                        <td class="!px-5 !py-4">
+                            <span *ngIf="bag.startTransfusion">{{ bag.startTransfusion | date: 'MMM dd, hh:mm a' }}</span>
+                            <span *ngIf="!bag.startTransfusion" class="text-gray-400 italic">Not Started</span>
+                        </td>
+                        <td class="!px-5 !py-4">
+                            <span *ngIf="bag.endTransfusion">{{ bag.endTransfusion | date: 'MMM dd, hh:mm a' }}</span>
+                            <span *ngIf="!bag.endTransfusion" class="text-gray-400 italic">Pending</span>
+                        </td>
+                        <td class="!px-5 !py-4">
+                            <span class="text-sm px-3 py-1.5 font-semibold inline-block">
+                                {{ bag.protocolMatched || 'None' }}
+                            </span>
+                        </td>
+                    </ng-container>
+
                 </tr>
             </ng-template>
 
             <ng-template pTemplate="emptymessage">
-                <tr>
+                <tr *ngIf="!loadingDetails">
                     <td colspan="7" class="!text-center py-8 text-gray-500 text-lg">
                         No bags recorded.
                     </td>

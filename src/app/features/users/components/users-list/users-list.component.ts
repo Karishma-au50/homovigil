@@ -13,6 +13,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 // Services & Child Components
 import { UsersDetailComponent } from '../users-detail/users-detail.component';
 import { UsersService, User } from '../../service/users.service';
+import { SkeletonModule } from 'primeng/skeleton';
 
 import { ToastModule } from 'primeng/toast'; 
 import { MessageService } from 'primeng/api';
@@ -21,6 +22,7 @@ import { MessageService } from 'primeng/api';
   selector: 'app-users-list',
   standalone: true,
   imports: [
+    SkeletonModule,
     CommonModule,
     TableModule,
     ButtonModule,
@@ -40,6 +42,9 @@ export class UsersListComponent implements OnInit {
   @ViewChild('dt') table!: Table;
   rows: User[] = [];
 
+  isLoading: boolean = true;
+  skeletonData: any[] = new Array(5).fill({});
+
   // Dialog & Form Variables
   visible: boolean = false;
   modalTitle: string = 'Add New User';
@@ -56,11 +61,13 @@ export class UsersListComponent implements OnInit {
 
   loadUsers(): void {
     this.rows = []; // Clear table first
+    this.isLoading = true;
 
     this.usersService.getAllUsers().subscribe({
       next: (res: any) => {
         // Assuming ApiResponse wraps data in 'data'
         this.rows = res.data;
+        this.isLoading = false;
 
         // Force paginator to page 1
         setTimeout(() => {
@@ -69,7 +76,10 @@ export class UsersListComponent implements OnInit {
           }
         });
       },
-      error: (err) => console.error('Failed to load users:', err)
+      error: (err) =>{
+        console.error('Failed to load users:', err)
+        this.isLoading = false;
+      } 
     });
   }
 

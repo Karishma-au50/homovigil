@@ -22,7 +22,7 @@
     <!-- <p-button label="New Allocation" icon="pi pi-bag" (click)="goToAllocateBag()"> </p-button> -->
 
 </div>
-<p-table #dt [value]="row" [paginator]="true" [rows]="10" [globalFilterFields]="[
+<p-table #dt [value]="isLoading ? skeletonData : row" [paginator]="true" [rows]="10" [globalFilterFields]="[
     'bloodBagId.bloodBagId',
     'patientId.UHID',
     'patientId.firstname',
@@ -36,6 +36,7 @@
                     tooltipPosition="bottom">TBID</th>
             <th class="!px-5 !py-3 whitespace-nowrap">Bag ID</th>
             <th class="!px-5 !py-3 whitespace-nowrap">UHID No</th>
+            <th class="!px-5 !py-3 whitespace-nowrap">Ward No</th>
             <th class="!px-5 !py-3 whitespace-nowrap">HaemovigilID</th>
             <th class="!px-5 !py-3 whitespace-nowrap">Patient Name</th>
             <th class="!px-5 !py-3 whitespace-nowrap">Blood Group</th>
@@ -47,26 +48,45 @@
 
     <ng-template pTemplate="body" let-row let-i="rowIndex">
         <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
-            <td class="!px-5 !py-3 !text-center">{{ row?.transporterBoxId }}</td>
-            <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodBagId }}</td>
-            <td class="!px-5 !py-3">{{ row.patientId?.UHID }}</td>
-            <td class="!px-5 !py-3">{{ row.HaemovigilID || row.patientId?.haemovigilId }}</td>
-            <td class="!px-5 !py-3">{{ row.patientId?.firstname | titlecase }} {{ row.patientId?.lastname | titlecase }}
-            </td>
-            <td class="!px-5 !py-3">{{ row.patientId?.bloodGroup }}</td>
-            <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodcomponent }}</td>
-            <td class="!px-5 !py-3">
-                <!-- {{ row.status }} -->
-                <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize"
-                    [ngClass]="badgeClass(row.status)">
-                    {{ formatStatus(row.status) }}
-                </span>
-            </td>
-            <td class="!px-5 !py-3 whitespace-nowrap">{{ row.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+
+             <!-- SHIMMER/SKELETON STATE -->
+            <ng-container *ngIf="isLoading">
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton width="3rem"></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton width="5rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton width="8rem"></p-skeleton></td>
+            </ng-container>
+
+            <ng-container *ngIf="!isLoading">
+                <td class="!px-5 !py-3 !text-center">{{ row?.transporterBoxId }}</td>
+                <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodBagId }}</td>
+                <td class="!px-5 !py-3">{{ row.patientId?.UHID }}</td>
+                <td class="!px-5 !py-3">{{ row.patientId?.wardNumber }}</td>
+                <td class="!px-5 !py-3">{{ row.HaemovigilID || row.patientId?.haemovigilId }}</td>
+                <td class="!px-5 !py-3">{{ row.patientId?.firstname | titlecase }} {{ row.patientId?.lastname | titlecase }}
+                </td>
+                <td class="!px-5 !py-3">{{ row.patientId?.bloodGroup }}</td>
+                <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodcomponent }}</td>
+                <td class="!px-5 !py-3">
+                    <!-- {{ row.status }} -->
+                    <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize"
+                        [ngClass]="badgeClass(row.status)">
+                        {{ formatStatus(row.status) }}
+                    </span>
+                </td>
+                <td class="!px-5 !py-3 whitespace-nowrap">{{ row.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+            </ng-container>
+
         </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
-        <tr>
+        <tr *ngIf="!isLoading">
             <td colspan="9" class="text-center py-8 text-gray-700 text-xl">
                 <div class="flex justify-center items-center h-full">No data found</div>
             </td>

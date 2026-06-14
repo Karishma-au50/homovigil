@@ -96,7 +96,7 @@
 
 
 <!-- MAIN TABLE -->
-<p-table #dt [value]="rows" [globalFilterFields]="['firstname', 'lastname', 'UHID', 'bloodGroup']" [paginator]="true"
+<p-table #dt [value]="isLoading ? skeletonData : rows" [globalFilterFields]="['firstname', 'lastname', 'UHID', 'bloodGroup']" [paginator]="true"
     [rows]="10" styleClass="w-full text-m" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
 
     <ng-template pTemplate="header">
@@ -114,56 +114,83 @@
 
     <ng-template pTemplate="body" let-row let-i="rowIndex">
         <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
-            <td class="!px-5 !py-3">{{ i + 1 }}</td>
-            <td class="!px-5 !py-3">
-                <button class="text-red-600 font-semibold hover:underline" (click)="viewPatientDetails(row)">
-                    {{ row.firstname | titlecase }} {{ row.lastname | titlecase }}
-                </button>
-            </td>
-            <td class="!px-5 !py-3">{{ row.UHID }}</td>
-            <td class="!px-5 !py-3">{{ row.wardNumber || '-' }}</td>
-            <td class="!px-5 !py-3 whitespace-nowrap">{{ row.createdAt | date: 'MMM dd, yyyy | hh:mm a' }}</td>
-            <td class="!px-5 !py-3">
-                <span class="border border-red-600 px-3 py-1 rounded-full text-xs font-bold">
-                    {{ row.haemovigilId }}
-                </span>
-            </td>
-            <td class="!px-5 !py-3">{{ row.bloodGroup }}</td>
-            <td class="!px-5 !py-3">
-                <div class="flex items-center gap-2">
-                    <button pButton type="button" icon="pi pi-pencil"
-                        class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit"
-                        (click)="editPatient(row)">
+
+            <!-- SHIMMER/SKELETON STATE -->
+            <ng-container *ngIf="isLoading">
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton width="80%"></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton width="3rem"></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton width="8rem"></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton width="6rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
+                <td class="!px-5 !py-3"><p-skeleton width="3rem"></p-skeleton></td>
+                <td class="!px-5 !py-3">
+                    <div class="flex items-center gap-2">
+                        <p-skeleton shape="circle" size="2rem"></p-skeleton>
+                        <span class="text-gray-400">|</span>
+                        <p-skeleton shape="circle" size="2rem"></p-skeleton>
+                        <span class="text-gray-400">|</span>
+                        <p-skeleton shape="circle" size="2rem"></p-skeleton>
+                        <span class="text-gray-400">|</span>
+                        <p-skeleton shape="circle" size="2rem"></p-skeleton>
+                    </div>
+                </td>
+            </ng-container>
+
+             <!-- ACTUAL DATA STATE (Your existing code) -->
+            <ng-container *ngIf="!isLoading">
+                <td class="!px-5 !py-3">{{ i + 1 }}</td>
+                <td class="!px-5 !py-3">
+                    <button class="text-red-600 font-semibold hover:underline" (click)="viewPatientDetails(row)">
+                        {{ row.firstname | titlecase }} {{ row.lastname | titlecase }}
                     </button>
+                </td>
+                <td class="!px-5 !py-3">{{ row.UHID }}</td>
+                <td class="!px-5 !py-3">{{ row.wardNumber || '-' }}</td>
+                <td class="!px-5 !py-3 whitespace-nowrap">{{ row.createdAt | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+                <td class="!px-5 !py-3">
+                    <span class="border border-red-600 px-3 py-1 rounded-full text-xs font-bold">
+                        {{ row.haemovigilId }}
+                    </span>
+                </td>
+                <td class="!px-5 !py-3">{{ row.bloodGroup }}</td>
+                <td class="!px-5 !py-3">
+                    <div class="flex items-center gap-2">
+                        <button pButton type="button" icon="pi pi-pencil"
+                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit"
+                            (click)="editPatient(row)">
+                        </button>
+    
+                        <span class="text-gray-400">|</span>
+    
+                        <button pButton type="button" icon="pi pi-trash"
+                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Delete"
+                            (click)="confirmDelete(row)">
+                        </button>
+    
+                        <span class="text-gray-400">|</span>
+    
+                        <button pButton type="button" icon="pi pi-barcode"
+                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Generate Barcode"
+                            (click)="openQrDialog(row)">
+                        </button>
+    
+                        <span class="text-gray-400">|</span>
+                        
+                        <button pButton type="button" icon="pi pi-key"
+                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Transporter Key"
+                            (click)="viewTransporterKey(row)">
+                        </button>
+    
+                    </div>
+                </td>
+            </ng-container>
 
-                    <span class="text-gray-400">|</span>
-
-                    <button pButton type="button" icon="pi pi-trash"
-                        class="p-button-text text-red-600 hover:text-red-800" pTooltip="Delete"
-                        (click)="confirmDelete(row)">
-                    </button>
-
-                    <span class="text-gray-400">|</span>
-
-                    <button pButton type="button" icon="pi pi-barcode"
-                        class="p-button-text text-red-600 hover:text-red-800" pTooltip="Generate Barcode"
-                        (click)="openQrDialog(row)">
-                    </button>
-
-                    <span class="text-gray-400">|</span>
-                    
-                    <button pButton type="button" icon="pi pi-key"
-                        class="p-button-text text-red-600 hover:text-red-800" pTooltip="Transporter Key"
-                        (click)="viewTransporterKey(row)">
-                    </button>
-
-                </div>
-            </td>
         </tr>
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
-        <tr>
+        <tr  *ngIf="!isLoading">
             <td colspan="8" class="text-center py-8 text-gray-700 text-xl">
                 <div class="flex justify-center items-center h-full">No data found</div>
             </td>

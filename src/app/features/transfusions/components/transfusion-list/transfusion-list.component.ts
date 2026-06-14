@@ -7,11 +7,13 @@ import { RippleModule } from 'primeng/ripple';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { TransfusionService, TransfusionRecord } from '../../service/transfusion.service';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-transfusion-list',
   standalone: true,
   imports: [
+    SkeletonModule,
     CommonModule, 
     TableModule, 
     InputTextModule, 
@@ -31,7 +33,8 @@ export class TransfusionListComponent implements OnInit {
   viewMode: 'list' | 'detail' = 'list'; // Controls which screen is shown
   selectedDetails: any = null;          // Holds the data for the specific transfusion
   loadingDetails: boolean = false;      // Spinner for the detail view
-
+  skeletonData: any[] = new Array(5).fill({});
+  
   constructor(
     private transfusionService: TransfusionService,
     private cdr: ChangeDetectorRef 

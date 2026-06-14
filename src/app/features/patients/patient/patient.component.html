@@ -13,7 +13,7 @@
             <div class="px-6 py-4 lg:px-6 lg:py-6">
                 <div class="grid grid-cols-1 md:grid-cols-6 gap-3 !mb-4">
                     <div class="col-span-1 md:col-span-2">
-                        <label class="block text-muted-color mb-2 font-semibold">UHID</label>
+                        <label class="block text-muted-color mb-2 font-semibold">UHID <span class="text-red-600">*</span> </label>
                         <input type="text" formControlName="UHID" placeholder="Enter UHID"
                             class="w-full placeholder:text-md border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
@@ -44,7 +44,7 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-muted-color mb-2 font-semibold">First Name</label>
+                        <label class="block text-muted-color mb-2 font-semibold">First Name <span class="text-red-600">*</span></label>
                         <input formControlName="firstname" type="text" placeholder="Enter First Name"
                             class="w-full placeholder:text-md border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
@@ -80,7 +80,7 @@
                         <p class="text-muted-color font-semibold text-lg !mb-1">
                             Haemovigil ID
                         </p>
-                        <p *ngIf="!isTopFormValid" class="text-red-500 text-xs m-0">Please fill all top fields to unlock
+                        <p *ngIf="!isTopFormValid" class="text-red-500 text-xs m-0">Please fill all top required fields to unlock
                         </p>
                     </div>
 
@@ -155,8 +155,8 @@
                         <i class="pi pi-key"></i>
                         <span>{{ isFetchingKey ? ' Fetching...' : ' Get Transporter Key' }}</span>
                     </button> -->
-                    <button type="submit"
-                        class="bg-[#BE0000] hover:from-red-700 hover:to-red-900 text-white font-semibold outline-none focus:outline-none py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">
+                    <button type="submit" [disabled]="registerPatient.invalid || isSaving"
+                        class="bg-[#BE0000] disabled:bg-red-400 hover:from-red-700 hover:to-red-900 text-white font-semibold outline-none focus:outline-none py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">
                         <i *ngIf="isSaving" class="pi pi-spin pi-spinner"></i>
                         <span>{{ isSaving ? 'Saving...' : 'Save' }}</span>
                     </button>

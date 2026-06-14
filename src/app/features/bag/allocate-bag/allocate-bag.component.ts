@@ -11,12 +11,13 @@ import { Patient } from '../../../core/models/patient.modal';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { Router } from '@angular/router';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
     selector: 'app-allocate-bag',
     templateUrl: './allocate-bag.component.html',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FormsModule, StepsModule, ButtonModule, DialogModule, ToastModule],
+    imports: [SkeletonModule, CommonModule, ReactiveFormsModule, FormsModule, StepsModule, ButtonModule, DialogModule, ToastModule],
     providers: [MessageService]
 })
 export class AllocateBagComponent implements OnInit, OnDestroy {
@@ -33,12 +34,15 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
 
     subscription = new Subscription();
 
+    isSearching: boolean = false;
+    isAllocating: boolean = false;
+
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
         private messageService: MessageService,
         private router: Router
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         this.steps = [{ label: 'Search Patient' }, { label: 'Allocate Bag' }];
@@ -73,13 +77,16 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
                     }
 
                     if (uhid || label) {
+                        this.isSearching = true;
                         this.authService.searchPatient(uhid, label).subscribe({
                             next: (res: any) => {
                                 this.patientData = res.data[0] || null;
+                                this.isSearching = false;
                             },
                             error: (err) => {
                                 this.showError('Search Failed', err?.error?.message || 'Error fetching patient');
                                 this.patientData = null;
+                                this.isSearching = false;
                             }
                         });
                     }
@@ -114,11 +121,14 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
             return;
         }
 
+        this.isSearching = true;
+
         // 1️⃣ Search patient
         this.authService.searchPatient(uhid, label).subscribe({
             next: (res: any) => {
                 const patient = res.data?.[0];
                 if (!patient) {
+                    this.isSearching = true;
                     this.showError('Not Found', 'Patient not found');
                     return;
                 }
@@ -126,6 +136,7 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
                 // 2️⃣ Check allocation limit
                 this.authService.checkAllocationLimit(patient._id).subscribe({
                     next: (limitRes: any) => {
+                        this.isSearching = false;
                         // 🔥 THIS IS THE KEY LINE
                         if (limitRes?.data?.limitReached) {
                             this.patientToClone = patient;
@@ -139,11 +150,13 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
                         this.activeIndex = 1;
                     },
                     error: () => {
+                        this.isSearching = false;
                         this.showError('Error', 'Failed to verify allocation limit');
                     }
                 });
             },
             error: () => {
+                this.isSearching = false;
                 this.showError('Error', 'Patient search failed');
             }
         });
@@ -189,8 +202,10 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
             bloodcomponent: this.recordFormStep2.value.componentType
         };
 
+        this.isAllocating = true; 
         this.authService.allocateBag(payload).subscribe({
             next: () => {
+                this.isAllocating = false;
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Success',
@@ -203,6 +218,7 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
                 this.patientData = null;
             },
             error: (err) => {
+                this.isAllocating = false;
                 this.showError('Allocation Error', err?.error?.message || 'Failed to allocate');
             }
         });

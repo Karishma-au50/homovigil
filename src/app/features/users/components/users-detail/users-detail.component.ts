@@ -30,6 +30,7 @@ export class UsersDetailComponent implements OnInit {
 
   isAdminOrSuperAdmin: boolean = false;
   showPassword = false;
+  isSaving = false;
 
   roles = [
     { label: 'User', value: 'user' },
@@ -58,25 +59,47 @@ export class UsersDetailComponent implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
+  // isFormInvalid(): boolean {
+  //   // Now valid if there's at least one digit (up to your 10-digit limit)
+  //   const isPhoneValid = this.user.phone && this.user.phone.length > 0;
+  //   const isNameValid = !!this.user.name;
+
+  //   if (!this.user._id) {
+  //     return !isNameValid || !isPhoneValid;
+  //   }
+  //   return !isNameValid || !isPhoneValid;
+  // }
+
   isFormInvalid(): boolean {
-    // Now valid if there's at least one digit (up to your 10-digit limit)
-    const isPhoneValid = this.user.phone && this.user.phone.length > 0;
-    const isNameValid = !!this.user.name;
+    const isNameValid = !!this.user.name?.trim();
+    const isPhoneValid = !!(this.user.phone && this.user.phone.length > 0);
+    const isRoleValid = !!this.user.role;
 
     if (!this.user._id) {
-      return !isNameValid || !isPhoneValid;
+      // New user: Name, Phone, Role, and Password (min 6 chars) are all mandatory
+      const isPasswordValid = !!(this.user.password && this.user.password.length >= 6);
+      return !isNameValid || !isPhoneValid || !isRoleValid || !isPasswordValid;
     }
-    return !isNameValid || !isPhoneValid;
+
+    // Existing user: Password is optional (only used if admin wants to reset it)
+    return !isNameValid || !isPhoneValid || !isRoleValid;
   }
 
   saveUser() {
+    this.isSaving = true;
+
     const action = this.user._id
       ? this.usersService.updateUser(this.user._id, this.user)
       : this.usersService.registerUser(this.user);
 
     action.subscribe({
-      next: () => this.closeDialog.emit(true),
+      next: () => {
+        this.isSaving = false;
+        this.closeDialog.emit(true);
+      },
       error: (err) => {
+        this.isSaving = false;
+
         // 1. Extract the specific message from the backend response body[cite: 15]
         const errorMessage = err.error?.message || 'Something went wrong';
 
