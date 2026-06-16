@@ -23,10 +23,12 @@
 
 </div>
 <p-table #dt [value]="isLoading ? skeletonData : row" [paginator]="true" [rows]="10" [globalFilterFields]="[
+    'transporterBoxId',
     'bloodBagId.bloodBagId',
     'patientId.UHID',
-    'patientId.firstname',
-    'patientId.lastname',
+    'patientId.wardNumber',
+    'patientId.fullName',
+    'patientId.bloodGroup',
     'bloodBagId.bloodcomponent',
     'HaemovigilID'
   ]" responsiveLayout="scroll" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
@@ -47,7 +49,7 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-row let-i="rowIndex">
-        <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
+        <tr class="hover:bg-red-50 dark:hover:!bg-[#450a0a]" [ngClass]="stripe(i)">
 
              <!-- SHIMMER/SKELETON STATE -->
             <ng-container *ngIf="isLoading">
@@ -65,7 +67,7 @@
 
             <ng-container *ngIf="!isLoading">
                 <td class="!px-5 !py-3 !text-center">{{ row?.transporterBoxId }}</td>
-                <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodBagId }}</td>
+                <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodBagId || 'N/A' }}</td>
                 <td class="!px-5 !py-3">{{ row.patientId?.UHID }}</td>
                 <td class="!px-5 !py-3">{{ row.patientId?.wardNumber }}</td>
                 <td class="!px-5 !py-3">{{ row.HaemovigilID || row.patientId?.haemovigilId }}</td>
@@ -87,7 +89,7 @@
     </ng-template>
     <ng-template pTemplate="emptymessage">
         <tr *ngIf="!isLoading">
-            <td colspan="9" class="text-center py-8 text-gray-700 text-xl">
+            <td colspan="10" class="text-center py-8 text-gray-700 text-xl">
                 <div class="flex justify-center items-center h-full">No data found</div>
             </td>
         </tr>

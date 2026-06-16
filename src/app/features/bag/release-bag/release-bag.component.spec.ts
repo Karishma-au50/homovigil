@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ReleasBagComponent } from './realeas-bag.component';
+import { ReleasBagComponent } from './release-bag.component';
 
 describe('ReleasBagComponent', () => {
   let component: ReleasBagComponent;

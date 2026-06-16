@@ -2,16 +2,18 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-login',
-    imports: [ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss'
 })
 export class LoginComponent {
     registerForm: FormGroup;
     authService = inject(AuthService); // Assuming HemoVigilHttpService is the service for authentication
+    isLoading: boolean = false;
 
     constructor(
         private fb: FormBuilder,
@@ -23,10 +25,27 @@ export class LoginComponent {
         });
     }
 
+    onPhoneInput(event: any) {
+        // Remove any non-numeric characters (like letters, 'e', '+', etc.)
+        let sanitizedValue = event.target.value.replace(/[^0-9]/g, '');
+        
+        // Limit to exactly 10 digits
+        if (sanitizedValue.length > 10) {
+            sanitizedValue = sanitizedValue.slice(0, 10);
+        }
+
+        // Update the input box and the Angular form control
+        event.target.value = sanitizedValue;
+        this.registerForm.get('phone')?.setValue(sanitizedValue);
+    }
+
     onSubmit() {
         if (this.registerForm.valid) {
+            this.isLoading = true;
+
             this.authService.login(this.registerForm.value).subscribe(
                 (response) => {
+                    this.isLoading = false;
                     // handle success, maybe store token, etc.
                     // console.log('Login successful', response);
                     // this.router.navigate(['home']);
@@ -43,6 +62,7 @@ export class LoginComponent {
                     }
                 },
                 (error) => {
+                    this.isLoading = false;
                     // handle error, show message, etc.
                     console.error('Login failed', error);
                 }

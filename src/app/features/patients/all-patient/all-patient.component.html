@@ -71,7 +71,7 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let a of selectedPatientDetails.allocations">
-                                <td>{{ a.bloodBagId?.bloodBagId }}</td>
+                                <td>{{ a.bloodBagId?.bloodBagId || 'N/A' }}</td>
                                 <td>{{ a.bloodBagId?.bloodcomponent }}</td>
                                 <td>
                                     <span class="status-badge">
@@ -96,7 +96,7 @@
 
 
 <!-- MAIN TABLE -->
-<p-table #dt [value]="isLoading ? skeletonData : rows" [globalFilterFields]="['firstname', 'lastname', 'UHID', 'bloodGroup']" [paginator]="true"
+<p-table #dt [value]="isLoading ? skeletonData : rows" [globalFilterFields]="['fullName', 'UHID', 'bloodGroup', 'haemovigilId', 'wardNumber']" [paginator]="true"
     [rows]="10" styleClass="w-full text-m" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
 
     <ng-template pTemplate="header">
@@ -113,7 +113,7 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-row let-i="rowIndex">
-        <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
+        <tr class="hover:bg-red-50 dark:hover:!bg-[#450a0a]" [ngClass]="stripe(i)">
 
             <!-- SHIMMER/SKELETON STATE -->
             <ng-container *ngIf="isLoading">
@@ -125,9 +125,7 @@
                 <td class="!px-5 !py-3"><p-skeleton width="6rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
                 <td class="!px-5 !py-3"><p-skeleton width="3rem"></p-skeleton></td>
                 <td class="!px-5 !py-3">
-                    <div class="flex items-center gap-2">
-                        <p-skeleton shape="circle" size="2rem"></p-skeleton>
-                        <span class="text-gray-400">|</span>
+                    <div class="flex items-center justify-center gap-2">
                         <p-skeleton shape="circle" size="2rem"></p-skeleton>
                         <span class="text-gray-400">|</span>
                         <p-skeleton shape="circle" size="2rem"></p-skeleton>
@@ -153,9 +151,16 @@
                         {{ row.haemovigilId }}
                     </span>
                 </td>
-                <td class="!px-5 !py-3">{{ row.bloodGroup }}</td>
+                <td class="!px-5 !py-3">{{ row.bloodGroup || '-' }}</td>
                 <td class="!px-5 !py-3">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center justify-center gap-2">
+                        <button pButton type="button" icon="pi pi-key"
+                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Transporter Key"
+                            (click)="viewTransporterKey(row)">
+                        </button>
+
+                        <span class="text-gray-400">|</span>
+
                         <button pButton type="button" icon="pi pi-pencil"
                             class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit"
                             (click)="editPatient(row)">
@@ -168,19 +173,12 @@
                             (click)="confirmDelete(row)">
                         </button>
     
-                        <span class="text-gray-400">|</span>
+                        <!-- <span class="text-gray-400">|</span> -->
     
-                        <button pButton type="button" icon="pi pi-barcode"
+                        <!-- <button pButton type="button" icon="pi pi-barcode"
                             class="p-button-text text-red-600 hover:text-red-800" pTooltip="Generate Barcode"
                             (click)="openQrDialog(row)">
-                        </button>
-    
-                        <span class="text-gray-400">|</span>
-                        
-                        <button pButton type="button" icon="pi pi-key"
-                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Transporter Key"
-                            (click)="viewTransporterKey(row)">
-                        </button>
+                        </button> -->
     
                     </div>
                 </td>

@@ -34,7 +34,7 @@
 <div class="mt-2">
     <h3>Allocate Bag</h3>
 </div>
-<div class="card">
+<div class="card !pb-6">
     <p-steps [model]="steps" [(activeIndex)]="activeIndex" [readonly]="true"></p-steps>
 
     <!-- Step 1: Search Patient -->
@@ -81,7 +81,7 @@
                 </table>
             </div>
 
-            <div *ngIf="patientData  && !isSearching" class="mt-6 p-2 md:p-4 rounded w-full md:px-6">
+            <div *ngIf="patientData  && !isSearching" class="mt-6 p-2 md:p-4 rounded w-full md:px-6 md:!pb-0">
                 <h3 class="text-xl font-bold text-red-700 mb-3">Fetched Patient Data</h3>
                 <table class="w-full text-left border-collapse">
                     <tr class="border-b">
@@ -107,7 +107,7 @@
                     </tr>
                 </table>
             </div>
-            <div class="text-center py-6">
+            <div class="text-center pt-6 pb-0">
                 <p-button type="button" (click)="handlePatientSearch()" label="Next"></p-button>
             </div>
         </form>
@@ -120,17 +120,17 @@
                 <div>
                     <label class="block text-gray-700 mb-2 font-medium">Transporter Box ID</label>
                     <input formControlName="transporterBoxId" type="text" placeholder="Enter Box ID"
-                        class="w-full border p-3 rounded" />
+                        class="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-red-500 transition" />
                 </div>
                 <div>
                     <label class="block text-gray-700 mb-2 font-medium">Bag ID</label>
                     <input formControlName="bagId" type="text" placeholder="Enter Bag ID"
-                        class="w-full border p-3 rounded" />
+                        class="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-red-500 transition" />
                 </div>
                 <div>
                     <label class="block text-gray-700 mb-2 font-medium">Blood Group</label>
                     <select formControlName="bloodGroup" placeholder="Select Blood Group"
-                        class="w-full border p-3 rounded">
+                        class="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-red-500 transition">
                         <option disabled selected>--Select Blood Group--</option>
                         <option>A+</option>
                         <option>A-</option>
@@ -145,7 +145,7 @@
                 <div>
                     <label class="block text-gray-700 mb-2 font-medium">Component Type</label>
                     <select formControlName="componentType" placeholder="Select Component Type"
-                        class="w-full border p-3 rounded">
+                        class="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-red-500 transition">
                         <option disabled selected>--Select Component Type--</option>
                         <option>Whole Blood</option>
                         <option>Red Blood Cells</option>

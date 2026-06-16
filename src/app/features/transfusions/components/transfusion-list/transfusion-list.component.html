@@ -2,7 +2,7 @@
     <div class="flex flex-wrap gap-4 p-4 justify-end md:justify-start items-center">
         <div class="flex bg-white border rounded-md shadow-sm">
             <input pInputText type="text" #searchInput (input)="dt.filterGlobal(searchInput.value, 'contains')"
-                placeholder="Search..." class="p-2 rounded-l-md outline-none w-[200px]" />
+                placeholder="Search..." class="p-2 rounded-l-md !rounded-r-none outline-none w-[200px]" />
             <button class="bg-red-600 text-white px-4 rounded-r-md">Search</button>
         </div>
     </div>
@@ -24,7 +24,7 @@
         </ng-template>
 
         <ng-template pTemplate="body" let-row let-i="rowIndex">
-            <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
+            <tr class="hover:bg-red-50 dark:hover:!bg-[#450a0a]" [ngClass]="stripe(i)">
 
                  <!-- SHIMMER STATE -->
                 <ng-container *ngIf="loading">
@@ -65,7 +65,7 @@
 
         <ng-template pTemplate="emptymessage">
             <tr *ngIf="!loading">
-                <td colspan="7" class="!text-center py-8 text-gray-700 text-sm">
+                <td colspan="7" class="!text-center py-8 text-gray-700 !text-lg">
                     No Data Found.
                 </td>
             </tr>
@@ -114,7 +114,7 @@
             </ng-template>
 
             <ng-template pTemplate="body" let-bag let-i="rowIndex">
-                <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
+                <tr class="hover:bg-red-50 dark:hover:!bg-[#450a0a]" [ngClass]="stripe(i)">
 
                     <!-- SHIMMER STATE -->
                     <ng-container *ngIf="loadingDetails">
@@ -129,12 +129,12 @@
 
                     <ng-container *ngIf="!loadingDetails">
                         <td class="!px-5 !py-3 !text-center">{{ bag?.transporterBoxId }}</td>
-                        <td class="!px-5 !py-4 font-medium text-gray-900">{{ bag.bagId }}</td>
+                        <td class="!px-5 !py-4 font-medium text-gray-900 dark:text-white">{{ bag.bagId }}</td>
                         <td class="!px-5 !py-4">
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-red-700 block">{{ bag.bloodGroup }}</span>
-                                <span class="text-xs text-gray-500">|</span>
-                                <span class="text-xs text-gray-500">{{ bag.component }}</span>
+                                <span class="text-xs text-gray-500 dark:text-white">|</span>
+                                <span class="text-xs text-gray-500 dark:text-white">{{ bag.component }}</span>
                             </div>
                         </td>
                         <td class="!px-5 !py-4">

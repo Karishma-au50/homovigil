@@ -38,7 +38,7 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-row let-i="rowIndex">
-        <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
+        <tr class="hover:bg-red-50 dark:hover:!bg-[#450a0a]" [ngClass]="stripe(i)">
 
             <!-- SHIMMER/SKELETON STATE -->
             <ng-container *ngIf="isLoading">

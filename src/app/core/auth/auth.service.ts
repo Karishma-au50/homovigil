@@ -236,6 +236,28 @@ export class AuthService {
         );
     }
 
+    addBloodbagId(bagId: string, bagObjectId: string): Observable<any> {
+        return this.hemoVigilService.addBloodbagId(bagId, bagObjectId).pipe(
+            tap(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Bag ID Saved',
+                    detail: 'Bag ID saved successfully.',
+                    life: 3000
+                });
+            }),
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Save Failed',
+                    detail: error.error?.message || 'Failed to save Bag ID.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
     // Logout
     signOut(): Observable<any> {
         localStorage.removeItem('slcAuthToken');
@@ -275,16 +297,16 @@ export class AuthService {
             tap(() => {
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Bag Released',
-                    detail: 'Allocated bag released successfully.',
+                    summary: 'Bag Issued',
+                    detail: 'Allocated bag issued successfully.',
                     life: 3000
                 });
             }),
             catchError((error) => {
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Release Failed',
-                    detail: error.error?.message || 'An error occurred during bag release.',
+                    summary: 'Issued Failed',
+                    detail: error.error?.message || 'An error occurred during bag issue.',
                     life: 3000
                 });
                 return throwError(() => error);

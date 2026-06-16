@@ -116,6 +116,7 @@ export class PatientComponent {
     onSubmit() {
         if (this.registerPatient.valid) {
             this.isSaving = true;
+            console.log(this.registerPatient);
 
             if (this.registerPatient.value._id == '0') {
                 // Remove the _id field if it's not needed for registration

@@ -54,7 +54,7 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
 
         this.recordFormStep2 = this.fb.group({
             transporterBoxId: ['', Validators.required],
-            bagId: ['', Validators.required],
+            bagId: [''],
             bloodGroup: ['', Validators.required],
             componentType: ['', Validators.required]
         });

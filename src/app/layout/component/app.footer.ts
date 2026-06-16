@@ -8,7 +8,7 @@ import { Component } from '@angular/core';
     template: `<div class="layout-footer">
     <p>
         Product of 
-        <span class="text-primary font-bold hover:underline">Alliance Transfusion</span>
+        <span class="text-primary font-bold hover:underline-none">Alliance Transfusion</span>
     </p>
          
     </div>`

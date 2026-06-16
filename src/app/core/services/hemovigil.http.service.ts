@@ -102,4 +102,8 @@ export class HemoVigilHttpService {
         return this.http.get(url);
     }
 
+    addBloodbagId(bagId: string, bagObjectId: string): Observable<any> {
+        return this.http.patch(`${this.baseUrl}api/bloodbag/add-bag-id`, { bagId, bagObjectId });
+    }
+
 }
