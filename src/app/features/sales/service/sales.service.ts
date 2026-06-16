@@ -73,4 +73,12 @@ export class SalesService {
     return this.http.post(`${this.apiUrl}/sales/sync-offline`, payload);
   }
 
+  getPatientByUHIDApi(uhid: string): Observable<any> {
+      return this.http.get(`${this.apiUrl}/transfusion/patient-by-uhid/${uhid}`);
+  }
+
+  resolveBarcodeApi(scannedValue: string): Observable<any> {
+      return this.http.post(`${this.apiUrl}/transfusions/resolve-barcode`, { scannedValue });
+  }
+
 }
