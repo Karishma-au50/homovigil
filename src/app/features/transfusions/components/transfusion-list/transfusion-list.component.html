@@ -44,7 +44,7 @@
                     <td class="!px-5 !py-3">{{ row.haemovigilId }}</td>
                     <td class="!px-5 !py-3">
                         <span *ngIf="row.bagIds && row.bagIds.length > 0">{{ row.bagIds.join(', ') }}</span>
-                        <span *ngIf="!row.bagIds || row.bagIds.length === 0" class="text-gray-400">No Bags</span>
+                        <span *ngIf="!row.bagIds || row.bagIds.length === 0" class="text-gray-400">N/A</span>
                     </td>
                     <td class="!px-5 !py-3">
                         <span class="inline-block rounded-full px-3 py-1 text-sm font-medium capitalize"

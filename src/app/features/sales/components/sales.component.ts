@@ -5,11 +5,12 @@ import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { BarcodeFormat } from '@zxing/library';
 import { SalesService } from '../service/sales.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { CalendarModule } from 'primeng/calendar';
 
 @Component({
   selector: 'app-sales',
   standalone: true,
-  imports: [CommonModule, ZXingScannerModule, FormsModule],
+  imports: [CommonModule, ZXingScannerModule, FormsModule, CalendarModule],
   templateUrl: './sales.component.html',
   styleUrl: './sales.component.scss'
 })
@@ -48,7 +49,7 @@ export class SalesComponent implements OnInit {
 
     const loggedInUser: any = this.authService.currentUser;
     const payload = {
-        salesId: loggedInUser._id || loggedInUser.id,
+        salesId: loggedInUser._id,
         offlineRecords: queue
     };
 
@@ -295,7 +296,7 @@ export class SalesComponent implements OnInit {
   //   }
   // }
 
-    onQrScanSuccess(scannedData: string) {
+  onQrScanSuccess(scannedData: string) {
     const value = scannedData.trim();
     if (!value) return;
 
@@ -306,7 +307,7 @@ export class SalesComponent implements OnInit {
     if (!this.isOnline) {
       if (!this.scannedPatient) {
         this.scannedPatient = {
-          patientName: 'Offline Patient (Pending Sync)',
+          patientName: 'Offline Patient',
           uhId: value, haemovigilId: '---', bloodGroup: '---',
           status: 'Offline', bags: []
         };
@@ -370,7 +371,7 @@ export class SalesComponent implements OnInit {
 
         // Lock the bag in database and get its subdocument _id
         this.salesService.createTransfusionApi({
-          salesId: loggedInUser._id || loggedInUser.id,
+          salesId: loggedInUser._id,
           patient: { patientId: patient._id, bags: [] },
           bagId: newBag.bagId,
           bloodBagId: newBag.bloodBagId
@@ -501,14 +502,14 @@ export class SalesComponent implements OnInit {
       return;
     }
 
-    const loggedInUser: any = this.authService.currentUser;
-    const payload = {
-      salesId: loggedInUser._id || loggedInUser.id,
-      patient: {
-        patientId: this.scannedPatient.patientId,
-        bags: []
-      }
-    };
+    // const loggedInUser: any = this.authService.currentUser;
+    // const payload = {
+    //   salesId: loggedInUser._id || loggedInUser.id,
+    //   patient: {
+    //     patientId: this.scannedPatient.patientId,
+    //     bags: []
+    //   }
+    // };
     // Bags already locked in DB during onQrScanSuccess — just proceed to step 2
     this.currentStep = 2;
     // if (this.isOnline) {
@@ -562,7 +563,7 @@ export class SalesComponent implements OnInit {
       });
     } else {
       const offlineRecord = {
-            shortId: bag.bloodBagNumber, // The barcode string
+            shortId: bag.qrData, // The barcode string
             startTime: bag.startTime,
             endTime: bag.selectedEndTime ? bag.selectedEndTime : undefined,
             protocolMatched: protocolString,

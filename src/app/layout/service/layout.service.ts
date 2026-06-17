@@ -79,6 +79,21 @@ export class LayoutService {
     private initialized = false;
 
     constructor() {
+         // ✅ Load stored theme config from local storage on startup
+        if (typeof localStorage !== 'undefined') {
+            const storedConfig = localStorage.getItem('app_layoutConfig');
+            if (storedConfig) {
+                try {
+                    const parsedConfig = JSON.parse(storedConfig);
+                    this._config = { ...this._config, ...parsedConfig };
+                    this.layoutConfig.set(this._config);
+                    this.toggleDarkMode(this._config);
+                } catch (e) {
+                    console.error('Failed to parse layout config from local storage', e);
+                }
+            }
+        }
+
         effect(() => {
             const config = this.layoutConfig();
             if (config) {
@@ -163,8 +178,19 @@ export class LayoutService {
         return !this.isDesktop();
     }
 
+    // onConfigUpdate() {
+    //     this._config = { ...this.layoutConfig() };
+    //     this.configUpdate.next(this.layoutConfig());
+    // }
+
     onConfigUpdate() {
         this._config = { ...this.layoutConfig() };
+        
+        // ✅ Save theme config to local storage whenever it changes
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('app_layoutConfig', JSON.stringify(this._config));
+        }
+        
         this.configUpdate.next(this.layoutConfig());
     }
 
