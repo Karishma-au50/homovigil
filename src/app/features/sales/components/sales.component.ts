@@ -49,22 +49,22 @@ export class SalesComponent implements OnInit {
 
     const loggedInUser: any = this.authService.currentUser;
     const payload = {
-        salesId: loggedInUser._id,
-        offlineRecords: queue
+      salesId: loggedInUser._id,
+      offlineRecords: queue
     };
 
     // Call the new backend endpoint you created in step 4
     this.salesService.syncOfflineApi(payload).subscribe({
-        next: (res: any) => {
-            console.log("Sync successful!", res);
-            // Clear the queue once successfully synced
-            localStorage.removeItem('transfusions_queue');
-        },
-        error: (err) => {
-            console.error("Sync failed, data remains in queue.", err);
-        }
+      next: (res: any) => {
+        console.log("Sync successful!", res);
+        // Clear the queue once successfully synced
+        localStorage.removeItem('transfusions_queue');
+      },
+      error: (err) => {
+        console.error("Sync failed, data remains in queue.", err);
+      }
     });
-}
+  }
 
   // isBagAlreadyScanned(bagId: string): boolean {
   //   if (!this.scannedPatient || !this.scannedPatient.bags) return false;
@@ -237,14 +237,14 @@ export class SalesComponent implements OnInit {
 
   // onQrScanSuccess(scannedData: string) {
   //   const allocationShortId = scannedData.trim();
-    
+
   //   if (!allocationShortId) return;
 
   //   // 2. Prevent duplicate processing if the scanner fires multiple times instantly
   //   if (this.sessionScannedBags.includes(allocationShortId)) {
   //     return; 
   //   }
-    
+
   //   // Optimistically lock in UI to prevent camera spam
   //   this.sessionScannedBags.push(allocationShortId);
 
@@ -305,6 +305,9 @@ export class SalesComponent implements OnInit {
     this.sessionScannedBags.push(value);
 
     if (!this.isOnline) {
+      setTimeout(() => {
+        this.sessionScannedBags = this.sessionScannedBags.filter(id => id !== value);
+      }, 2500);
       if (!this.scannedPatient) {
         this.scannedPatient = {
           patientName: 'Offline Patient',
@@ -329,6 +332,12 @@ export class SalesComponent implements OnInit {
         const data = res.data;
         const patient = data.patient;
         const bloodBag = data.bloodBag;
+
+        if (data.scenario === 'UHID') {
+          setTimeout(() => {
+            this.sessionScannedBags = this.sessionScannedBags.filter(id => id !== value);
+          }, 2500); // 2.5 second delay to prevent instant scanner bouncy-spam
+        }
 
         // Different patient scanned — reset session and continue
         if (this.scannedPatient && this.scannedPatient.patientId !== patient._id.toString()) {
@@ -466,19 +475,19 @@ export class SalesComponent implements OnInit {
   //           this.scannedPatient = null;
   //         }
   //         // --------------------
-          
+
   //         return;
   //       }
 
   //       this.createdSalesRecordId = res.data?._id || res._id;
-        
+
   //       // Push to UI list
   //       this.scannedPatient.bags.push(newBag);
   //       this.scrollToBottom();
   //     },
   //     error: () => {
   //        this.sessionScannedBags = this.sessionScannedBags.filter(id => id !== shortId);
-         
+
   //        // ADD THIS BLOCK:
   //        // Destroy the empty patient card if the API request fails
   //        if (this.scannedPatient && this.scannedPatient.bags.length === 0) {
@@ -563,12 +572,12 @@ export class SalesComponent implements OnInit {
       });
     } else {
       const offlineRecord = {
-            shortId: bag.qrData, // The barcode string
-            startTime: bag.startTime,
-            endTime: bag.selectedEndTime ? bag.selectedEndTime : undefined,
-            protocolMatched: protocolString,
-            offlineSyncId: Date.now().toString()
-        };
+        shortId: bag.qrData, // The barcode string
+        startTime: bag.startTime,
+        endTime: bag.selectedEndTime ? bag.selectedEndTime : undefined,
+        protocolMatched: protocolString,
+        offlineSyncId: Date.now().toString()
+      };
 
       const records = JSON.parse(localStorage.getItem('transfusions_queue') || '[]');
       records.push(offlineRecord);
@@ -618,8 +627,8 @@ export class SalesComponent implements OnInit {
         bloodBagId: bag.bloodBagId,
         bagSubDocId: bag.bagSubDocId || null,
         startTime: bag.startTime,
-        protocolMatched: "", 
-        status: "pending" 
+        protocolMatched: "",
+        status: "pending"
       };
 
       this.salesService.saveTransfusionApi(payload).subscribe({

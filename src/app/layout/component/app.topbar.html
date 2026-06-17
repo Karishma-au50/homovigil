@@ -32,6 +32,25 @@
         </button>
 
         <div class="layout-topbar-menu hidden lg:block">
+            <div class="layout-topbar-menu-content flex !gap-0 items-center">
+
+                <div *ngIf="authService.currentUser"
+                    class="hidden lg:flex items-center cursor-pointer gap-2 text-base text-gray-700 dark:text-white mr-3"
+                    (click)="op.toggle($event)">
+                    Welcome, <span class="font-bold text-red-700">{{ authService.currentUser.name | titlecase }}</span>
+                </div>
+
+                <button type="button" class="layout-topbar-action" (click)="op.toggle($event)">
+                    <div class="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-gray-700">
+                        <i class="pi pi-user !m-0"></i>
+                    </div>
+                    <span class="!ml-2 md:!ml-auto">Profile</span>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- <div class="layout-topbar-menu hidden lg:block">
             <div class="layout-topbar-menu-content !gap-2" (click)="op.toggle($event)">
                 <button type="button" class="layout-topbar-action">
                     <div class="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-gray-700">
@@ -45,26 +64,25 @@
                 </div>
 
             </div>
-        </div>
+        </div> -->
     </div>
 </div>
 
 <p-overlayPanel #op styleClass="shadow-lg rounded-xl">
     <div class="flex flex-col items-center p-2 gap-3 min-w-[200px]">
-        
+
         <div class="text-center">
             <div class="font-semibold text-gray-800 dark:text-white mb-2 text-lg">
                 Welcome, {{ authService.currentUser?.name | titlecase }}
             </div>
-            
+
             <span class="bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm font-semibold">
                 {{ (authService.currentUser?.role | titlecase) || '' }}
             </span>
         </div>
 
         <button pButton type="button" label="Logout" icon="pi pi-sign-out" iconPos="right"
-            class="p-button-danger w-full mt-2 !justify-center"
-            (click)="logout(); op.hide()">
+            class="p-button-danger w-full mt-2 !justify-center" (click)="logout(); op.hide()">
         </button>
 
     </div>

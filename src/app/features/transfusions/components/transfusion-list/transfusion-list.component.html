@@ -145,11 +145,11 @@
                         </td>
                         <td class="!px-5 !py-4">
                             <span *ngIf="bag.startTransfusion">{{ bag.startTransfusion | date: 'MMM dd, hh:mm a' }}</span>
-                            <span *ngIf="!bag.startTransfusion" class="text-gray-400 italic">Not Started</span>
+                            <span *ngIf="!bag.startTransfusion" class="text-gray-400">Not Started</span>
                         </td>
                         <td class="!px-5 !py-4">
                             <span *ngIf="bag.endTransfusion">{{ bag.endTransfusion | date: 'MMM dd, hh:mm a' }}</span>
-                            <span *ngIf="!bag.endTransfusion" class="text-gray-400 italic">Pending</span>
+                            <span *ngIf="!bag.endTransfusion" class="text-gray-400">N/A</span>
                         </td>
                         <td class="!px-5 !py-4">
                             <span class="text-sm px-3 py-1.5 font-semibold inline-block">

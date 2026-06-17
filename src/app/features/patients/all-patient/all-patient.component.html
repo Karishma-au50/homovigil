@@ -144,14 +144,14 @@
                     </button>
                 </td>
                 <td class="!px-5 !py-3">{{ row.UHID }}</td>
-                <td class="!px-5 !py-3">{{ row.wardNumber || '-' }}</td>
+                <td class="!px-5 !py-3">{{ row.wardNumber || 'N/A' }}</td>
                 <td class="!px-5 !py-3 whitespace-nowrap">{{ row.createdAt | date: 'MMM dd, yyyy | hh:mm a' }}</td>
                 <td class="!px-5 !py-3">
                     <span class="border border-red-600 px-3 py-1 rounded-full text-xs font-bold">
                         {{ row.haemovigilId }}
                     </span>
                 </td>
-                <td class="!px-5 !py-3">{{ row.bloodGroup || '-' }}</td>
+                <td class="!px-5 !py-3">{{ row.bloodGroup || 'N/A' }}</td>
                 <td class="!px-5 !py-3">
                     <div class="flex items-center justify-center gap-2">
                         <button pButton type="button" icon="pi pi-key"

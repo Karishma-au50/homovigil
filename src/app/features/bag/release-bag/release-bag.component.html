@@ -174,10 +174,10 @@
         <td class="!px-3 !py-3 !text-center">{{ row?.transporterBoxId }}</td>
         <td class="!px-3 !py-3">{{ row.bloodBagId?.bloodBagId || 'N/A' }}</td>
         <td class="!px-3 !py-3">{{ row.patientId?.UHID }}</td>
-        <td class="!px-3 !py-3">{{ row.patientId?.wardNumber }}</td>
+        <td class="!px-3 !py-3">{{ row.patientId?.wardNumber || 'N/A' }}</td>
         <td class="!px-3 !py-3"> {{ row.HaemovigilID || row.patientId?.haemovigilId }}</td>
         <td class="!px-3 !py-3">{{ row.patientId?.firstname | titlecase }} {{ row.patientId?.lastname | titlecase }}</td>
-        <td class="!px-3 !py-3">{{ row.patientId?.bloodGroup }}</td>
+        <td class="!px-3 !py-3">{{ row.patientId?.bloodGroup || 'N/A' }}</td>
         <td class="!px-3 !py-3">{{ row.bloodBagId?.bloodcomponent }}</td>
         <td class="!px-3 !py-3">
           <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize"

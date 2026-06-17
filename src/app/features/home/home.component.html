@@ -71,13 +71,13 @@
                     <td class="!px-5 !py-3 !text-center">{{ rec?.transporterBoxId }}</td>
                     <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodBagId || 'N/A' }}</td>
                     <td class="!px-5 !py-3">{{ rec.patientId?.UHID }}</td>
-                    <td class="!px-5 !py-3">{{ rec.patientId?.wardNumber }}</td>
+                    <td class="!px-5 !py-3">{{ rec.patientId?.wardNumber || 'N/A' }}</td>
                     <td class="!px-5 !py-3">
                         {{ rec.HaemovigilID || rec.patientId?.haemovigilId || 'N/A' }}
                     </td>
                     <td class="!px-5 !py-3">{{ rec.patientId?.firstname | titlecase }} {{ rec.patientId?.lastname |
                         titlecase }}</td>
-                    <td class="!px-5 !py-3">{{ rec.patientId?.bloodGroup }}</td>
+                    <td class="!px-5 !py-3">{{ rec.patientId?.bloodGroup || 'N/A' }}</td>
                     <td class="!px-5 !py-3">{{ rec.bloodBagId?.bloodcomponent }}</td>
     
                     <!-- Status badge -->
