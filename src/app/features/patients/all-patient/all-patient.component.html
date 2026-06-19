@@ -131,6 +131,8 @@
                         <p-skeleton shape="circle" size="2rem"></p-skeleton>
                         <span class="text-gray-400">|</span>
                         <p-skeleton shape="circle" size="2rem"></p-skeleton>
+                        <span class="text-gray-400">|</span>
+                        <p-skeleton shape="circle" size="2rem"></p-skeleton>
                     </div>
                 </td>
             </ng-container>
@@ -154,22 +156,29 @@
                 <td class="!px-5 !py-3">{{ row.bloodGroup || 'N/A' }}</td>
                 <td class="!px-5 !py-3">
                     <div class="flex items-center justify-center gap-2">
+                        <button pButton type="button" icon="pi pi-barcode"
+                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Generate Barcode"  tooltipPosition="left"
+                            (click)="openQrDialog(row)">
+                        </button>
+
+                        <span class="text-gray-400">|</span>
+
                         <button pButton type="button" icon="pi pi-key"
-                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Transporter Key"
+                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Transporter Key"  tooltipPosition="left"
                             (click)="viewTransporterKey(row)">
                         </button>
 
                         <span class="text-gray-400">|</span>
 
                         <button pButton type="button" icon="pi pi-pencil"
-                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit"
+                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit"  tooltipPosition="left"
                             (click)="editPatient(row)">
                         </button>
     
                         <span class="text-gray-400">|</span>
     
                         <button pButton type="button" icon="pi pi-trash"
-                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Delete"
+                            class="p-button-text text-red-600 hover:text-red-800" pTooltip="Delete"  tooltipPosition="left"
                             (click)="confirmDelete(row)">
                         </button>
     

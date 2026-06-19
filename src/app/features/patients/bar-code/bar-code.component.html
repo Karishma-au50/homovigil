@@ -6,13 +6,18 @@
     </div>
 
     <div class="w-full mt-2 flex justify-center text-center">
-        @if(!isAnyBag){
+        <!-- @if(!isAnyBag){
         <p class="text-gray-600 font-medium py-6">No Bag allocated to this Patient.</p>
-        }@else{
+        }@else{ -->
         <div id="print-section"
             class="flex flex-wrap justify-center gap-4 bg-white border border-gray-200 rounded-xl p-2 shadow-sm w-full">
 
-            @for(item of barcodeItems; track $index){
+            <div>
+                <canvas #barcodeCanvas></canvas>
+                {{patientUHID?patientUHID:''}}
+            </div>
+
+            <!-- @for(item of barcodeItems; track $index){
                 <div class="flex flex-col items-center rounded-lg bg-white p-2">
                     
                     <canvas #barcodeCanvas></canvas>
@@ -21,36 +26,15 @@
                         {{ item.displayBagId }}
                     </p>
                 </div>
-            }
-
-            <!-- @for(item of qrItems; track $index){
-                <div class="flex flex-col items-center rounded-lg bg-white">
-                    <div class="qr-image-container" style="width: 130px; height: 130px;">
-                        <qrcode 
-                            [qrdata]="item.qrStr" 
-                            [width]="1024" 
-                            [margin]="2" 
-                            [errorCorrectionLevel]="'Q'" 
-                            [colorDark]="'#000000'"
-                            [colorLight]="'#ffffff'" 
-                            [elementType]="'img'"
-                            style="width: 100%; height: 100%; display: block;">
-                        </qrcode>
-                    </div>
-
-                    <p class="bag-label text-sm text-gray-800 font-bold !mt-1 mb-0">
-                        {{ item.displayBagId }}
-                    </p>
-                </div>
             } -->
 
         </div>
-        }
+        <!-- } -->
     </div>
 
     <div class="flex items-center gap-2">
         <p-button label="Close" icon="pi pi-times" (click)="close()"></p-button>
-        <p-button label="Print" icon="pi pi-print" (click)="printQrCodes()" [disabled]="!isAnyBag"></p-button>
+        <p-button label="Print" icon="pi pi-print" (click)="printQrCodes()"></p-button>
     </div>
 
 </div>

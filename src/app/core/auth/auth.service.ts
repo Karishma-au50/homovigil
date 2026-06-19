@@ -95,13 +95,17 @@ export class AuthService {
     // Patient search
     searchPatient(uhid: string, label: string): Observable<any> {
         return this.hemoVigilService.searchPatient(uhid, label).pipe(
-            tap(() => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Patient Fetched',
-                    detail: 'Patient fetched successfully.',
-                    life: 3000
-                });
+            tap((response: any) => {
+
+                if (response?.data && response.data.length > 0) {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Patient Fetched',
+                        detail: 'Patient fetched successfully.',
+                        life: 3000
+                    });
+                }
+
             }),
             catchError((error) => {
                 this.messageService.add({

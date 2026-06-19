@@ -118,6 +118,16 @@ export class ReleaseBagComponent {
         this.scannedBagId = resultString;
         this.entryMode = 'manual';
     }
+
+    releaseBagWithoutBagId(row: any, index: number): void{
+        this.selectedAllocationId = row._id;
+        this.selectedIndex = index;
+        this.selectedRow = row;
+
+        this.scannedBagId = row.bloodBagId.bloodBagId || null;
+        this.triggerConfirmDialog();
+    }
+
     // 1. We now pass the entire 'row' object to check its data
     releaseBag(row: any, index: number): void {
         this.selectedAllocationId = row._id;
@@ -174,7 +184,8 @@ export class ReleaseBagComponent {
                 // If you need to send the new scannedBagId to the backend, add it here!
                 this.authService.releaseAllocatedBag(this.selectedAllocationId, this.releaseUserName).subscribe({
                     next: () => {
-                        this.row.splice(this.selectedIndex, 1);
+                        // this.row.splice(this.selectedIndex, 1);
+                        this.loadPatients();
                     }
                 });
             }

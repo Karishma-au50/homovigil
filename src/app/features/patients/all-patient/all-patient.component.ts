@@ -154,7 +154,13 @@ export class AllPatientComponent {
 
     openQrDialog(row: Patient) {
         this.selectedPatientForQr = row;
-        this.qrVisible = true;
+        // console.log(row)
+        let patientUhid = row?.UHID;
+        if(patientUhid){
+            this.qrVisible = true;
+        }else{
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'UHID not exists for this patient.' });
+        }
     }
 
     stripe = (i: number) => (i % 2 === 0 ? 'bg-gray-50' : '');

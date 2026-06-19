@@ -64,7 +64,7 @@
 <div class="flex flex-wrap gap-4 p-4 justify-end md:justify-start items-center">
   <!-- Search input + button -->
   <div class="flex bg-white border rounded-md shadow-sm">
-    <input type="text" pInputText placeholder="Search..." class="p-2 rounded-l-md outline-none w-[200px]"
+    <input type="text" pInputText placeholder="Search..." class="p-2 rounded-l-md !rounded-r-none outline-none w-[200px]"
       (input)="onGlobalFilter(dt, $event)" />
     <button class="bg-red-600 text-white px-4 rounded-r-md">Search</button>
   </div>
@@ -140,7 +140,7 @@
       <th class="!px-3 !py-3 whitespace-nowrap">HaemovigilID</th>
       <th class="!px-3 !py-3 whitespace-nowrap">Patient Name</th>
       <th class="!px-3 !py-3 whitespace-nowrap">Blood Group</th>
-      <th class="!px-3 !py-3 whitespace-nowrap">Blood Component</th>
+      <th class="!px-3 !py-3 whitespace-nowrap" pTooltip="Blood Component" tooltipPosition="bottom"  >Blood Comp.</th>
       <th class="!px-3 !py-3 whitespace-nowrap">Status</th>
       <th class="!px-3 !py-3 whitespace-nowrap">Allocated On</th>
       <th class="rounded-tr-xl !px-3 !py-3 !text-center whitespace-nowrap">Action</th>
@@ -189,6 +189,9 @@
         <td class="!px-3 !py-3 whitespace-nowrap">{{ row.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
         <td class="!px-3 !py-3">
           <div class="flex gap-x-4">
+            <span pTooltip="Issue Without Box ID" tooltipPosition="bottom"
+              class="text-gray-500 border border-gray-500 bg-gray-100/80 whitespace-nowrap px-3 py-1 rounded-full text-s font-semibold cursor-pointer"
+              (click)="releaseBagWithoutBagId(row, i)"> Issue (No ID) </span>
             <span
               class="border border-blue-600 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-s font-semibold cursor-pointer"
               (click)="releaseBag(row, i)"> Issued </span>

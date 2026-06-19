@@ -17,71 +17,69 @@ export class BarCodeComponent implements OnInit {
 
   @ViewChildren('barcodeCanvas') canvasRefs!: QueryList<ElementRef>;
 
-  isAnyBag: boolean = false;
-  barcodeItems: { bcStr: string, displayBagId: string }[] = [];
+  patientUHID: string | null = null;
+  // isAnyBag: boolean = false;
+  // barcodeItems: { bcStr: string, displayBagId: string }[] = [];
 
   // qrDataString: string[] = [];
   // qrItems: { qrStr: string, displayBagId: string }[] = [];
 
-  constructor(private authService: AuthService) { }
+  // constructor(private authService: AuthService) { }
 
   ngOnInit() {
     if (!this.patientData?._id) return;
+    const patientUhid = this.patientData?.UHID;
+
+    if(patientUhid){
+      this.patientUHID = String(patientUhid);
+    }
 
     // console.log(this.patientData?._id);
 
-    this.authService.getPatientDetailsWithBags(this.patientData._id).subscribe({
-      next: (res) => {
-        let allocationBags = res?.data?.allocations || [];
-        this.isAnyBag = allocationBags.length > 0;
+    // this.authService.getPatientDetailsWithBags(this.patientData._id).subscribe({
+    //   next: (res) => {
+    //     let allocationBags = res?.data?.allocations || [];
+    //     this.isAnyBag = allocationBags.length > 0;
 
-        if (this.isAnyBag) {
-          allocationBags.forEach((bag: any) => {
+    //     if (this.isAnyBag) {
+    //       allocationBags.forEach((bag: any) => {
 
-            let bagLabel = bag.bloodBagId?.bloodBagId || bag.bloodBagId?._id || bag._id;
+    //         let bagLabel = bag.bloodBagId?.bloodBagId || bag.bloodBagId?._id || bag._id;
 
-            // MINIFIED PAYLOAD: Short keys = less data = larger, readable QR blocks
-            // let essentialIds = {
-            //   bId: bag._id,
-            //   pId: this.patientData._id,
-            //   bbId: bag.bloodBagId?._id,
-            //   bbC: bag.bloodBagId?.bloodcomponent,
-            //   pN: `${this.patientData.firstname} ${this.patientData.lastname || ''}`.trim(),
-            //   uId: this.patientData.UHID || 'N/A',
-            //   hId: this.patientData.haemovigilId || 'N/A',
-            //   bG: this.patientData.bloodGroup || 'N/A',
-            //   bbN: bagLabel
-            // };
+    //         let barcodeValue = bag.allocationShortId || bag._id;
 
-            // let bagQrStr = JSON.stringify(essentialIds);
+    //         this.barcodeItems.push({
+    //           bcStr: barcodeValue,
+    //           displayBagId: bagLabel
+    //         });
 
-            // this.qrItems.push({
-            //   qrStr: bagQrStr,
-            //   displayBagId: bagLabel
-            // });
+    //       });
 
-            let barcodeValue = bag.allocationShortId || bag._id;
+    //       setTimeout(() => this.renderBarcodes(), 0);
+    //     }
 
-            this.barcodeItems.push({
-              bcStr: barcodeValue,
-              displayBagId: bagLabel
-            });
+    //   },
+    //   error: (err) => {
+    //     console.error("Error fetching patient bags:", err);
+    //   }
+    // });
+  }
 
-          });
-
-          setTimeout(() => this.renderBarcodes(), 0);
-        }
-
-      },
-      error: (err) => {
-        console.error("Error fetching patient bags:", err);
+  ngAfterViewInit() {
+    setTimeout(() => {
+      if (this.patientUHID) {
+        this.renderBarcodes();
       }
-    });
+    }, 0);
   }
 
   renderBarcodes() {
+    if(!this.patientUHID || !this.canvasRefs){
+      return;
+    }
+
     this.canvasRefs.forEach((canvasRef, index) => {
-      JsBarcode(canvasRef.nativeElement, this.barcodeItems[index].bcStr, {
+      JsBarcode(canvasRef.nativeElement, this.patientUHID as string, {
         format: "CODE128",
         lineColor: "#000",
         width: 1.5,       // 👈 CHANGE THIS: Reduces the thickness of the bars (try 1.2 or 1.5)
@@ -102,7 +100,7 @@ export class BarCodeComponent implements OnInit {
     // Convert each canvas into a Base64 image URL for printing
     this.canvasRefs.forEach((canvasRef, index) => {
       let dataUrl = canvasRef.nativeElement.toDataURL('image/png');
-      let bagLabel = this.barcodeItems[index].displayBagId;
+      let bagLabel = this.patientUHID;
 
       printContents += `
         <div class="qr-card">
