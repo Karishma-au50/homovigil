@@ -197,7 +197,7 @@ export class AllPatientComponent {
                 // Backend returns { status, data: { patient, totalBags, allocations } }
                 this.selectedPatientDetails = res.data.patient;
                 this.selectedPatientDetails.totalBags = res.data.totalBags || 0;
-                this.selectedPatientDetails.allocations = res.data.allocations || [];
+                this.selectedPatientDetails.allocations = res.data.allocations.filter((elm:any)=>elm.status != 'reserved') || [];
 
                 this.detailsVisible = true;
             },

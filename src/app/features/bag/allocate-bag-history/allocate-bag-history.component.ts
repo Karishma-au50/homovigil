@@ -40,7 +40,7 @@ export class AllocateBagHistoryComponent {
 
         this.authService.getAllAllocationsNoPagination().subscribe({
             next: (res: any) => {
-                this.row = res.data ?? [];
+                this.row = res.data.filter((elm:any)=>elm.status != 'reserved') ?? [];
                 this.isLoading = false;
             },
             error: () => {

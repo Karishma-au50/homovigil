@@ -136,8 +136,25 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
     }
 
     // ✅ Duplicates a bag (ONLY copies blood group)
+    // duplicateBag(index: number): void {
+    //     const bg = this.bags.at(index).get('bloodGroup')?.value || '';
+    //     this.addBag(bg);
+    // }
+
+    // ✅ Duplicates a bag (ONLY copies blood group)
     duplicateBag(index: number): void {
-        const bg = this.bags.at(index).get('bloodGroup')?.value || '';
+        const currentBag = this.bags.at(index) as FormGroup;
+        
+        // 1. Check if mandatory fields (Blood Group & Component) are filled
+        if (currentBag.invalid) {
+            // 2. Mark fields as touched so the red error borders show up
+            currentBag.markAllAsTouched(); 
+            // 3. Show error toast
+            this.showError('Incomplete Bag', 'Please fill the Blood Group and Component Type before duplicating.');
+            return; // Stop the duplication!
+        }
+
+        const bg = currentBag.get('bloodGroup')?.value || '';
         this.addBag(bg);
     }
 

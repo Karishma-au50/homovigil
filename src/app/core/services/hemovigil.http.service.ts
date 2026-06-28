@@ -106,4 +106,8 @@ export class HemoVigilHttpService {
         return this.http.patch(`${this.baseUrl}api/bloodbag/add-bag-id`, { bagId, bagObjectId, allocationId, transporterBoxId });
     }
 
+    public deleteAllocation(allocationId: string): Observable<ApiResponse<any>> {
+        return this.http.delete<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}`);
+    }
+
 }

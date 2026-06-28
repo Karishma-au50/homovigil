@@ -240,6 +240,21 @@ export class ReleaseBagComponent {
         });
     }
 
+    deleteAllocatedBag(allocationId: string): void {
+        this.confirmationService.confirm({
+            message: 'Are you sure you want to completely delete this allocation?',
+            header: 'Confirm Delete',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.authService.deleteAllocation(allocationId).subscribe({
+                    next: () => {
+                        this.loadPatients();
+                    }
+                });
+            }
+        });
+    }
+
     // 1. Method to open the new Modal
     openReleaseModal(row: any, index: number): void {
         this.selectedAllocationId = row._id;
@@ -335,7 +350,7 @@ export class ReleaseBagComponent {
                 this.loadPatients();
             },
             error: (err: any) => {
-                console.error('Failed to release bag', err);
+                console.error('Failed to issue bag', err);
                 this.isIssuingBag = false; // STOP LOADING ON ERROR
             }
         });

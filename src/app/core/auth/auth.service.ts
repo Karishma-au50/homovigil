@@ -340,6 +340,28 @@ export class AuthService {
         );
     }
 
+    deleteAllocation(allocationId: string): Observable<any> {
+        return this.hemoVigilService.deleteAllocation(allocationId).pipe(
+            tap(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Bag Deleted',
+                    detail: 'Allocated bag deleted successfully.',
+                    life: 3000
+                });
+            }),
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Delete Failed',
+                    detail: error.error?.message || 'An error occurred during deletion.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
     getPatientDetailsWithBags(patientId: string): Observable<any> {
         return this.hemoVigilService.getPatientDetailsWithBags(patientId).pipe(
             catchError((error) => {

@@ -180,7 +180,7 @@
             </div>
 
             <!-- Footer Actions -->
-            <div class="flex flex-col sm:flex-row justify-end items-center mt-6 pt-4 border-t gap-4">
+            <div class="flex flex-col sm:flex-row justify-center items-center mt-6 pt-4 border-t gap-4">
                 <p-button [label]="bags.length > 1 ? 'Allocate All (' + bags.length + ')' : 'Allocate Bag'"
                     (onClick)="onSubmit()" [loading]="isAllocating" [disabled]="recordFormStep2.invalid || isAllocating"
                     styleClass="!bg-green-600 hover:!bg-green-700 text-white px-8 py-2.5 !rounded !border-none font-bold w-full sm:w-auto shadow-md">

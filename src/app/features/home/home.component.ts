@@ -48,7 +48,7 @@ export class HomeComponent {
 
         this.authService.getAllAllocationsNoPagination().subscribe({
             next: (res: any) => {
-                this.records = res.data ?? [];
+                this.records = (res.data.filter((elm:any)=> elm.status != 'reserved')) ?? [];
                 this.allRecords = [...this.records];
                 this.isLoading = false;
 

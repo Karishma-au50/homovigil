@@ -46,7 +46,7 @@ export class AppMenu {
                 role: 'Admin',
                 items: [
                     { label: 'Allocate Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocateBag'] },
-                    { label: 'Release Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/releaseBag'] },
+                    { label: 'Issue Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/releaseBag'] },
                     { label: 'Blood Component Management', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocationHistory'] },
                     { label: 'Transfusion Update', icon: 'pi pi-fw pi-sitemap', routerLink: ['/transfusionUpdate'] }
                 ]
