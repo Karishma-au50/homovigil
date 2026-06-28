@@ -14,7 +14,7 @@
 </div>
 
 <!-- ADD / EDIT USER DIALOG -->
-<p-dialog [(visible)]="visible" [modal]="true" [closable]="false" [header]="modalTitle" styleClass="w-[28rem] md:w-[35rem]">
+<p-dialog [(visible)]="visible" [modal]="true" [closable]="false" [header]="modalTitle" [style]="{width: '400px'}" [breakpoints]="{ '768px': '75vw', '576px': '90vw' }">
     <ng-template pTemplate="content">
         <!-- Connecting to the existing detail component -->
         <app-users-detail [formData]="selectedUser" (closeDialog)="closeDialog($event)">
@@ -28,12 +28,12 @@
 
     <ng-template pTemplate="header">
         <tr class="bg-red-700 text-white text-m px-5 py-3 font-semibold">
-            <th class="rounded-tl-xl !px-5 !py-3">S.No</th>
-            <th class="!px-5 !py-3">Name</th>
-            <th class="!px-5 !py-3">Phone</th>
-            <th class="!px-5 !py-3">Email</th>
-            <th class="!px-5 !py-3">Role</th>
-            <th class="rounded-tr-xl !px-5 !py-3">Action</th>
+            <th class="rounded-tl-xl !px-5 !py-2">S.No</th>
+            <th class="!px-5 !py-2">Name</th>
+            <th class="!px-5 !py-2">Phone</th>
+            <th class="!px-5 !py-2">Email</th>
+            <th class="!px-5 !py-2">Role</th>
+            <th class="rounded-tr-xl !px-5 !py-2">Action</th>
         </tr>
     </ng-template>
 
@@ -42,14 +42,14 @@
 
             <!-- SHIMMER/SKELETON STATE -->
             <ng-container *ngIf="isLoading">
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton></p-skeleton></td>
                 <!-- Custom skeleton for the role badge -->
-                <td class="!px-5 !py-3"><p-skeleton width="4rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton width="4rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
                 <!-- Custom skeleton for the action buttons -->
-                <td class="!px-5 !py-3">
+                <td class="!px-5 !py-1">
                     <div class="flex items-center gap-2">
                         <p-skeleton shape="circle" size="2rem"></p-skeleton>
                         <span class="text-gray-400">|</span>
@@ -59,19 +59,19 @@
             </ng-container>
 
             <ng-container *ngIf="!isLoading">
-                <td class="!px-5 !py-3">{{ i + 1 }}</td>
-                <td class="!px-5 !py-3 font-medium">
+                <td class="!px-5 !py-1">{{ i + 1 }}</td>
+                <td class="!px-5 !py-1 font-medium">
                     {{ row.name | titlecase }}
                 </td>
-                <td class="!px-5 !py-3">{{ row.phone }}</td>
-                <td class="!px-5 !py-3">{{ row.email || 'N/A' }}</td>
-                <td class="!px-5 !py-3">
+                <td class="!px-5 !py-1">{{ row.phone }}</td>
+                <td class="!px-5 !py-1">{{ row.email || 'N/A' }}</td>
+                <td class="!px-5 !py-1">
                     <span class="border px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
-                        [ngClass]="getRoleColors(row.role)">
-                        {{ row.role }}
+                        [ngClass]="getRoleColors(row.role === 'sales' ? 'ward' : row.role)">
+                        {{ row.role === 'sales' ? 'ward' : row.role }}
                     </span>
                 </td>
-                <td class="!px-5 !py-3">
+                <td class="!px-5 !py-1">
                     <div class="flex items-center gap-2">
                         <button pButton type="button" icon="pi pi-pencil"
                             class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit" (click)="editUser(row)">

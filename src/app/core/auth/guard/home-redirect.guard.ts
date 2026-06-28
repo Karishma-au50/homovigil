@@ -13,9 +13,9 @@ export const HomeRedirectGuard: CanActivateFn = (route, state) => {
         try {
             const decodedToken: any = jwtHelper.decodeToken(token);
             const role = decodedToken?.role?.toLowerCase();
-
-            // If the user has the sales role, reroute them to /sales
-            if (role === 'sales') {
+            // alert(role)
+            // If the user has the ward role, reroute them to /sales
+            if (role === 'ward' || role === 'sales') {
                 return router.parseUrl('/sales');
             }
         } catch (error) {

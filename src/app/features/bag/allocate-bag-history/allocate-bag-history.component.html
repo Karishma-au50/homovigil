@@ -34,17 +34,17 @@
   ]" responsiveLayout="scroll" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
     <ng-template pTemplate="header">
         <tr class="bg-red-700 text-white text-left text-m font-semibold">
-            <th class="rounded-tl-xl !px-5 !py-3 whitespace-nowrap" pTooltip="Transporter Box ID" 
+            <th class="rounded-tl-xl !px-5 !py-2 whitespace-nowrap" pTooltip="Transporter Box ID" 
                     tooltipPosition="bottom">TBID</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Bag ID</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">UHID No</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Ward No</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">HaemovigilID</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Patient Name</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Blood Group</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Blood Component</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Status</th>
-            <th class="rounded-tr-xl !px-5 !py-3 whitespace-nowrap">Allocated On</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Bag ID</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">UHID No</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Ward No</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">HaemovigilID</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Patient Name</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Blood Group</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Blood Component</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Status</th>
+            <th class="rounded-tr-xl !px-5 !py-2 whitespace-nowrap">Allocated On</th>
         </tr>
     </ng-template>
 
@@ -53,36 +53,36 @@
 
              <!-- SHIMMER/SKELETON STATE -->
             <ng-container *ngIf="isLoading">
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton width="3rem"></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton width="5rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton width="8rem"></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton width="3rem"></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton width="5rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton width="8rem"></p-skeleton></td>
             </ng-container>
 
             <ng-container *ngIf="!isLoading">
-                <td class="!px-5 !py-3 !text-center">{{ row?.transporterBoxId }}</td>
-                <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodBagId || 'N/A' }}</td>
-                <td class="!px-5 !py-3">{{ row.patientId?.UHID }}</td>
-                <td class="!px-5 !py-3">{{ row.patientId?.wardNumber || 'N/A' }}</td>
-                <td class="!px-5 !py-3">{{ row.HaemovigilID || row.patientId?.haemovigilId }}</td>
-                <td class="!px-5 !py-3">{{ row.patientId?.firstname | titlecase }} {{ row.patientId?.lastname | titlecase }}
+                <td class="!px-5 !py-2 !text-center">{{ row?.transporterBoxId || 'N/A' }}</td>
+                <td class="!px-5 !py-2">{{ row.bloodBagId?.bloodBagId || 'N/A' }}</td>
+                <td class="!px-5 !py-2">{{ row.patientId?.UHID }}</td>
+                <td class="!px-5 !py-2">{{ row.patientId?.wardNumber || 'N/A' }}</td>
+                <td class="!px-5 !py-2">{{ row.HaemovigilID || row.patientId?.haemovigilId }}</td>
+                <td class="!px-5 !py-2">{{ row.patientId?.firstname | titlecase }} {{ row.patientId?.lastname | titlecase }}
                 </td>
-                <td class="!px-5 !py-3">{{ row.patientId?.bloodGroup || 'N/A' }}</td>
-                <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodcomponent }}</td>
-                <td class="!px-5 !py-3">
+                <td class="!px-5 !py-2">{{ row.patientId?.bloodGroup || 'N/A' }}</td>
+                <td class="!px-5 !py-2">{{ row.bloodBagId?.bloodcomponent }}</td>
+                <td class="!px-5 !py-2">
                     <!-- {{ row.status }} -->
                     <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize"
                         [ngClass]="badgeClass(row.status)">
                         {{ formatStatus(row.status) }}
                     </span>
                 </td>
-                <td class="!px-5 !py-3 whitespace-nowrap">{{ row.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+                <td class="!px-5 !py-2 whitespace-nowrap">{{ row.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
             </ng-container>
 
         </tr>

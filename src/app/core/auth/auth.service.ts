@@ -221,27 +221,27 @@ export class AuthService {
     allocateBag(bagData: any): Observable<any> {
         return this.hemoVigilService.allocateBag(bagData).pipe(
             tap(() => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Bag Allocation Successful',
-                    detail: 'Bag allocated successfully.',
-                    life: 3000
-                });
+                // this.messageService.add({
+                //     severity: 'success',
+                //     summary: 'Bag Allocation Successful',
+                //     detail: 'Bag allocated successfully.',
+                //     life: 3000
+                // });
             }),
             catchError((error) => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Allocation Failed',
-                    detail: error.error?.message || 'An error occurred during bag allocation.',
-                    life: 3000
-                });
+                // this.messageService.add({
+                //     severity: 'error',
+                //     summary: 'Allocation Failed',
+                //     detail: error.error?.message || 'An error occurred during bag allocation.',
+                //     life: 3000
+                // });
                 return throwError(() => error);
             })
         );
     }
 
-    addBloodbagId(bagId: string, bagObjectId: string): Observable<any> {
-        return this.hemoVigilService.addBloodbagId(bagId, bagObjectId).pipe(
+    addBloodbagId(bagId: string, bagObjectId: string, allocationId?: string, transporterBoxId?: string): Observable<any> {
+        return this.hemoVigilService.addBloodbagId(bagId, bagObjectId, allocationId, transporterBoxId).pipe(
             tap(() => {
                 this.messageService.add({
                     severity: 'success',
@@ -296,8 +296,8 @@ export class AuthService {
         }
     }
     // Release allocated bag
-    releaseAllocatedBag(allocationId: string, releaseUserName: string): Observable<any> {
-        return this.hemoVigilService.releaseAllocatedBag(allocationId, releaseUserName).pipe(
+    releaseAllocatedBag(allocationId: string, payload: any): Observable<any> {
+        return this.hemoVigilService.releaseAllocatedBag(allocationId, payload).pipe(
             tap(() => {
                 this.messageService.add({
                     severity: 'success',

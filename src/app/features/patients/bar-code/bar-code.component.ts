@@ -94,20 +94,24 @@ export class BarCodeComponent implements OnInit {
     this.closeDialog.emit();
   }
 
-  printQrCodes() {
+  printQrCodes(copiesStr: string = '1') {
     let printContents = '';
+    const copies = parseInt(copiesStr, 10) || 1;
 
     // Convert each canvas into a Base64 image URL for printing
     this.canvasRefs.forEach((canvasRef, index) => {
       let dataUrl = canvasRef.nativeElement.toDataURL('image/png');
       let bagLabel = this.patientUHID;
 
-      printContents += `
-        <div class="qr-card">
-          <img src="${dataUrl}" />
-          <p class="bag-label">${bagLabel}</p>
-        </div>
-      `;
+      for (let i = 0; i < copies; i++) {
+        printContents += `
+          <div class="qr-card">
+            <img src="${dataUrl}" />
+            <p class="bag-label">${bagLabel}</p>
+          </div>
+        `;
+      }
+
     });
 
     if (!printContents) return;

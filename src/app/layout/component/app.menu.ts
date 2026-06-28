@@ -53,6 +53,13 @@ export class AppMenu {
             },
             {
                 label: 'Sales Management',
+                role: 'ward', // Custom property for filtering
+                items: [
+                    { label: 'Sales', icon: 'pi pi-fw pi-user', routerLink: ['/sales'] }
+                ]
+            },
+            {
+                label: 'Sales Management',
                 role: 'sales', // Custom property for filtering
                 items: [
                     { label: 'Sales', icon: 'pi pi-fw pi-user', routerLink: ['/sales'] }
@@ -75,8 +82,16 @@ export class AppMenu {
             .filter(item => {
                 const itemRole = item.role?.toLowerCase();
 
+                if (item.label === 'User Management' && currentRole === 'user') {
+                    return false;
+                }
+                
                 // 3. Explicitly check for the 'sales' role restriction. 
                 // If the item is marked for sales, ONLY sales can see it.
+                if (itemRole === 'ward') {
+                    return currentRole === 'ward';
+                }
+
                 if (itemRole === 'sales') {
                     return currentRole === 'sales';
                 }

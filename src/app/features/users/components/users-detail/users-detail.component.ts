@@ -36,7 +36,7 @@ export class UsersDetailComponent implements OnInit {
     { label: 'User', value: 'user' },
     { label: 'Admin', value: 'admin' },
     { label: 'Super Admin', value: 'superAdmin' },
-    { label: 'Sales', value: 'sales' }
+    { label: 'Ward', value: 'ward' }
   ];
 
   constructor(private usersService: UsersService,

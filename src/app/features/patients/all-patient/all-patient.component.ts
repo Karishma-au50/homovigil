@@ -62,8 +62,10 @@ export class AllPatientComponent {
     // Component variables
     modalTitle: string = 'Add New Patient';
     selectedPatient: Patient | null = null;
+    currentRole:string|null = '';
 
     ngOnInit(): void {
+        this.currentRole = this.authService.currentUser?.role || null;
         this.loadPatients();
     }
 

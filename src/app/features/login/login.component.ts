@@ -54,11 +54,11 @@ export class LoginComponent {
                     const userRole = this.authService.currentUser?.role || response?.role;
 
                     // Conditionally route based on the role
-                    if (userRole && userRole.toLowerCase() === 'sales') {
+                    if (userRole && (userRole.toLowerCase() === 'ward' || userRole.toLowerCase() === 'sales') ) {
                         this.router.navigate(['/sales']);
                     } else {
                         // Default redirection for Admin and other roles
-                        this.router.navigate(['/home']);
+                        this.router.navigate(['/allPatient']);
                     }
                 },
                 (error) => {

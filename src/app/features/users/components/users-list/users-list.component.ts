@@ -108,7 +108,7 @@ export class UsersListComponent implements OnInit {
         return 'border-green-600 bg-green-100 text-green-700';
       case 'admin':
         return 'border-red-600 bg-red-100 text-red-700';
-      case 'sales':
+      case 'ward':
         return 'border-blue-600 bg-blue-100 text-blue-700';
       case 'user':
       default:

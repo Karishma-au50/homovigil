@@ -66,17 +66,17 @@
                             <tr>
                                 <th>Bag ID</th>
                                 <th>Component</th>
-                                <th>Status</th>
+                                <th class="!text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr *ngFor="let a of selectedPatientDetails.allocations">
                                 <td>{{ a.bloodBagId?.bloodBagId || 'N/A' }}</td>
                                 <td>{{ a.bloodBagId?.bloodcomponent }}</td>
-                                <td>
-                                    <span class="status-badge">
-                                        {{ a.status }}
-                                    </span>
+                                <td class="flex justify-center">
+                                    <p class="status-badge">
+                                        {{ a.status == 'released' ? 'Issued' : a.status }}
+                                    </p>
                                 </td>
                             </tr>
                         </tbody>
@@ -101,14 +101,14 @@
 
     <ng-template pTemplate="header">
         <tr class="bg-red-700 text-white text-m px-5 py-3 font-semibold">
-            <th class="rounded-tl-xl !px-5 !py-3 whitespace-nowrap">S.No</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Patient Name</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">UHID No</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Ward No</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Created On</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Haemovigil Id</th>
-            <th class="!px-5 !py-3 whitespace-nowrap">Blood Group</th>
-            <th class="rounded-tr-xl !px-5 !py-3 whitespace-nowrap !text-center">Action</th>
+            <th class="rounded-tl-xl !px-5 !py-2 whitespace-nowrap">S.No</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Patient Name</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">UHID No</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Ward No</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Created On</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Haemovigil Id</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Blood Group</th>
+            <th class="rounded-tr-xl !px-5 !py-2 whitespace-nowrap !text-center">Action</th>
         </tr>
     </ng-template>
 
@@ -117,44 +117,44 @@
 
             <!-- SHIMMER/SKELETON STATE -->
             <ng-container *ngIf="isLoading">
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton width="80%"></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton width="3rem"></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton width="8rem"></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton width="6rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
-                <td class="!px-5 !py-3"><p-skeleton width="3rem"></p-skeleton></td>
-                <td class="!px-5 !py-3">
+                <td class="!px-5 !py-1"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton width="80%"></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton width="3rem"></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton width="8rem"></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton width="6rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton width="3rem"></p-skeleton></td>
+                <td class="!px-5 !py-1">
                     <div class="flex items-center justify-center gap-2">
                         <p-skeleton shape="circle" size="2rem"></p-skeleton>
                         <span class="text-gray-400">|</span>
                         <p-skeleton shape="circle" size="2rem"></p-skeleton>
                         <span class="text-gray-400">|</span>
                         <p-skeleton shape="circle" size="2rem"></p-skeleton>
-                        <span class="text-gray-400">|</span>
-                        <p-skeleton shape="circle" size="2rem"></p-skeleton>
+                        <span class="text-gray-400" *ngIf="currentRole!='user'">|</span>
+                        <p-skeleton shape="circle" size="2rem" *ngIf="currentRole!='user'"></p-skeleton>
                     </div>
                 </td>
             </ng-container>
 
              <!-- ACTUAL DATA STATE (Your existing code) -->
             <ng-container *ngIf="!isLoading">
-                <td class="!px-5 !py-3">{{ i + 1 }}</td>
-                <td class="!px-5 !py-3">
+                <td class="!px-5 !py-1">{{ i + 1 }}</td>
+                <td class="!px-5 !py-1">
                     <button class="text-red-600 font-semibold hover:underline" (click)="viewPatientDetails(row)">
                         {{ row.firstname | titlecase }} {{ row.lastname | titlecase }}
                     </button>
                 </td>
-                <td class="!px-5 !py-3">{{ row.UHID }}</td>
-                <td class="!px-5 !py-3">{{ row.wardNumber || 'N/A' }}</td>
-                <td class="!px-5 !py-3 whitespace-nowrap">{{ row.createdAt | date: 'MMM dd, yyyy | hh:mm a' }}</td>
-                <td class="!px-5 !py-3">
+                <td class="!px-5 !py-1">{{ row.UHID }}</td>
+                <td class="!px-5 !py-1">{{ row.wardNumber || 'N/A' }}</td>
+                <td class="!px-5 !py-1 whitespace-nowrap">{{ row.createdAt | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+                <td class="!px-5 !py-1">
                     <span class="border border-red-600 px-3 py-1 rounded-full text-xs font-bold">
                         {{ row.haemovigilId }}
                     </span>
                 </td>
-                <td class="!px-5 !py-3">{{ row.bloodGroup || 'N/A' }}</td>
-                <td class="!px-5 !py-3">
+                <td class="!px-5 !py-1">{{ row.bloodGroup || 'N/A' }}</td>
+                <td class="!px-5 !py-1">
                     <div class="flex items-center justify-center gap-2">
                         <button pButton type="button" icon="pi pi-barcode"
                             class="p-button-text text-red-600 hover:text-red-800" pTooltip="Generate Barcode"  tooltipPosition="left"
@@ -175,9 +175,9 @@
                             (click)="editPatient(row)">
                         </button>
     
-                        <span class="text-gray-400">|</span>
-    
-                        <button pButton type="button" icon="pi pi-trash"
+                        <span class="text-gray-400" *ngIf="currentRole!='user'">|</span>
+                        
+                        <button pButton type="button" icon="pi pi-trash" *ngIf="currentRole!='user'"
                             class="p-button-text text-red-600 hover:text-red-800" pTooltip="Delete"  tooltipPosition="left"
                             (click)="confirmDelete(row)">
                         </button>
@@ -206,7 +206,7 @@
 
 </p-table>
 
-<p-dialog [(visible)]="qrVisible" [closable]="false" modal="true" dismissableMask="true" header="Bar Code Scanner"
+<p-dialog [(visible)]="qrVisible" [closable]="true" modal="true" dismissableMask="true" header="Generate Patient Barcode"
     [style]="{ minWidth: '280px', maxWidth: '800px' }">
     <ng-template pTemplate="content">
         <app-bar-code *ngIf="qrVisible" [patientData]="selectedPatientForQr"

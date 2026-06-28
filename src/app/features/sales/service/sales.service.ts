@@ -55,9 +55,9 @@ export class SalesService {
     return this.http.get(`${this.apiUrl}/bloodbag/${bloodBagId}`);
   }
 
-  getDetailsFromBarcodeApi(shortId: string) {
-    return this.http.get(`${this.apiUrl}/sales/barcode/${shortId}`);
-  }
+  // getDetailsFromBarcodeApi(shortId: string) {
+  //   return this.http.get(`${this.apiUrl}/sales/barcode/${shortId}`);
+  // }
 
   // Step 1: Create bulk record on "Process" click
   createTransfusionApi(payload: any): Observable<any> {

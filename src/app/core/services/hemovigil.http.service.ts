@@ -57,8 +57,8 @@ export class HemoVigilHttpService {
     public deletePatient(id: string) {
         return this.http.delete(`${this.baseUrl}api/patient/${id}`);
     }
-    public releaseAllocatedBag(allocationId: string, releaseUserName: string): Observable<ApiResponse<any>> {
-        return this.http.patch<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}/release`, { releaseUserName });
+    public releaseAllocatedBag(allocationId: string, payload: any): Observable<ApiResponse<any>> {
+        return this.http.patch<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}/release`, { payload });
     }
     public reserveAllocatedBag(allocationId: string): Observable<ApiResponse<any>> {
         return this.http.patch<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}/reserve`, {});
@@ -102,8 +102,8 @@ export class HemoVigilHttpService {
         return this.http.get(url);
     }
 
-    addBloodbagId(bagId: string, bagObjectId: string): Observable<any> {
-        return this.http.patch(`${this.baseUrl}api/bloodbag/add-bag-id`, { bagId, bagObjectId });
+    addBloodbagId(bagId: string, bagObjectId: string, allocationId?: string, transporterBoxId?: string): Observable<any> {
+        return this.http.patch(`${this.baseUrl}api/bloodbag/add-bag-id`, { bagId, bagObjectId, allocationId, transporterBoxId });
     }
 
 }
