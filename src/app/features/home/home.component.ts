@@ -14,11 +14,14 @@ import { Router } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
     selector: 'app-home',
     standalone: true,
-    imports: [SkeletonModule, CommonModule, FormsModule, DropdownModule, ButtonModule, DatePickerModule, TableModule, InputIconModule, ToolbarModule, IconFieldModule, InputTextModule, TooltipModule],
+    imports: [SkeletonModule, CommonModule, FormsModule, DropdownModule, ButtonModule, DatePickerModule, TableModule, InputIconModule, ToolbarModule, IconFieldModule, InputTextModule, TooltipModule, ConfirmDialogModule],
+    providers: [ConfirmationService],
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss']
 })
@@ -36,7 +39,8 @@ export class HomeComponent {
 
     constructor(
         private authService: AuthService,
-        private router: Router
+        private router: Router,
+        private confirmationService: ConfirmationService
     ) {}
     
     ngOnInit(): void {
@@ -135,5 +139,25 @@ export class HomeComponent {
         this.fromDate = null;
         this.toDate = null;
         this.records = [...this.allRecords];
+    }
+
+    confirmRemove(record: any) {
+        this.confirmationService.confirm({
+            message: 'Are you sure you want to remove?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                if (record._id) {
+                    this.authService.deleteAllocation(record._id).subscribe({
+                        next: () => {
+                            this.loadPatients(); // refresh data
+                        },
+                        error: (err) => {
+                            console.error('Failed to remove allocation', err);
+                        }
+                    });
+                }
+            }
+        });
     }
 }

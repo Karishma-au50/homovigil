@@ -50,6 +50,10 @@ export class HemoVigilHttpService {
         return this.http.post<ApiResponse<BagAllocation>>(`${this.baseUrl}api/allocation`, bagAllocation);
     }
 
+    public allocateMultipleBags(bagAllocations: BagAllocation[]): Observable<ApiResponse<BagAllocation[]>> {
+        return this.http.post<ApiResponse<BagAllocation[]>>(`${this.baseUrl}api/allocation/bulk`, bagAllocations);
+    }
+
     public updatePatient(user: any, id: string): Observable<ApiResponse<any>> {
         return this.http.put<ApiResponse<User>>(`${this.baseUrl}api/patient/${id}`, user);
     }

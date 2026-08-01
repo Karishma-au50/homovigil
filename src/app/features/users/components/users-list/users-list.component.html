@@ -32,8 +32,10 @@
             <th class="!px-5 !py-2">Name</th>
             <th class="!px-5 !py-2">Phone</th>
             <th class="!px-5 !py-2">Email</th>
+            <th class="!px-5 !py-2 !text-center">Password</th>
             <th class="!px-5 !py-2">Role</th>
-            <th class="rounded-tr-xl !px-5 !py-2">Action</th>
+            <th class="!px-5 !py-2">Created On</th>
+            <th class="rounded-tr-xl !px-5 !py-2 !text-center">Action</th>
         </tr>
     </ng-template>
 
@@ -46,11 +48,13 @@
                 <td class="!px-5 !py-1"><p-skeleton></p-skeleton></td>
                 <td class="!px-5 !py-1"><p-skeleton></p-skeleton></td>
                 <td class="!px-5 !py-1"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton></p-skeleton></td>
                 <!-- Custom skeleton for the role badge -->
                 <td class="!px-5 !py-1"><p-skeleton width="4rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
+                <td class="!px-5 !py-1"><p-skeleton width="8rem"></p-skeleton></td>
                 <!-- Custom skeleton for the action buttons -->
                 <td class="!px-5 !py-1">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center justify-center gap-2">
                         <p-skeleton shape="circle" size="2rem"></p-skeleton>
                         <span class="text-gray-400">|</span>
                         <p-skeleton shape="circle" size="2rem"></p-skeleton>
@@ -65,14 +69,16 @@
                 </td>
                 <td class="!px-5 !py-1">{{ row.phone }}</td>
                 <td class="!px-5 !py-1">{{ row.email || 'N/A' }}</td>
+                <td class="!px-5 !py-1 !text-center">{{ row.password || 'N/A' }}</td>
                 <td class="!px-5 !py-1">
                     <span class="border px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
                         [ngClass]="getRoleColors(row.role === 'sales' ? 'ward' : row.role)">
                         {{ row.role === 'sales' ? 'ward' : row.role }}
                     </span>
                 </td>
+                <td class="!px-5 !py-1 whitespace-nowrap">{{ row.createdAt | date: 'MMM dd, yyyy | hh:mm a' }}</td>
                 <td class="!px-5 !py-1">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 justify-center">
                         <button pButton type="button" icon="pi pi-pencil"
                             class="p-button-text text-red-600 hover:text-red-800" pTooltip="Edit" (click)="editUser(row)">
                         </button>
@@ -92,7 +98,7 @@
 
     <ng-template pTemplate="emptymessage">
         <tr *ngIf="!isLoading">
-            <td colspan="6" class="text-center py-8 text-gray-700 text-xl">
+            <td colspan="8" class="text-center py-8 text-gray-700 text-xl">
                 <div class="flex justify-center items-center h-full">No users found</div>
             </td>
         </tr>

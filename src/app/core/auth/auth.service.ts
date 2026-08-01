@@ -240,6 +240,14 @@ export class AuthService {
         );
     }
 
+    allocateMultipleBags(bagDataArray: any[]): Observable<any> {
+        return this.hemoVigilService.allocateMultipleBags(bagDataArray).pipe(
+            catchError((error) => {
+                return throwError(() => error);
+            })
+        );
+    }
+
     addBloodbagId(bagId: string, bagObjectId: string, allocationId?: string, transporterBoxId?: string): Observable<any> {
         return this.hemoVigilService.addBloodbagId(bagId, bagObjectId, allocationId, transporterBoxId).pipe(
             tap(() => {

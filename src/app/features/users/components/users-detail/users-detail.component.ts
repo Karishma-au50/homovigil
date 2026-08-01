@@ -28,14 +28,13 @@ export class UsersDetailComponent implements OnInit {
 
   user: Partial<User> = {};
 
-  isAdminOrSuperAdmin: boolean = false;
+  isAdmin: boolean = false;
   showPassword = false;
   isSaving = false;
 
   roles = [
     { label: 'User', value: 'user' },
     { label: 'Admin', value: 'admin' },
-    { label: 'Super Admin', value: 'superAdmin' },
     { label: 'Ward', value: 'ward' }
   ];
 
@@ -50,8 +49,8 @@ export class UsersDetailComponent implements OnInit {
     }
 
     const currentUser = this.authService.currentUser;
-    if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'superAdmin')) {
-      this.isAdminOrSuperAdmin = true;
+    if (currentUser && currentUser.role === 'admin') {
+      this.isAdmin = true;
     }
   }
 
@@ -76,8 +75,8 @@ export class UsersDetailComponent implements OnInit {
     const isRoleValid = !!this.user.role;
 
     if (!this.user._id) {
-      // New user: Name, Phone, Role, and Password (min 6 chars) are all mandatory
-      const isPasswordValid = !!(this.user.password && this.user.password.length >= 6);
+      // New user: Name, Phone, Role, and Password are all mandatory
+      const isPasswordValid = !!this.user.password;
       return !isNameValid || !isPhoneValid || !isRoleValid || !isPasswordValid;
     }
 

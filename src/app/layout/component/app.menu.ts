@@ -76,7 +76,7 @@ export class AppMenu {
         const currentRole = role?.toLowerCase();
 
         // 2. Define privileged roles in lowercase
-        const privilegedRoles = ['admin', 'superadmin', 'user'];
+        const privilegedRoles = ['admin', 'user', 'ward'];
 
         return menu
             .filter(item => {
@@ -96,7 +96,7 @@ export class AppMenu {
                     return currentRole === 'sales';
                 }
 
-                // 4. If the user is an admin/superadmin, they can see all OTHER items
+                // 4. If the user is an admin, they can see all OTHER items
                 if (currentRole && privilegedRoles.includes(currentRole)) {
                     return true;
                 }

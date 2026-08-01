@@ -286,39 +286,28 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
             return;
         }
 
-        const requests = this.bags.controls.map(bagCtrl => {
-            const payload = {
+        const payloadArray = this.bags.controls.map(bagCtrl => {
+            return {
                 patientId: this.patientData!._id,
                 bloodBagId: bagCtrl.value.bagId,
                 bloodGroup: bagCtrl.value.bloodGroup,
                 bloodcomponent: bagCtrl.value.componentType
             };
-            return this.authService.allocateBag(payload);
         });
-
-
-        // const payload = {
-        //     patientId: this.patientData._id,
-        //     // transporterBoxId: this.recordFormStep2.value.transporterBoxId,
-        //     bloodBagId: this.recordFormStep2.value.bagId,
-        //     bloodGroup: this.recordFormStep2.value.bloodGroup,
-        //     bloodcomponent: this.recordFormStep2.value.componentType
-        // };
 
         this.isAllocating = true; 
 
-        forkJoin(requests).subscribe({
+        this.authService.allocateMultipleBags(payloadArray).subscribe({
             next: () => {
                 this.isAllocating = false;
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Success',
-                    detail: `${requests.length} bag(s) allocated successfully`
+                    detail: `${payloadArray.length} bag(s) allocated successfully`
                 });
 
                 // 🔁 RESET FLOW
                 this.activeIndex = 0;
-                // this.recordFormStep2.reset();
                 this.recordFormStep2 = this.fb.group({
                     bags: this.fb.array([this.createBagFormGroup()])
                 });
@@ -326,7 +315,7 @@ export class AllocateBagComponent implements OnInit, OnDestroy {
             },
             error: (err) => {
                 this.isAllocating = false;
-                this.showError('Allocation Error', err?.error?.message || 'Failed to allocate');
+                this.showError('Allocation Error', err?.error?.message || 'Failed to allocate bags');
             }
         });
     }

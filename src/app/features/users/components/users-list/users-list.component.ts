@@ -104,8 +104,6 @@ export class UsersListComponent implements OnInit {
 
   getRoleColors(role: string): string {
     switch (role?.toLowerCase()) {
-      case 'superadmin':
-        return 'border-green-600 bg-green-100 text-green-700';
       case 'admin':
         return 'border-red-600 bg-red-100 text-red-700';
       case 'ward':

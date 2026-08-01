@@ -44,6 +44,7 @@
                 <th class="!px-5 !py-2 whitespace-nowrap">Blood Component</th>
                 <th class="!px-5 !py-2 whitespace-nowrap">Status</th>
                 <th class="!px-5 !py-2 whitespace-nowrap">Allocated On</th>
+                <th class="!px-2 !py-2 whitespace-nowrap text-center">Action</th>
             </tr>
         </ng-template>
 
@@ -64,6 +65,7 @@
                     <td class="!px-5 !py-1"><p-skeleton></p-skeleton></td>
                     <td class="!px-5 !py-1"><p-skeleton shape="circle" size="2rem"></p-skeleton></td>
                     <td class="!px-5 !py-1"><p-skeleton></p-skeleton></td>
+                    <td class="!px-2 !py-1 text-center"><p-skeleton shape="circle" size="2rem"></p-skeleton></td>
                 </ng-container>
 
                 <ng-container *ngIf="!isLoading">
@@ -90,17 +92,25 @@
                     </td>
     
                     <td class="px-5 py-3 whitespace-nowrap">{{ rec.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+                    
+                    <td class="!px-2 !py-1 text-center">
+                        @if(rec.status == 'released'){
+                            <button pButton type="button" icon="pi pi-undo" class="p-button-rounded p-button-text p-button-danger"
+                                pTooltip="Remove" tooltipPosition="left" (click)="confirmRemove(rec)">
+                            </button>
+                        }
+                    </td>
                 </ng-container>
 
             </tr>
         </ng-template>
-        <ng-template pTemplate="emptymessage">
-            <tr *ngIf="!isLoading">
-                <td colspan="11" class="text-center py-8 text-gray-700 text-xl">
-                    <div class="flex justify-center items-center h-full">No data found</div>
-                </td>
-            </tr>
-        </ng-template>
+    <ng-template pTemplate="emptymessage">
+        <tr *ngIf="!isLoading">
+            <td colspan="12" class="text-center py-8 text-gray-700 text-xl">
+                <div class="flex justify-center items-center h-full">No data found</div>
+            </td>
+        </tr>
+    </ng-template>
 
         <!-- PAGINATOR -->
         <ng-template pTemplate="paginatorcenter">
@@ -108,3 +118,12 @@
         </ng-template>
     </p-table>
 </div>
+
+<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle" [style]="{width: '450px'}" [closable]="false" >
+    <ng-template pTemplate="accept">
+        <p-button label="Yes" icon="pi pi-check" severity="danger"></p-button>
+    </ng-template>
+    <ng-template pTemplate="reject">
+        <p-button label="No" icon="pi pi-times" severity="secondary" [outlined]="true"></p-button>
+    </ng-template>
+</p-confirmDialog>

@@ -28,14 +28,14 @@
     </div>
 
     <!-- Password Field (Only show when creating a new user, not editing) -->
-    <div class="flex flex-col gap-2" *ngIf="!user._id || isAdminOrSuperAdmin">
+    <div class="flex flex-col gap-2" *ngIf="!user._id || isAdmin">
         <label for="password" class="font-semibold text-gray-700">
             {{ user._id ? 'Reset Password' : 'Password' }} <span class="text-red-600">*</span>
         </label>
 
         <div class="relative w-full">
             <input pInputText [type]="showPassword ? 'text' : 'password'" id="password" [(ngModel)]="user.password"
-                [placeholder]="user._id ? 'Enter new password (min 6 chars)' : 'Min 6 characters'"
+                [placeholder]="user._id ? 'Enter new password' : 'Enter password'"
                 class="w-full pr-10" />
 
             <i class="pi absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-800 transition-colors"
