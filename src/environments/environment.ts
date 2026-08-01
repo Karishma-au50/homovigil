@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://testhaemovigilapi.atf-labs.com/'
+    apiUrl: 'https://haemovigilapi.atf-labs.com/'
 };
