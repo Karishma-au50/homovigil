@@ -1,26 +1,27 @@
 <div class="h-full flex items-center justify-center">
-    <div class="flex flex-col items-center">
+    <div class="w-full flex flex-col items-center">
         <!-- Header -->
-        <div class="bg-red-700 text-white p-6 rounded-t-xl w-full flex justify-between">
-            <h2 class="text-3xl text-white tracking-wide m-0">{{ isEditMode ? 'Edit Patient Entry' : 'New Patient Entry'
+        <div class="bg-red-700 text-white px-6 py-3 rounded-t-xl !w-full flex justify-between">
+            <h2 class="text-2xl text-white tracking-wide m-0">{{ isEditMode ? 'Edit Patient Entry' : 'New Patient Entry'
                 }}</h2>
-            <p-button icon="pi pi-times" aria-label="Close" (click)="onClose(false)" severity="contrast" />
+            <p-button icon="pi pi-times" aria-label="Close" (click)="onClose(false)"
+                styleClass="!rounded-full !text-sm !bg-red-700 !border-none" />
         </div>
 
         <!-- Form -->
-        <form [formGroup]="registerPatient" (ngSubmit)="onSubmit()">
-            <div class="p-10">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <label class="block text-muted-color mb-2 font-medium">UHID</label>
+        <form [formGroup]="registerPatient" (ngSubmit)="onSubmit()" class="w-full">
+            <div class="px-6 py-4 lg:px-6 lg:py-6">
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-3 !mb-4">
+                    <div class="col-span-1 md:col-span-2">
+                        <label class="block text-muted-color mb-2 font-semibold">UHID <span class="text-red-600">*</span> </label>
                         <input type="text" formControlName="UHID" placeholder="Enter UHID"
-                            class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                            class="w-full placeholder:text-md border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
 
-                    <div>
-                        <label class="block text-muted-color mb-2 font-medium">Blood Group</label>
+                    <div class="col-span-1 md:col-span-2">
+                        <label class="block text-muted-color mb-2 font-semibold">Blood Group</label>
                         <select formControlName="bloodGroup"
-                            class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                            class="w-full placeholder:text-md border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
                             <option disabled selected hidden>--Select Blood Group--</option>
                             <option>A+</option>
                             <option>A-</option>
@@ -33,37 +34,134 @@
                         </select>
                     </div>
 
+                    <div class="col-span-1 md:col-span-2">
+                        <label class="block text-muted-color mb-2 font-semibold">Ward No</label>
+                        <input formControlName="wardNumber" type="text" placeholder="Enter Ward No"
+                            class="w-full placeholder:text-md border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                    </div>
+
+
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-muted-color mb-2 font-medium">First Name</label>
+                        <label class="block text-muted-color mb-2 font-semibold">First Name <span class="text-red-600">*</span></label>
                         <input formControlName="firstname" type="text" placeholder="Enter First Name"
-                            class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                            class="w-full placeholder:text-md border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
 
                     <div>
-                        <label class="block text-muted-color mb-2 font-medium">Last Name</label>
+                        <label class="block text-muted-color mb-2 font-semibold">Last Name</label>
                         <input formControlName="lastname" type="text" placeholder="Enter Last Name"
-                            class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+                            class="w-full placeholder:text-md border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
                     </div>
                 </div>
-
                 <!-- Label Text -->
-                <div class="text-center mt-10 text-xl font-semibold text-muted-color">Scan the Haemovigil label on test
+                <!-- <div class="text-center mt-10 text-xl font-semibold text-muted-color">Scan the Haemovigil label on test
                     tube</div>
 
-                <!-- Image -->
                 <div class="flex justify-center mt-6">
                     <img src="/assets/tubes.png" alt="test-tube" class="w-60" />
                 </div>
 
-                <!-- Button -->
                 <div class="text-center mt-8">
                     <button type="submit"
                         class="bg-[#BE0000] hover:from-red-700 hover:to-red-900 text-white font-bold py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">Get
                         Haemovigil Transporter Key</button>
-                </div>
+                </div> -->
                 <!-- <div class="flex justify-center px-6 pt-4">
                     <button type="button" class="text-red-500 font-bold text-lg" (click)="onClose()">Close</button>
                 </div> -->
+
+                <div class="border-t border-gray-200 my-3"></div>
+
+                <div class="flex flex-col items-center w-full  transition-opacity duration-300"
+                    [ngClass]="{'opacity-50 pointer-events-none': !isTopFormValid}">
+                    <div class="block w-full !mb-2">
+                        <p class="text-muted-color font-semibold text-lg !mb-1">
+                            Haemovigil ID
+                        </p>
+                        <p *ngIf="!isTopFormValid" class="text-red-500 text-xs m-0">Please fill all top required fields to unlock
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-4 w-full">
+                        <div class="bg-gray-100 rounded-full p-1 inline-flex border border-gray-200 shadow-inner">
+                            <button type="button" (click)="setEntryMode('manual')"
+                                [class]="entryMode === 'manual' ? 'bg-white shadow text-red-700' : 'text-gray-500 hover:text-gray-700'"
+                                class="p-3 rounded-full font-medium transition-all duration-200 flex items-center gap-2 outline-none focus:outline-none">
+                                <i class="pi pi-pencil"></i>
+                            </button>
+                            <button type="button" (click)="setEntryMode('scan')"
+                                [class]="entryMode === 'scan' ? 'bg-white shadow text-red-700' : 'text-gray-500 hover:text-gray-700'"
+                                class="p-3 rounded-full font-medium transition-all duration-200 flex items-center gap-2 outline-none focus:outline-none">
+                                <i class="pi pi-camera"></i>
+                            </button>
+                        </div>
+
+                        <div *ngIf="entryMode === 'manual'" class="w-full max-w-md animate-fadein">
+                            <input formControlName="haemovigilId" type="text" placeholder="Enter Haemovigil ID manually"
+                                [readonly]="!isTopFormValid"
+                                class="w-full border border-red-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400 transition" />
+
+                            <!-- <div class="text-center">
+                                <small class="text-red-500 mt-1 inline-block" *ngIf="registerPatient.get('haemovigilId')?.touched && registerPatient.get('haemovigilId')?.invalid">
+                                    Haemovigil ID is required.
+                                </small>
+                            </div> -->
+                        </div>
+                    </div>
+
+                    <div *ngIf="entryMode === 'scan'" class="w-full max-w-md animate-fadein">
+                        <div class="mt-2 rounded-lg py-4 px-2 bg-gray-50 flex justify-center">
+                            <div
+                                class="w-full rounded overflow-hidden shadow-inner bg-black aspect-video relative flex items-center justify-center">
+                                <zxing-scanner [enable]="entryMode === 'scan'" [formats]="allowedFormats"
+                                    (scanSuccess)="onCodeResult($event)"
+                                    class="absolute inset-0 w-full h-full object-cover">
+                                </zxing-scanner>
+                            </div>
+                        </div>
+                        <!-- <p class="text-center text-sm text-gray-500 mt-2">Center the barcode in the camera view</p> -->
+                    </div>
+                </div>
+
+                <!-- <div>
+                    <button type="button"
+                        class="bg-[#BE0000] hover:from-red-700 hover:to-red-900 text-white font-semibold outline-none focus:outline-none py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">
+                        <i class="pi pi-key"></i>
+                        Get Transporter Key
+                    </button>
+                </div> -->
+
+                <div class="w-full max-w-md mx-auto mt-4 transition-opacity duration-300"
+                    [ngClass]="{'opacity-50 pointer-events-none': !isTopFormValid}">
+                    <!-- <label class="block text-muted-color mb-2 font-semibold">Transporter Key</label> -->
+                    <div class="flex items-stretch w-full">
+
+                        <button type="button" (click)="getTranspoterKey()"
+                            [disabled]="isFetchingKey || !registerPatient.get('haemovigilId')?.value"
+                            class="bg-[#BE0000] hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-5 rounded-tl-lg rounded-bl-lg shadow transition whitespace-nowrap outline-none focus:outline-none">
+                            <i [class]="isFetchingKey ? 'pi pi-spin pi-spinner' : 'pi pi-key'"></i>
+                        </button>
+
+                        <input type="text" [value]="transporterKey || ''" readonly placeholder="Transporter Key"
+                            class="w-full !text-center bg-white border border-red-300 rounded-tr-lg rounded-br-lg p-3 text-gray-700 font-semibold focus:outline-none" />
+                    </div>
+                </div>
+
+                <div class="flex justify-center gap-2 w-full text-center mt-6">
+                    <!-- <button type="button" (click)="getTranspoterKey()"
+                        class="bg-[#BE0000] hover:from-red-700 hover:to-red-900 text-white font-semibold outline-none focus:outline-none py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">
+                        <i class="pi pi-key"></i>
+                        <span>{{ isFetchingKey ? ' Fetching...' : ' Get Transporter Key' }}</span>
+                    </button> -->
+                    <button type="submit" [disabled]="registerPatient.invalid || isSaving"
+                        class="bg-[#BE0000] disabled:bg-red-400 hover:from-red-700 hover:to-red-900 text-white font-semibold outline-none focus:outline-none py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">
+                        <i *ngIf="isSaving" class="pi pi-spin pi-spinner"></i>
+                        <span>{{ isSaving ? 'Saving...' : 'Save' }}</span>
+                    </button>
+                </div>
+
             </div>
         </form>
     </div>

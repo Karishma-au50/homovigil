@@ -10,16 +10,20 @@ import { FormsModule } from '@angular/forms';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { BagAllocation } from '../../../core/models/bag.modal';
+import { TooltipModule } from 'primeng/tooltip';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
     selector: 'app-allocate-bag-history',
     standalone: true,
-    imports: [CommonModule, FormsModule, TableModule, InputTextModule, DropdownModule, DatePickerModule, TagModule, ButtonModule],
+    imports: [SkeletonModule, CommonModule, FormsModule, TableModule, InputTextModule, DropdownModule, DatePickerModule, TagModule, ButtonModule, TooltipModule],
     templateUrl: './allocate-bag-history.component.html',
     styleUrl: './allocate-bag-history.component.scss'
 })
 export class AllocateBagHistoryComponent {
     row: BagAllocation[] = [];
+    isLoading: boolean = true;
+    skeletonData: any[] = new Array(5).fill({});
 
     @ViewChild('dt') dt!: Table;
 
@@ -32,12 +36,16 @@ export class AllocateBagHistoryComponent {
 
     // ✅ LOAD ALL DATA ONCE
     loadPatients(): void {
+         this.isLoading = true;
+
         this.authService.getAllAllocationsNoPagination().subscribe({
             next: (res: any) => {
-                this.row = res.data ?? [];
+                this.row = res.data.filter((elm:any)=>elm.status != 'reserved') ?? [];
+                this.isLoading = false;
             },
             error: () => {
                 this.row = [];
+                this.isLoading = false;
             }
         });
     }
@@ -49,6 +57,16 @@ export class AllocateBagHistoryComponent {
     }
 
     stripe = (i: number) => (i % 2 === 0 ? 'bg-gray-50' : '');
+
+    formatStatus(status: string): string {
+        if (!status) return '';
+        // If the backend sends 'released' or 'Released', display 'Issued' instead
+        if (status.toLowerCase() === 'released') {
+            return 'Issued';
+        }
+        // Otherwise, display the status exactly as it came from the backend
+        return status;
+    }
 
     badgeClass(status: string) {
         return (

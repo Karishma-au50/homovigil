@@ -2,13 +2,13 @@
 
 .layout-sidebar {
     position: fixed;
-    width: 20rem;
+    width: 16rem;
     height: calc(100vh - 8rem);
     z-index: 999;
     overflow-y: auto;
     user-select: none;
-    top: 6rem;
-    left: 2rem;
+    top: 5.5rem;
+    left: 0.8rem;
     transition:
         transform var(--layout-section-transition-duration),
         left var(--layout-section-transition-duration);

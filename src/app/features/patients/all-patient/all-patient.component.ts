@@ -15,16 +15,24 @@ import { PatientComponent } from '../patient/patient.component';
 import { ConfirmationService } from 'primeng/api';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DropdownModule } from 'primeng/dropdown';
+import { BarCodeComponent } from '../bar-code/bar-code.component';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
     selector: 'app-all-patient',
     templateUrl: './all-patient.component.html',
     styleUrl: './all-patient.component.scss',
-    imports: [CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule]
+    imports: [SkeletonModule, CommonModule, TableModule, ButtonModule, TooltipModule, FormsModule, DialogModule, AvatarModule, PatientComponent, DropdownModule, DatePickerModule, BarCodeComponent, ToastModule],
+    providers: [MessageService]
 })
 export class AllPatientComponent {
     @ViewChild('dt') table!: Table;
     rows: Patient[] = [];
+
+    isLoading: boolean = true;
+    skeletonData: any[] = new Array(5).fill({});
 
     router: any;
     selectedSearchBy: any;
@@ -35,32 +43,53 @@ export class AllPatientComponent {
         { label: 'Blood Group', value: 'bloodGroup' },
         { label: 'Component', value: 'component' }
     ];
+
+    // --- BarCode Dialog State ---
+    qrVisible: boolean = false;
+    selectedPatientForQr: Patient | null = null;
+
+    // --- Transporter Key Dialog State ---
+    transporterKeyVisible: boolean = false;
+    currentTransporterKey: string | null = null;
+    isLoadingKey: boolean = false;
+
     constructor(
         private authService: AuthService,
-        private confirmationService: ConfirmationService
-    ) {}
+        private confirmationService: ConfirmationService,
+        private messageService: MessageService
+    ) { }
 
     // Component variables
     modalTitle: string = 'Add New Patient';
     selectedPatient: Patient | null = null;
+    currentRole:string|null = '';
 
     ngOnInit(): void {
+        this.currentRole = this.authService.currentUser?.role || null;
         this.loadPatients();
     }
 
     loadPatients(): void {
         this.rows = []; // 🔥 STEP 1: clear table first
+        this.isLoading = true;
 
-        this.authService.getAllPatients().subscribe((data: any) => {
-            // 🔥 STEP 2: assign sorted data
-            this.rows = data.data;
+        this.authService.getAllPatients().subscribe({
+            next: (data: any) => {
+                // 🔥 STEP 2: assign sorted data
+                this.rows = data.data;
+                this.isLoading = false;
 
-            // 🔥 STEP 3: force paginator to page 1
-            setTimeout(() => {
-                if (this.table) {
-                    this.table.first = 0;
-                }
-            });
+                // 🔥 STEP 3: force paginator to page 1
+                setTimeout(() => {
+                    if (this.table) {
+                        this.table.first = 0;
+                    }
+                });
+            },
+            error: () => {
+                this.isLoading = false; // Stop loading on error
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load patients' });
+            }
         });
     }
 
@@ -83,6 +112,25 @@ export class AllPatientComponent {
         this.showDialog();
     }
 
+    viewTransporterKey(patient: Patient) {
+        this.isLoadingKey = true;
+        this.currentTransporterKey = null;
+        this.transporterKeyVisible = true;
+
+        this.authService.getTransporterKey(patient._id).subscribe({
+            next: (res: any) => {
+                this.currentTransporterKey = res.data.transporterKey;
+                this.isLoadingKey = false;
+            },
+            error: (err: any) => {
+                this.isLoadingKey = false;
+                this.transporterKeyVisible = false;
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch Transporter Key.' });
+                console.log(err);
+            }
+        });
+    }
+
     confirmDelete(patient: Patient): void {
         this.confirmationService.confirm({
             message: `Are you sure you want to delete ${patient.firstname} ${patient.lastname}?`,
@@ -91,12 +139,11 @@ export class AllPatientComponent {
             accept: () => {
                 this.authService.deletePatient(patient._id).subscribe({
                     next: () => {
-                        // Optionally show success message
-                        this.loadPatients(); // Reload updated list
+                        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Patient deleted successfully.' });
+                        this.loadPatients();
                     },
                     error: () => {
-                        // Optionally show error message
-                        alert('Failed to delete patient.');
+                        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete patient.' });
                     }
                 });
             },
@@ -106,6 +153,18 @@ export class AllPatientComponent {
             key: 'confirmDialog'
         });
     }
+
+    openQrDialog(row: Patient) {
+        this.selectedPatientForQr = row;
+        // console.log(row)
+        let patientUhid = row?.UHID;
+        if(patientUhid){
+            this.qrVisible = true;
+        }else{
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'UHID not exists for this patient.' });
+        }
+    }
+
     stripe = (i: number) => (i % 2 === 0 ? 'bg-gray-50' : '');
 
     visible: boolean = false;
@@ -138,12 +197,12 @@ export class AllPatientComponent {
                 // Backend returns { status, data: { patient, totalBags, allocations } }
                 this.selectedPatientDetails = res.data.patient;
                 this.selectedPatientDetails.totalBags = res.data.totalBags || 0;
-                this.selectedPatientDetails.allocations = res.data.allocations || [];
+                this.selectedPatientDetails.allocations = res.data.allocations.filter((elm:any)=>elm.status != 'reserved') || [];
 
                 this.detailsVisible = true;
             },
             error: () => {
-                alert('Failed to fetch patient details.');
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch patient details.' });
             }
         });
     }

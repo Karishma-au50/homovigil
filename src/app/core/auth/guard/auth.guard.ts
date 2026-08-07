@@ -33,6 +33,9 @@ export const AuthGuard: CanActivateFn | CanActivateChildFn = (route, state) => {
     switch (role) {
         case 'Admin':
         case 'subAdmin':
+        case 'ward':
+            // Allowed roles, allow access
+            return true;
         case 'sales':
             // Allowed roles, allow access
             return true;

@@ -1,6 +1,6 @@
 <div class="flex flex-wrap gap-4 p-4 items-center">
     <div class="flex bg-white border rounded-md shadow-sm">
-        <input type="text" pInputText placeholder="Search..." class="p-2 rounded-l-md outline-none w-[200px]"
+        <input type="text" pInputText placeholder="Search..." class="p-2 !rounded-tl-md !rounded-bl-md !rounded-tr-none !rounded-br-none outline-none w-[200px]"
             (input)="onGlobalFilter(dt, $event)" />
         <button class="bg-red-600 text-white px-4 rounded-r-md">Search</button>
     </div>
@@ -22,48 +22,74 @@
     <!-- <p-button label="New Allocation" icon="pi pi-bag" (click)="goToAllocateBag()"> </p-button> -->
 
 </div>
-<p-table #dt [value]="row" [paginator]="true" [rows]="10" [globalFilterFields]="[
+<p-table #dt [value]="isLoading ? skeletonData : row" [paginator]="true" [rows]="10" [globalFilterFields]="[
+    'transporterBoxId',
     'bloodBagId.bloodBagId',
     'patientId.UHID',
-    'patientId.firstname',
-    'patientId.lastname',
+    'patientId.wardNumber',
+    'patientId.fullName',
+    'patientId.bloodGroup',
     'bloodBagId.bloodcomponent',
     'HaemovigilID'
   ]" responsiveLayout="scroll" class="p-datatable-striped rounded-xl shadow-lg min-w-[800px]">
     <ng-template pTemplate="header">
         <tr class="bg-red-700 text-white text-left text-m font-semibold">
-            <th class="rounded-tl-xl !px-5 !py-3">Bag ID</th>
-            <th class="!px-5 !py-3">UHID</th>
-            <th class="!px-5 !py-3">HaemovigilID</th>
-            <th class="!px-5 !py-3">Patient Name</th>
-            <th class="!px-5 !py-3">Blood Group</th>
-            <th class="!px-5 !py-3">Blood Component</th>
-            <th class="!px-5 !py-3">Status</th>
-            <th class="rounded-tr-xl !px-5 !py-3">Allocated On</th>
+            <th class="rounded-tl-xl !px-5 !py-2 whitespace-nowrap" pTooltip="Transporter Box ID" 
+                    tooltipPosition="bottom">TBID</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Bag ID</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">UHID No</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Ward No</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">HaemovigilID</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Patient Name</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Blood Group</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Blood Component</th>
+            <th class="!px-5 !py-2 whitespace-nowrap">Status</th>
+            <th class="rounded-tr-xl !px-5 !py-2 whitespace-nowrap">Allocated On</th>
         </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-row let-i="rowIndex">
-        <tr class="hover:bg-red-50" [ngClass]="stripe(i)">
-            <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodBagId }}</td>
-            <td class="!px-5 !py-3">{{ row.patientId?.UHID }}</td>
-            <td class="!px-5 !py-3">{{ row.HaemovigilID || row.patientId?.haemovigilId }}</td>
-            <td class="!px-5 !py-3">{{ row.patientId?.firstname | titlecase }} {{ row.patientId?.lastname | titlecase }}
-            </td>
-            <td class="!px-5 !py-3">{{ row.patientId?.bloodGroup }}</td>
-            <td class="!px-5 !py-3">{{ row.bloodBagId?.bloodcomponent }}</td>
-            <td class="!px-5 !py-3">
-                <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize"
-                    [ngClass]="badgeClass(row.status)">
-                    {{ row.status }}
-                </span>
-            </td>
-            <td class="!px-5 !py-3">{{ row.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+        <tr class="hover:bg-red-50 dark:hover:!bg-[#450a0a]" [ngClass]="stripe(i)">
+
+             <!-- SHIMMER/SKELETON STATE -->
+            <ng-container *ngIf="isLoading">
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton width="3rem"></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton width="5rem" height="1.5rem" borderRadius="16px"></p-skeleton></td>
+                <td class="!px-5 !py-2"><p-skeleton width="8rem"></p-skeleton></td>
+            </ng-container>
+
+            <ng-container *ngIf="!isLoading">
+                <td class="!px-5 !py-2 !text-center">{{ row?.transporterBoxId || 'N/A' }}</td>
+                <td class="!px-5 !py-2">{{ row.bloodBagId?.bloodBagId || 'N/A' }}</td>
+                <td class="!px-5 !py-2">{{ row.patientId?.UHID }}</td>
+                <td class="!px-5 !py-2">{{ row.patientId?.wardNumber || 'N/A' }}</td>
+                <td class="!px-5 !py-2">{{ row.HaemovigilID || row.patientId?.haemovigilId }}</td>
+                <td class="!px-5 !py-2">{{ row.patientId?.firstname | titlecase }} {{ row.patientId?.lastname | titlecase }}
+                </td>
+                <td class="!px-5 !py-2">{{ row.patientId?.bloodGroup || 'N/A' }}</td>
+                <td class="!px-5 !py-2">{{ row.bloodBagId?.bloodcomponent }}</td>
+                <td class="!px-5 !py-2">
+                    <!-- {{ row.status }} -->
+                    <span class="inline-block rounded-full px-3 py-1 text-m text-black font-normal capitalize"
+                        [ngClass]="badgeClass(row.status)">
+                        {{ formatStatus(row.status) }}
+                    </span>
+                </td>
+                <td class="!px-5 !py-2 whitespace-nowrap">{{ row.allocatedOn | date: 'MMM dd, yyyy | hh:mm a' }}</td>
+            </ng-container>
+
         </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
-        <tr>
-            <td colspan="8" class="text-center py-8 text-gray-700 text-xl">
+        <tr *ngIf="!isLoading">
+            <td colspan="10" class="text-center py-8 text-gray-700 text-xl">
                 <div class="flex justify-center items-center h-full">No data found</div>
             </td>
         </tr>

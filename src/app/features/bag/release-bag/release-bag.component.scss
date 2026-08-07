@@ -1,0 +1,8 @@
+/* Reduce padding for the Issue Blood Bag modal header and content */
+::ng-deep .custom-issue-dialog .p-dialog-header {
+    padding: 1rem 1.5rem 0.5rem 1.5rem !important; /* Reduces top and bottom padding of the header */
+}
+
+::ng-deep .custom-issue-dialog .p-dialog-content {
+    padding-top: 0.5rem !important; /* Reduces the gap between the header and the content */
+}

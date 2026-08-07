@@ -50,6 +50,10 @@ export class HemoVigilHttpService {
         return this.http.post<ApiResponse<BagAllocation>>(`${this.baseUrl}api/allocation`, bagAllocation);
     }
 
+    public allocateMultipleBags(bagAllocations: BagAllocation[]): Observable<ApiResponse<BagAllocation[]>> {
+        return this.http.post<ApiResponse<BagAllocation[]>>(`${this.baseUrl}api/allocation/bulk`, bagAllocations);
+    }
+
     public updatePatient(user: any, id: string): Observable<ApiResponse<any>> {
         return this.http.put<ApiResponse<User>>(`${this.baseUrl}api/patient/${id}`, user);
     }
@@ -57,8 +61,8 @@ export class HemoVigilHttpService {
     public deletePatient(id: string) {
         return this.http.delete(`${this.baseUrl}api/patient/${id}`);
     }
-    public releaseAllocatedBag(allocationId: string, releaseUserName: string): Observable<ApiResponse<any>> {
-        return this.http.patch<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}/release`, { releaseUserName });
+    public releaseAllocatedBag(allocationId: string, payload: any): Observable<ApiResponse<any>> {
+        return this.http.patch<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}/release`, { payload });
     }
     public reserveAllocatedBag(allocationId: string): Observable<ApiResponse<any>> {
         return this.http.patch<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}/reserve`, {});
@@ -87,4 +91,27 @@ export class HemoVigilHttpService {
     getAllAllocationsNoPagination() {
         return this.http.get<any>(`${this.baseUrl}api/allocation/all`);
     }
+
+    getTransporterKey(patientId: string): Observable<any> {
+        return this.http.get(`${this.baseUrl}api/patient/${patientId}/transporter-key`); 
+    }
+
+    getHaemovigilIdTransporterKey(haemovigilId: string, isNew: boolean, patientId?: string): Observable<any> {
+        let url = `${this.baseUrl}api/patient/${haemovigilId}/haemovigil-id/transporter-key?isNew=${isNew}`;
+        
+        if (!isNew && patientId) {
+            url += `&patientId=${patientId}`;
+        }
+        
+        return this.http.get(url);
+    }
+
+    addBloodbagId(bagId: string, bagObjectId: string, allocationId?: string, transporterBoxId?: string): Observable<any> {
+        return this.http.patch(`${this.baseUrl}api/bloodbag/add-bag-id`, { bagId, bagObjectId, allocationId, transporterBoxId });
+    }
+
+    public deleteAllocation(allocationId: string): Observable<ApiResponse<any>> {
+        return this.http.delete<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}`);
+    }
+
 }

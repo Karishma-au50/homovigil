@@ -12,11 +12,16 @@ import { BagAllocation } from '../../core/models/bag.modal';
 import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
+import { TooltipModule } from 'primeng/tooltip';
+import { SkeletonModule } from 'primeng/skeleton';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
     selector: 'app-home',
     standalone: true,
-    imports: [CommonModule, FormsModule, DropdownModule, ButtonModule, DatePickerModule, TableModule, InputIconModule, ToolbarModule, IconFieldModule, InputTextModule],
+    imports: [SkeletonModule, CommonModule, FormsModule, DropdownModule, ButtonModule, DatePickerModule, TableModule, InputIconModule, ToolbarModule, IconFieldModule, InputTextModule, TooltipModule, ConfirmDialogModule],
+    providers: [ConfirmationService],
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss']
 })
@@ -27,26 +32,36 @@ export class HomeComponent {
     toDate: Date | null = null;
     allRecords: any[] = [];
 
+    isLoading: boolean = true;
+    skeletonData: any[] = new Array(5).fill({});
+
     @ViewChild('dt') dt!: Table;
+
     constructor(
         private authService: AuthService,
-        private router: Router
+        private router: Router,
+        private confirmationService: ConfirmationService
     ) {}
+    
     ngOnInit(): void {
         this.loadPatients();
     }
 
     loadPatients(): void {
+        this.isLoading = true;
+
         this.authService.getAllAllocationsNoPagination().subscribe({
             next: (res: any) => {
-                this.records = res.data ?? [];
+                this.records = (res.data.filter((elm:any)=> elm.status != 'reserved')) ?? [];
                 this.allRecords = [...this.records];
+                this.isLoading = false;
 
                 setTimeout(() => this.dt?.reset());
             },
             error: () => {
                 this.records = [];
                 this.allRecords = [];
+                this.isLoading = false;
             }
         });
     }
@@ -66,6 +81,16 @@ export class HomeComponent {
             }[status] ?? 'bg-gray-100 text-gray-700'
         );
     }
+
+    formatStatus(status: string): string {
+        if (!status) return '';
+        // If the backend sends 'released', display 'Issued' instead
+        if (status.toLowerCase() === 'released') {
+            return 'Issued';
+        }
+        return status;
+    }
+
     // onFilterGlobal(event: Event): void {
     //     const inputElement = event.target as HTMLInputElement;
     //     this.dt.filterGlobal(inputElement.value, 'contains');
@@ -114,5 +139,25 @@ export class HomeComponent {
         this.fromDate = null;
         this.toDate = null;
         this.records = [...this.allRecords];
+    }
+
+    confirmRemove(record: any) {
+        this.confirmationService.confirm({
+            message: 'Are you sure you want to remove?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                if (record._id) {
+                    this.authService.deleteAllocation(record._id).subscribe({
+                        next: () => {
+                            this.loadPatients(); // refresh data
+                        },
+                        error: (err) => {
+                            console.error('Failed to remove allocation', err);
+                        }
+                    });
+                }
+            }
+        });
     }
 }

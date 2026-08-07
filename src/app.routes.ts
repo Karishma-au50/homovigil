@@ -9,8 +9,12 @@ import { PatientComponent } from './app/features/patients/patient/patient.compon
 import { AllPatientComponent } from './app/features/patients/all-patient/all-patient.component';
 import { LoginComponent } from './app/features/login/login.component';
 import { AllocateBagComponent } from './app/features/bag/allocate-bag/allocate-bag.component';
-import { ReleasBagComponent } from './app/features/bag/realeas-bag/realeas-bag.component';
+import { ReleaseBagComponent } from './app/features/bag/release-bag/release-bag.component';
 import { AllocateBagHistoryComponent } from './app/features/bag/allocate-bag-history/allocate-bag-history.component';
+import { UsersListComponent } from './app/features/users/components/users-list/users-list.component';
+import { SalesComponent } from './app/features/sales/components/sales.component';
+import { HomeRedirectGuard } from './app/core/auth/guard/home-redirect.guard';
+import { TransfusionListComponent } from './app/features/transfusions/components/transfusion-list/transfusion-list.component';
 
 export const appRoutes: Routes = [
     {
@@ -24,7 +28,8 @@ export const appRoutes: Routes = [
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
             {
                 path: 'home',
-                component: HomeComponent
+                component: HomeComponent,
+                canActivate: [HomeRedirectGuard]
             },
              {
                 path: 'patient',
@@ -40,14 +45,24 @@ export const appRoutes: Routes = [
             },
             {
                 path:'releaseBag',
-                component:ReleasBagComponent
+                component:ReleaseBagComponent
             },
             {
                 path:'allocationHistory',
                 component:AllocateBagHistoryComponent
-
+            },
+            {
+                path:'users',
+                component:UsersListComponent
+            },
+            {
+                path:'sales',
+                component:SalesComponent
+            },
+            {
+                path:'transfusionUpdate',
+                component:TransfusionListComponent
             }
-
 
         ]
     },

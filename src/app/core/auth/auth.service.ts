@@ -95,13 +95,17 @@ export class AuthService {
     // Patient search
     searchPatient(uhid: string, label: string): Observable<any> {
         return this.hemoVigilService.searchPatient(uhid, label).pipe(
-            tap(() => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Patient Fetched',
-                    detail: 'Patient fetched successfully.',
-                    life: 3000
-                });
+            tap((response: any) => {
+
+                if (response?.data && response.data.length > 0) {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Patient Fetched',
+                        detail: 'Patient fetched successfully.',
+                        life: 3000
+                    });
+                }
+
             }),
             catchError((error) => {
                 this.messageService.add({
@@ -217,18 +221,48 @@ export class AuthService {
     allocateBag(bagData: any): Observable<any> {
         return this.hemoVigilService.allocateBag(bagData).pipe(
             tap(() => {
+                // this.messageService.add({
+                //     severity: 'success',
+                //     summary: 'Bag Allocation Successful',
+                //     detail: 'Bag allocated successfully.',
+                //     life: 3000
+                // });
+            }),
+            catchError((error) => {
+                // this.messageService.add({
+                //     severity: 'error',
+                //     summary: 'Allocation Failed',
+                //     detail: error.error?.message || 'An error occurred during bag allocation.',
+                //     life: 3000
+                // });
+                return throwError(() => error);
+            })
+        );
+    }
+
+    allocateMultipleBags(bagDataArray: any[]): Observable<any> {
+        return this.hemoVigilService.allocateMultipleBags(bagDataArray).pipe(
+            catchError((error) => {
+                return throwError(() => error);
+            })
+        );
+    }
+
+    addBloodbagId(bagId: string, bagObjectId: string, allocationId?: string, transporterBoxId?: string): Observable<any> {
+        return this.hemoVigilService.addBloodbagId(bagId, bagObjectId, allocationId, transporterBoxId).pipe(
+            tap(() => {
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Bag Allocation Successful',
-                    detail: 'Bag allocated successfully.',
+                    summary: 'Bag ID Saved',
+                    detail: 'Bag ID saved successfully.',
                     life: 3000
                 });
             }),
             catchError((error) => {
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Allocation Failed',
-                    detail: error.error?.message || 'An error occurred during bag allocation.',
+                    summary: 'Save Failed',
+                    detail: error.error?.message || 'Failed to save Bag ID.',
                     life: 3000
                 });
                 return throwError(() => error);
@@ -270,21 +304,21 @@ export class AuthService {
         }
     }
     // Release allocated bag
-    releaseAllocatedBag(allocationId: string, releaseUserName: string): Observable<any> {
-        return this.hemoVigilService.releaseAllocatedBag(allocationId, releaseUserName).pipe(
+    releaseAllocatedBag(allocationId: string, payload: any): Observable<any> {
+        return this.hemoVigilService.releaseAllocatedBag(allocationId, payload).pipe(
             tap(() => {
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Bag Released',
-                    detail: 'Allocated bag released successfully.',
+                    summary: 'Bag Issued',
+                    detail: 'Allocated bag issued successfully.',
                     life: 3000
                 });
             }),
             catchError((error) => {
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Release Failed',
-                    detail: error.error?.message || 'An error occurred during bag release.',
+                    summary: 'Issued Failed',
+                    detail: error.error?.message || 'An error occurred during bag issue.',
                     life: 3000
                 });
                 return throwError(() => error);
@@ -314,6 +348,28 @@ export class AuthService {
         );
     }
 
+    deleteAllocation(allocationId: string): Observable<any> {
+        return this.hemoVigilService.deleteAllocation(allocationId).pipe(
+            tap(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Bag Deleted',
+                    detail: 'Allocated bag deleted successfully.',
+                    life: 3000
+                });
+            }),
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Delete Failed',
+                    detail: error.error?.message || 'An error occurred during deletion.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
     getPatientDetailsWithBags(patientId: string): Observable<any> {
         return this.hemoVigilService.getPatientDetailsWithBags(patientId).pipe(
             catchError((error) => {
@@ -327,6 +383,21 @@ export class AuthService {
             })
         );
     }
+
+    getTransporterKey(patientId: string): Observable<any> {
+        return this.hemoVigilService.getTransporterKey(patientId).pipe(
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Fetch Failed',
+                    detail: error.error?.message || 'Could not fetch Transporter Key.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
     checkAllocationLimit(patientId: string): Observable<any> {
         return this.hemoVigilService.checkAllocationLimit(patientId);
     }
