@@ -1,0 +1,474 @@
+<p-toast></p-toast>
+<p-confirmdialog></p-confirmdialog>
+
+<div class="p-4 flex flex-col gap-6">
+  <!-- WARNING BANNERS -->
+  <div *ngIf="rfidStatus === 'offline'" class="mb-5 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+    <div class="flex items-start md:items-center gap-3">
+      <i class="pi pi-exclamation-triangle text-2xl text-rose-500 mt-1 md:mt-0"></i>
+      <div>
+        <h4 class="font-bold text-base">RFID Local Bridge Service Offline</h4>
+        <p class="text-xs text-rose-600 mt-0.5">We could not establish a connection to your local RFID listener service. RFID scanning features will not work until it is started.</p>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <a href="assets/rfid-service.zip" download="rfid-service.zip" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-lg transition text-center flex items-center gap-1.5 no-underline">
+        <i class="pi pi-download"></i> Download RFID Service
+      </a>
+      <span class="px-4 py-2 bg-rose-600 text-white font-semibold text-xs rounded-lg transition text-center flex items-center gap-1.5 cursor-help" pTooltip="Start the service by running 'npm start' in rfid-service folder.">
+        <i class="pi pi-info-circle"></i> Run 'npm start'
+      </span>
+    </div>
+  </div>
+
+  <div *ngIf="rfidStatus === 'outdated'" class="mb-5 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+    <div class="flex items-start md:items-center gap-3">
+      <i class="pi pi-refresh text-2xl text-amber-500 mt-1 md:mt-0"></i>
+      <div>
+        <h4 class="font-bold text-base">RFID Bridge Service Update Available</h4>
+        <p class="text-xs text-amber-600 mt-0.5">Your running service version is v{{runningVersion}} but version v{{expectedVersion}} is required. Please restart or update the service.</p>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <span class="px-4 py-2 bg-amber-600 text-white font-semibold text-xs rounded-lg transition text-center flex items-center gap-1.5 cursor-help" pTooltip="Pull the latest commit and restart the service inside the rfid-service folder.">
+        <i class="pi pi-info-circle"></i> Update to v{{expectedVersion}}
+      </span>
+    </div>
+  </div>
+
+  <!-- Header / Toolbar -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <div>
+      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+        <i class="pi pi-database text-rose-600 text-3xl"></i>
+        Blood Bank Stock Control
+      </h1>
+      <p class="text-sm text-slate-500 mt-1">Manage physical blood bag stock levels and assign tags via RFID scans</p>
+    </div>
+    
+    <div class="flex flex-wrap gap-3">
+      <!-- Local RFID Connection Status Indicator -->
+      <div 
+        class="flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-semibold"
+        [ngClass]="isScannerConnected ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700'"
+      >
+        <span class="relative flex h-2 w-2">
+          <span 
+            class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+            [ngClass]="isScannerConnected ? 'bg-emerald-400' : 'bg-rose-400'"
+          ></span>
+          <span 
+            class="relative inline-flex rounded-full h-2 w-2"
+            [ngClass]="isScannerConnected ? 'bg-emerald-500' : 'bg-rose-500'"
+          ></span>
+        </span>
+        RFID Listener: {{ isScannerConnected ? 'ONLINE' : 'OFFLINE' }}
+      </div>
+
+      <p-button 
+        label="Register Blood Bag" 
+        icon="pi pi-plus" 
+        styleClass="p-button-danger shadow-md transition hover:scale-105"
+        (click)="openRegisterDialog()"
+      ></p-button>
+
+      <p-button 
+        label="Scan to Dispatch" 
+        icon="pi pi-sign-out" 
+        styleClass="p-button-outlined p-button-danger shadow-sm transition hover:scale-105"
+        (click)="openDispatchDialog()"
+      ></p-button>
+    </div>
+  </div>
+
+  <!-- Dashboard Overview Cards -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 mb-8">
+    <div *ngFor="let group of ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']" 
+         class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex flex-col items-center justify-center transition duration-200 hover:shadow-md hover:-translate-y-0.5">
+      <div class="text-2xl font-black text-rose-600 mb-1">{{ group }}</div>
+      <div class="text-sm text-slate-400 font-medium">Bags In Stock</div>
+      <div class="text-2xl font-bold text-slate-700 mt-2">
+        <span *ngIf="isLoading"><i class="pi pi-spin pi-spinner text-slate-300"></i></span>
+        <span *ngIf="!isLoading">{{ getGroupCount(group) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blood Components Summary List -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+      <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <i class="pi pi-info-circle text-blue-500"></i>
+        Total Inventory Breakdown
+      </h3>
+      <div *ngIf="isLoading" class="space-y-3">
+        <p-skeleton width="100%" height="2rem"></p-skeleton>
+        <p-skeleton width="100%" height="2rem"></p-skeleton>
+        <p-skeleton width="100%" height="2rem"></p-skeleton>
+      </div>
+      <div *ngIf="!isLoading && componentStats.length === 0" class="text-slate-400 text-sm py-4 text-center">
+        No items in stock.
+      </div>
+      <div *ngIf="!isLoading && componentStats.length > 0" class="space-y-4">
+        <div *ngFor="let component of componentStats" class="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
+          <span class="text-sm font-semibold text-slate-600">{{ component.component }}</span>
+          <span class="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">
+            {{ component.count }} Bag(s)
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Status Box / Guide -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col justify-between">
+      <div>
+        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+          <i class="pi pi-question-circle text-rose-500"></i>
+          RFID Workflow Instructions
+        </h3>
+        <ul class="text-sm text-slate-600 space-y-2 list-disc list-inside">
+          <li>Ensure the local RFID reader service is running in your terminal (`npm start` inside `rfid-test`).</li>
+          <li>Click **Register Blood Bag** and place/tap the bag tag on the RFID scanner to populate the Tag UID.</li>
+          <li>Click **Scan to Dispatch** or simply scan a registered bag's tag to quickly check it out and remove it from inventory.</li>
+        </ul>
+      </div>
+      <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 flex items-center justify-between text-xs mt-4">
+        <span class="text-slate-500 font-medium">Reader Port Connection:</span>
+        <span class="font-bold" [ngClass]="isScannerConnected ? 'text-emerald-600' : 'text-rose-600'">
+          {{ isScannerConnected ? 'ws://localhost:8080 (Connected)' : 'ws://localhost:8080 (Not Running)' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Datatable Component -->
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <h3 class="text-lg font-bold text-slate-800">Inventory Stock Table</h3>
+      <span class="p-input-icon-left w-full sm:w-80">
+        <i class="pi pi-search"></i>
+        <input 
+          pInputText 
+          type="text" 
+          placeholder="Global Search (RFID, Component...)" 
+          class="w-full p-inputtext-sm rounded-lg"
+          (input)="onGlobalFilter(dt, $event)"
+        />
+      </span>
+    </div>
+
+    <p-table 
+      #dt 
+      [value]="filteredBloodbags" 
+      [rows]="10" 
+      [paginator]="true" 
+      [loading]="isLoading" 
+      [rowHover]="true"
+      responsiveLayout="scroll"
+      [globalFilterFields]="['bloodBagId', 'bloodGroup', 'bloodcomponent']"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} blood bags" 
+      [showCurrentPageReport]="true"
+      styleClass="p-datatable-striped"
+    >
+      <ng-template pTemplate="header">
+        <tr class="bg-red-700 text-white text-left text-m font-semibold">
+          <th pSortableColumn="bloodBagId" class="!px-5 !py-3 whitespace-nowrap text-white">RFID Tag UID <p-sortIcon field="bloodBagId"></p-sortIcon></th>
+          <th pSortableColumn="bloodGroup" class="!px-5 !py-3 whitespace-nowrap text-white">Blood Group <p-sortIcon field="bloodGroup"></p-sortIcon></th>
+          <th pSortableColumn="bloodcomponent" class="!px-5 !py-3 whitespace-nowrap text-white">Blood Component <p-sortIcon field="bloodcomponent"></p-sortIcon></th>
+          <th pSortableColumn="volume" class="!px-5 !py-3 whitespace-nowrap text-white">Volume (ml) <p-sortIcon field="volume"></p-sortIcon></th>
+          <th pSortableColumn="expiryDate" class="!px-5 !py-3 whitespace-nowrap text-white">Expiry Date <p-sortIcon field="expiryDate"></p-sortIcon></th>
+          <th pSortableColumn="createdAt" class="!px-5 !py-3 whitespace-nowrap text-white">Added On <p-sortIcon field="createdAt"></p-sortIcon></th>
+          <th class="!px-5 !py-3 whitespace-nowrap text-center text-white">Actions</th>
+        </tr>
+      </ng-template>
+
+      <!-- Skeleton Loading Rows -->
+      <ng-template pTemplate="loadingbody">
+        <tr *ngFor="let item of skeletonData">
+          <td><p-skeleton width="70%"></p-skeleton></td>
+          <td><p-skeleton width="40%"></p-skeleton></td>
+          <td><p-skeleton width="80%"></p-skeleton></td>
+          <td><p-skeleton width="50%"></p-skeleton></td>
+          <td><p-skeleton width="60%"></p-skeleton></td>
+          <td><p-skeleton width="60%"></p-skeleton></td>
+          <td class="flex justify-center gap-2"><p-skeleton width="2rem" height="2rem"></p-skeleton></td>
+        </tr>
+      </ng-template>
+
+      <!-- Empty State -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center p-8 text-slate-400">
+            <i class="pi pi-box text-3xl mb-2 block"></i>
+            No blood bags found in inventory.
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Table Body Rows -->
+      <ng-template pTemplate="body" let-bag let-rowIndex="rowIndex">
+        <tr [className]="stripe(rowIndex) + ' border-b border-slate-50 transition duration-150 hover:bg-slate-50/50'">
+          <td class="p-4">
+            <span class="font-mono text-sm font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded">
+              {{ bag.bloodBagId || 'No RFID Assigned' }}
+            </span>
+          </td>
+          <td class="p-4">
+            <span class="text-base font-extrabold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">
+              {{ bag.bloodGroup }}
+            </span>
+          </td>
+          <td class="p-4 font-semibold text-slate-700">{{ bag.bloodcomponent }}</td>
+          <td class="p-4 font-semibold text-slate-600">{{ bag.volume ? bag.volume + ' ml' : '--' }}</td>
+          <td class="p-4 font-medium text-slate-500">{{ bag.expiryDate | date:'mediumDate' }}</td>
+          <td class="p-4 font-medium text-slate-400">{{ bag.createdAt | date:'short' }}</td>
+          <td class="p-4 flex justify-center gap-2">
+            <button 
+              pButton 
+              type="button" 
+              icon="pi pi-trash" 
+              class="p-button-text p-button-danger p-button-sm rounded-full" 
+              pTooltip="Remove bag from inventory" 
+              tooltipPosition="top"
+              (click)="confirmDelete(bag)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- =======================================================================
+     DIALOG: REGISTER NEW BLOOD BAG
+     ======================================================================= -->
+<p-dialog 
+  [(visible)]="registerDialog" 
+  [style]="{ width: '480px' }" 
+  header="Register New Blood Bag" 
+  [modal]="true" 
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="space-y-5 pt-3">
+      
+      <!-- RFID Card Assignment Area -->
+      <div class="p-4 rounded-xl border border-dashed flex flex-col justify-center transition duration-200"
+           [ngClass]="isScanningForRegister ? 'bg-amber-50/50 border-amber-300' : 'bg-slate-50/50 border-slate-200'">
+        <div class="flex flex-col items-center justify-center mb-3">
+          <i class="pi pi-tablet text-3xl mb-2 text-slate-500 animate-pulse" *ngIf="isScanningForRegister"></i>
+          <i class="pi pi-credit-card text-3xl mb-2 text-slate-400" *ngIf="!isScanningForRegister"></i>
+          <p class="text-sm text-center font-medium text-slate-600">
+            {{ isScanningForRegister ? 'Waiting for RFID scan...' : 'RFID Tag Association' }}
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label for="bloodBagId" class="block text-xs font-bold text-slate-500 mb-1">RFID Tag UID (Manual or Scanned)</label>
+            <div class="flex gap-2">
+              <input 
+                pInputText 
+                id="bloodBagId" 
+                [(ngModel)]="newBag.bloodBagId" 
+                placeholder="Scan tag or enter manually" 
+                class="p-inputtext-sm rounded-lg flex-1 font-mono text-sm"
+              />
+              <p-button 
+                [icon]="isScanningForRegister ? 'pi pi-times' : 'pi pi-wifi'" 
+                [styleClass]="isScanningForRegister ? 'p-button-warning' : 'p-button-secondary'"
+                (click)="toggleRegisterScanner()"
+                pTooltip="Scan from reader"
+                tooltipPosition="top"
+                class="w-10 h-10 p-0"
+              ></p-button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blood Group Dropdown -->
+      <div>
+        <label for="bloodGroup" class="block text-sm font-bold text-slate-700 mb-1.5">Blood Group</label>
+        <p-dropdown 
+          id="bloodGroup" 
+          [options]="bloodGroups" 
+          [(ngModel)]="newBag.bloodGroup" 
+          placeholder="Select Blood Group"
+          class="rounded-lg"
+        ></p-dropdown>
+      </div>
+
+      <!-- Blood Component Dropdown -->
+      <div>
+        <label for="bloodcomponent" class="block text-sm font-bold text-slate-700 mb-1.5">Blood Component</label>
+        <p-dropdown 
+          id="bloodcomponent" 
+          [options]="bloodComponents" 
+          [(ngModel)]="newBag.bloodcomponent" 
+          placeholder="Select Component type"
+          class="rounded-lg"
+        ></p-dropdown>
+      </div>
+
+      <!-- Volume Input -->
+      <div>
+        <label for="volume" class="block text-sm font-bold text-slate-700 mb-1.5">Volume (ml)</label>
+        <input 
+          pInputText 
+          id="volume" 
+          type="number" 
+          [(ngModel)]="newBag.volume" 
+          placeholder="e.g. 350 or 450" 
+          class="p-inputtext-sm rounded-lg"
+        />
+      </div>
+
+      <!-- Expiry Date Datepicker -->
+      <div>
+        <label for="expiryDate" class="block text-sm font-bold text-slate-700 mb-1.5">Expiry Date</label>
+        <p-datepicker 
+          id="expiryDate" 
+          [(ngModel)]="newBag.expiryDate" 
+          placeholder="Select expiration date"
+          [showIcon]="true"
+          class="rounded-lg"
+        ></p-datepicker>
+      </div>
+
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Cancel" 
+      icon="pi pi-times" 
+      styleClass="p-button-text p-button-secondary" 
+      (click)="registerDialog = false"
+    ></p-button>
+    <p-button 
+      label="Register Bag" 
+      icon="pi pi-check" 
+      styleClass="p-button-danger" 
+      [disabled]="isSaving || !newBag.bloodGroup || !newBag.bloodcomponent"
+      (click)="saveBloodBag()"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- =======================================================================
+     DIALOG: SCAN TO DISPATCH / REMOVE BAG
+     ======================================================================= -->
+<p-dialog 
+  [(visible)]="dispatchDialog" 
+  [style]="{ width: '480px' }" 
+  header="RFID Stock Dispatcher" 
+  [modal]="true" 
+  [closable]="true"
+  (onHide)="closeDispatchDialog()"
+>
+  <div class="flex flex-col items-center justify-center p-6 space-y-4">
+    
+    <!-- IF NO BAG SCANNED/LOADED YET -->
+    <ng-container *ngIf="!scannedDispatchBag">
+      <div class="relative flex h-16 w-16 items-center justify-center rounded-full bg-rose-50 text-rose-500">
+        <i class="pi pi-sign-out text-4xl animate-pulse"></i>
+      </div>
+      
+      <div class="text-center">
+        <h3 class="text-lg font-bold text-slate-800">Scan Bag to Dispatch</h3>
+        <p class="text-sm text-slate-500 mt-1">Tap the blood bag's RFID card on the scanner to load its details for dispatch.</p>
+      </div>
+
+      <!-- Active scan indicator box -->
+      <div class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2">
+        <div class="flex items-center gap-2 text-xs font-semibold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-100">
+          <i class="pi pi-spin pi-spinner"></i>
+          Awaiting Scan...
+        </div>
+        <span class="text-xs text-slate-400 font-medium">Place tag on ACR1281U RFID reader</span>
+      </div>
+
+      <!-- Manual UID Input Option -->
+      <div class="w-full pt-2">
+        <div class="text-xs font-bold text-slate-500 mb-1.5 text-left">OR Enter RFID UID Manually:</div>
+        <div class="flex gap-2">
+          <input 
+            pInputText 
+            [(ngModel)]="manualDispatchRfid" 
+            placeholder="Enter RFID UID" 
+            class="p-inputtext-sm rounded-lg flex-1 font-mono text-sm"
+          />
+          <p-button 
+            label="Load Bag" 
+            icon="pi pi-search" 
+            styleClass="p-button-secondary p-button-sm w-28"
+            [disabled]="!manualDispatchRfid"
+            (click)="dispatchManual()"
+          ></p-button>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- IF BAG IS LOADED (CONFIRMATION VIEW) -->
+    <ng-container *ngIf="scannedDispatchBag">
+      <div class="relative flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-500">
+        <i class="pi pi-check-circle text-4xl"></i>
+      </div>
+      
+      <div class="text-center">
+        <h3 class="text-lg font-bold text-slate-800">Verify Bag Details</h3>
+        <p class="text-xs text-slate-500 mt-1">Confirm that this is the correct blood bag you want to dispatch.</p>
+      </div>
+
+      <!-- Detailed Info Card -->
+      <div class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2.5 text-sm">
+        <div class="flex justify-between border-b border-slate-200/60 pb-2">
+          <span class="text-slate-400 font-medium">RFID Tag UID:</span>
+          <span class="font-mono font-bold text-slate-700 bg-slate-200 px-2 py-0.5 rounded text-xs">{{ scannedDispatchBag.bloodBagId }}</span>
+        </div>
+        <div class="flex justify-between border-b border-slate-200/60 pb-2">
+          <span class="text-slate-400 font-medium">Blood Group:</span>
+          <span class="font-extrabold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100 text-xs">{{ scannedDispatchBag.bloodGroup }}</span>
+        </div>
+        <div class="flex justify-between border-b border-slate-200/60 pb-2">
+          <span class="text-slate-400 font-medium">Component Type:</span>
+          <span class="font-semibold text-slate-700">{{ scannedDispatchBag.bloodcomponent }}</span>
+        </div>
+        <div class="flex justify-between border-b border-slate-200/60 pb-2">
+          <span class="text-slate-400 font-medium">Volume:</span>
+          <span class="font-semibold text-slate-600">{{ scannedDispatchBag.volume ? scannedDispatchBag.volume + ' ml' : '--' }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400 font-medium">Expiry Date:</span>
+          <span class="font-medium text-slate-600">{{ scannedDispatchBag.expiryDate | date:'mediumDate' }}</span>
+        </div>
+      </div>
+
+      <div class="flex w-full gap-3 mt-2">
+        <p-button 
+          label="Clear / Rescan" 
+          icon="pi pi-refresh" 
+          styleClass="p-button-outlined p-button-secondary flex-1" 
+          (click)="clearDispatchBag()"
+        ></p-button>
+        <p-button 
+          label="Confirm Dispatch" 
+          icon="pi pi-check" 
+          styleClass="p-button-danger flex-1" 
+          (click)="executeDispatch()"
+        ></p-button>
+      </div>
+    </ng-container>
+
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Close" 
+      icon="pi pi-times" 
+      styleClass="p-button-text p-button-secondary w-full" 
+      (click)="closeDispatchDialog()"
+    ></p-button>
+  </ng-template>
+</p-dialog>

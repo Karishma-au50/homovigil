@@ -114,4 +114,31 @@ export class HemoVigilHttpService {
         return this.http.delete<ApiResponse<any>>(`${this.baseUrl}api/allocation/${allocationId}`);
     }
 
+    public getAllBloodbags(params?: any): Observable<ApiResponse<any>> {
+        let url = `${this.baseUrl}api/bloodbank?page=${params?.page || 1}&limit=${params?.limit || 100}`;
+        if (params?.bloodGroup) url += `&bloodGroup=${encodeURIComponent(params.bloodGroup)}`;
+        if (params?.bloodcomponent) url += `&bloodcomponent=${encodeURIComponent(params.bloodcomponent)}`;
+        return this.http.get<ApiResponse<any>>(url);
+    }
+
+    public getBloodbagStats(): Observable<ApiResponse<any>> {
+        return this.http.get<ApiResponse<any>>(`${this.baseUrl}api/bloodbank/stats`);
+    }
+
+    public getBloodbagByRfid(rfid: string): Observable<ApiResponse<any>> {
+        return this.http.get<ApiResponse<any>>(`${this.baseUrl}api/bloodbank/rfid/${rfid}`);
+    }
+
+    public createBloodbag(bloodbag: any): Observable<ApiResponse<any>> {
+        return this.http.post<ApiResponse<any>>(`${this.baseUrl}api/bloodbank/`, bloodbag);
+    }
+
+    public updateBloodbag(id: string, bloodbag: any): Observable<ApiResponse<any>> {
+        return this.http.put<ApiResponse<any>>(`${this.baseUrl}api/bloodbank/${id}`, bloodbag);
+    }
+
+    public deleteBloodbag(id: string): Observable<ApiResponse<any>> {
+        return this.http.delete<ApiResponse<any>>(`${this.baseUrl}api/bloodbank/${id}`);
+    }
+
 }

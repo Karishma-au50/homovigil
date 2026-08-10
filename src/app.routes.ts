@@ -15,6 +15,8 @@ import { UsersListComponent } from './app/features/users/components/users-list/u
 import { SalesComponent } from './app/features/sales/components/sales.component';
 import { HomeRedirectGuard } from './app/core/auth/guard/home-redirect.guard';
 import { TransfusionListComponent } from './app/features/transfusions/components/transfusion-list/transfusion-list.component';
+import { AuthGuard } from './app/core/auth/guard/auth.guard';
+import { BloodbankComponent } from './app/features/bloodbank/bloodbank.component';
 
 export const appRoutes: Routes = [
     {
@@ -37,33 +39,52 @@ export const appRoutes: Routes = [
             },
             {
                 path: 'allPatient',
-                component:AllPatientComponent
+                component: AllPatientComponent,
+                canActivate: [AuthGuard],
+                data: { allowedRoles: ['admin', 'ward'] }
             },
-              {
+            {
                 path: 'allocateBag',
-                component:AllocateBagComponent
+                component: AllocateBagComponent,
+                canActivate: [AuthGuard],
+                data: { allowedRoles: ['admin', 'ward'] }
             },
             {
-                path:'releaseBag',
-                component:ReleaseBagComponent
+                path: 'releaseBag',
+                component: ReleaseBagComponent,
+                canActivate: [AuthGuard],
+                data: { allowedRoles: ['admin', 'ward'] }
             },
             {
-                path:'allocationHistory',
-                component:AllocateBagHistoryComponent
+                path: 'allocationHistory',
+                component: AllocateBagHistoryComponent,
+                canActivate: [AuthGuard],
+                data: { allowedRoles: ['admin', 'ward'] }
             },
             {
-                path:'users',
-                component:UsersListComponent
+                path: 'users',
+                component: UsersListComponent,
+                canActivate: [AuthGuard],
+                data: { allowedRoles: ['admin'] }
             },
             {
-                path:'sales',
-                component:SalesComponent
+                path: 'sales',
+                component: SalesComponent,
+                canActivate: [AuthGuard],
+                data: { allowedRoles: ['admin', 'ward', 'sales'] }
             },
             {
-                path:'transfusionUpdate',
-                component:TransfusionListComponent
+                path: 'transfusionUpdate',
+                component: TransfusionListComponent,
+                canActivate: [AuthGuard],
+                data: { allowedRoles: ['admin', 'ward'] }
+            },
+            {
+                path: 'bloodbank',
+                component: BloodbankComponent,
+                canActivate: [AuthGuard],
+                data: { allowedRoles: ['admin', 'bloodbank'] }
             }
-
         ]
     },
     { path: 'landing', component: Landing },

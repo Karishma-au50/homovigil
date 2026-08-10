@@ -407,4 +407,113 @@ export class AuthService {
     getAllAllocationsNoPagination() {
         return this.hemoVigilService.getAllAllocationsNoPagination();
     }
+
+    getAllBloodbags(params?: any): Observable<any> {
+        return this.hemoVigilService.getAllBloodbags(params).pipe(
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Load Failed',
+                    detail: error.error?.message || 'Failed to load blood bags.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
+    getBloodbagStats(): Observable<any> {
+        return this.hemoVigilService.getBloodbagStats().pipe(
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Stats Load Failed',
+                    detail: error.error?.message || 'Failed to load statistics.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
+    getBloodbagByRfid(rfid: string): Observable<any> {
+        return this.hemoVigilService.getBloodbagByRfid(rfid).pipe(
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Search Failed',
+                    detail: error.error?.message || 'Blood bag search failed.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
+    createBloodbag(bloodbag: any): Observable<any> {
+        return this.hemoVigilService.createBloodbag(bloodbag).pipe(
+            tap(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Registration Successful',
+                    detail: 'Blood bag registered successfully.',
+                    life: 3000
+                });
+            }),
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Registration Failed',
+                    detail: error.error?.message || 'Failed to register blood bag.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
+    updateBloodbag(id: string, bloodbag: any): Observable<any> {
+        return this.hemoVigilService.updateBloodbag(id, bloodbag).pipe(
+            tap(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Update Successful',
+                    detail: 'Blood bag updated successfully.',
+                    life: 3000
+                });
+            }),
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Update Failed',
+                    detail: error.error?.message || 'Failed to update blood bag.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
+    deleteBloodbag(id: string): Observable<any> {
+        return this.hemoVigilService.deleteBloodbag(id).pipe(
+            tap(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Delete Successful',
+                    detail: 'Blood bag deleted successfully.',
+                    life: 3000
+                });
+            }),
+            catchError((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Delete Failed',
+                    detail: error.error?.message || 'Failed to delete blood bag.',
+                    life: 3000
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
 }

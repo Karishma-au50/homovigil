@@ -24,28 +24,19 @@ export const AuthGuard: CanActivateFn | CanActivateChildFn = (route, state) => {
 
     const allowedRoles = route.data?.['allowedRoles'];
 
-    // If no roles specified, allow access to everyone
+    // If no roles specified, allow access to logged-in users
     if (!allowedRoles || allowedRoles.length === 0) {
         return true;
     }
 
-    // If not allowed → redirect based on role
-    switch (role) {
-        case 'Admin':
-        case 'subAdmin':
-        case 'ward':
-            // Allowed roles, allow access
-            return true;
-        case 'sales':
-            // Allowed roles, allow access
-            return true;
-        case 'customer':
-            router.navigate(['/not-found']);
-            return false;
-        default:
-            router.navigate(['/not-found']);
-            break;
+    const userRole = (role || '').toLowerCase();
+    const allowed = (allowedRoles as string[]).map(r => r.toLowerCase());
+
+    if (allowed.includes(userRole)) {
+        return true;
     }
 
+    // Default redirection if not allowed
+    router.navigate(['/notfound']);
     return false;
 };

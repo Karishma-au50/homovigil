@@ -1,9 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
 import { AuthService } from '../../core/auth/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-menu',
@@ -16,58 +17,74 @@ import { AuthService } from '../../core/auth/auth.service';
         </ng-container>
     </ul> `
 })
-export class AppMenu {
+export class AppMenu implements OnInit, OnDestroy {
     private authService = inject(AuthService);
+    private userSub: Subscription | null = null;
     model: MenuItem[] = [];
 
     ngOnInit() {
-        const userRole = this.authService.currentUser?.role;
-        // console.log(userRole);
+        this.userSub = this.authService.user$.subscribe(user => {
+            const userRole = user?.role;
+            // console.log('AppMenu loaded user role:', userRole);
 
-        const fullMenu = [
-            {
-                label: 'Overview',
-                role: 'Admin',
-                items: [
-                    { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/home'] },
-                    { label: 'User Management', icon: 'pi pi-fw pi-user', routerLink: ['/users'] }
-                ]
-            },
-            {
-                label: 'Patient Management',
-                role: 'Admin',
-                items: [
-                    // { label: 'New Patient Entry', icon: 'pi pi-fw pi-users', routerLink: ['/patient'] },
-                    { label: 'Patient List', icon: 'pi pi-fw pi-users', routerLink: ['/allPatient'] }
-                ]
-            },
-            {
-                label: 'Bag Management',
-                role: 'Admin',
-                items: [
-                    { label: 'Allocate Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocateBag'] },
-                    { label: 'Issue Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/releaseBag'] },
-                    { label: 'Blood Component Management', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocationHistory'] },
-                    { label: 'Transfusion Update', icon: 'pi pi-fw pi-sitemap', routerLink: ['/transfusionUpdate'] }
-                ]
-            },
-            {
-                label: 'Sales Management',
-                role: 'ward', // Custom property for filtering
-                items: [
-                    { label: 'Sales', icon: 'pi pi-fw pi-user', routerLink: ['/sales'] }
-                ]
-            },
-            {
-                label: 'Sales Management',
-                role: 'sales', // Custom property for filtering
-                items: [
-                    { label: 'Sales', icon: 'pi pi-fw pi-user', routerLink: ['/sales'] }
-                ]
-            }
-        ];
+            const fullMenu = [
+                {
+                    label: 'Overview',
+                    role: 'Admin',
+                    items: [
+                        { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/home'] },
+                        { label: 'User Management', icon: 'pi pi-fw pi-user', routerLink: ['/users'] }
+                    ]
+                },
+                {
+                    label: 'Patient Management',
+                    role: 'Admin',
+                    items: [
+                        // { label: 'New Patient Entry', icon: 'pi pi-fw pi-users', routerLink: ['/patient'] },
+                        { label: 'Patient List', icon: 'pi pi-fw pi-users', routerLink: ['/allPatient'] }
+                    ]
+                },
+                {
+                    label: 'Bag Management',
+                    role: 'Admin',
+                    items: [
+                        { label: 'Allocate Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocateBag'] },
+                        { label: 'Issue Bag', icon: 'pi pi-fw pi-sitemap', routerLink: ['/releaseBag'] },
+                        { label: 'Blood Component Management', icon: 'pi pi-fw pi-sitemap', routerLink: ['/allocationHistory'] },
+                        { label: 'Transfusion Update', icon: 'pi pi-fw pi-sitemap', routerLink: ['/transfusionUpdate'] }
+                    ]
+                },
+                {
+                    label: 'Sales Management',
+                    role: 'ward', // Custom property for filtering
+                    items: [
+                        { label: 'Sales', icon: 'pi pi-fw pi-user', routerLink: ['/sales'] }
+                    ]
+                },
+                {
+                    label: 'Sales Management',
+                    role: 'sales', // Custom property for filtering
+                    items: [
+                        { label: 'Sales', icon: 'pi pi-fw pi-user', routerLink: ['/sales'] }
+                    ]
+                },
+                {
+                    label: 'Blood Bank Management',
+                    role: 'bloodbank',
+                    items: [
+                        { label: 'Blood Bank Stock', icon: 'pi pi-fw pi-database', routerLink: ['/bloodbank'] }
+                    ]
+                }
+            ];
 
-        this.model = this.filterMenuByRole(fullMenu, userRole);
+            this.model = this.filterMenuByRole(fullMenu, userRole);
+        });
+    }
+
+    ngOnDestroy() {
+        if (this.userSub) {
+            this.userSub.unsubscribe();
+        }
     }
 
     // Inside AppMenu class
