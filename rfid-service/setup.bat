@@ -1,7 +1,7 @@
 @echo off
 :: =======================================================================
 :: Haemovigil RFID Bridge Service Auto-Installer (Smart Edition)
-:: Installs Drivers, downloads Node (if missing), copies app to a permanent
+:: Downloads Node (if missing), copies app to a permanent
 :: location, configures PM2 startup & auto-recovery.
 :: =======================================================================
 
@@ -88,26 +88,13 @@ goto :Main
     :: The original Downloads/zip folder is no longer needed by the service.
     cd /d "%INSTALL_DIR%"
 
-    :: 3. Find and Install Smart Card Reader Drivers (from the copied driver folder)
+    :: 3. Reader drivers
+    :: RapidRadio RRHFOEM04 USB readers are standard HID devices and use the
+    :: driver built into Windows, so there is nothing to install.
     echo.
-    echo [3/6] Checking driver folder...
-
-    set "DRIVER_PATH="
-    for /r "%INSTALL_DIR%\driver" %%f in (Setup.exe) do (
-        if exist "%%f" (
-            set "DRIVER_PATH=%%f"
-        )
-    )
-
-    if defined DRIVER_PATH (
-        echo [INFO] Found driver installer: "%DRIVER_PATH%"
-        echo [INFO] Installing drivers silently...
-        start /wait "" "%DRIVER_PATH%" /s /v/qn
-        echo [OK] Driver installation completed.
-    ) else (
-        echo [WARN] Could not find 'Setup.exe' inside 'driver\' directory.
-        echo Skipping driver installation. Ensure your ACR1281U-C1 drivers are installed manually.
-    )
+    echo [3/6] Checking reader drivers...
+    echo [OK] RRHFOEM04 USB readers use the built-in Windows HID driver. No install needed.
+    echo      Ethernet readers are configured in config.json (see config.example.json).
 
     :: 4. Install local Node.js dependencies (in the permanent location)
     echo.

@@ -80,7 +80,7 @@ export class BloodbankComponent implements OnInit, OnDestroy {
   isScannerConnected = false;
   rfidStatus: 'checking' | 'connected' | 'offline' | 'outdated' = 'checking';
   runningVersion = '';
-  expectedVersion = '1.1.0';
+  expectedVersion = '2.0.0';
   
   // RFID Mode States
   isScanningForRegister = false;

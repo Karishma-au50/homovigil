@@ -1,0 +1,11 @@
+{
+  "wsPort": 8080,
+  "pollIntervalMs": 250,
+  "removeAfterMissedPolls": 3,
+  "beepOnScan": true,
+  "protocols": ["iso15693", "iso14443a"],
+  "usb": { "enabled": true },
+  "ethernetReaders": [
+    { "host": "192.168.1.200", "port": 9090, "label": "Storage Fridge 1" }
+  ]
+}
